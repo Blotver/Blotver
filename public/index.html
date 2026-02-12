@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clip Player</title>
+    <style>
+        body {
+            background: transparent;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #player {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe id="player"></iframe>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+
+        socket.on("newClip", (url) => {
+            document.getElementById("player").src = url + "&parent=localhost&autoplay=true";
+        });
+    </script>
+</body>
+</html>
