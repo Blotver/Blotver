@@ -7,12 +7,17 @@ const axios = require("axios");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 
 // ========================
-// SERVIDOR WEB PARA OBS
+// SERVIDOR WEB
 // ========================
 
 const app = express();
+
+app.use(express.static("public"));
+
+app.use(express.json());
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -31,7 +36,34 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("✅ Conectado a MongoDB"))
     .catch(err => console.error("❌ Error conectando a MongoDB:", err));
 
-app.use(express.static("public"));
+// ========================
+// CONFIGURACIÓN DEL BOT
+// ========================
+
+const client = new tmi.Client({
+    options: { debug: true },
+    identity: {
+        username: process.env.BOT_USERNAME,
+        password: process.env.OAUTH_CHAT
+    },
+    channels: []
+});
+
+client.connect();
+
+client.on("connected", async () => {
+    console.log("🔄 Buscando usuarios guardados...");
+    const users = await User.find({ botActive: true });
+
+    for (const user of users) {
+        console.log(`👉 Uniéndose a ${user.login}`);
+        await client.join(user.login);
+    }
+
+    console.log("✅ Reconexión automática completa.");
+});
+
+console.log("🤖 Bot iniciado correctamente!");
 
 // ========================
 // AUTH TWITCH
@@ -46,7 +78,10 @@ app.get("/auth/twitch", (req, res) => {
 
 app.get("/auth/twitch/callback", async (req, res) => {
 
+    console.log("QUERY:", req.query);
+
     const code = req.query.code;
+
 
     try {
 
@@ -63,8 +98,6 @@ app.get("/auth/twitch/callback", async (req, res) => {
         const accessToken = tokenRes.data.access_token;
         const refreshToken = tokenRes.data.refresh_token;
 
-
-        // Obtener info del usuario
         const userRes = await axios.get("https://api.twitch.tv/helix/users", {
             headers: {
                 "Client-ID": process.env.TWITCH_CLIENT_ID,
@@ -74,23 +107,25 @@ app.get("/auth/twitch/callback", async (req, res) => {
 
         const user = userRes.data.data[0];
 
-        // Guardar en DB
         await User.findOneAndUpdate(
             { twitchId: user.id },
             {
                 twitchId: user.id,
                 login: user.login,
-                accessToken: accessToken,
-                refreshToken: refreshToken
+                accessToken,
+                refreshToken,
+                botActive: true,
+                profileImageUrl: user.profile_image_url
             },
             { upsert: true, new: true }
         );
 
 
-        // Hacer que el bot se una a su canal
-        await client.join(user.login);
+        if (!client.getChannels().includes(`#${user.login}`)) {
+            await client.join(user.login);
+        }
 
-        // Guardar sesión
+
         req.session.user = {
             id: user.id,
             login: user.login
@@ -99,9 +134,14 @@ app.get("/auth/twitch/callback", async (req, res) => {
         res.redirect("/dashboard");
 
     } catch (err) {
-        console.log(err.response?.data || err.message);
+        console.log("===== ERROR AUTH =====");
+        console.log("status:", err.response?.status);
+        console.log("data:", err.response?.data);
+        console.log("message:", err.message);
+        console.log("======================");
         res.send("❌ Error en autenticación");
     }
+
 });
 
 // ========================
@@ -119,26 +159,9 @@ function isAuthenticated(req, res, next) {
 // RUTAS
 // ========================
 
-app.get("/", (req, res) => {
-    res.send(`<h1>Blotver</h1><a href="/auth/twitch">Login con Twitch</a>`);
+app.get("/overlay", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/overlay.html"));
 });
-
-app.get("/dashboard", isAuthenticated, async (req, res) => {
-
-    const userDB = await User.findOne({ twitchId: req.session.user.id });
-
-    const estadoBot = userDB.botActive ? "🟢 Conectado" : "🔴 Desconectado";
-    const botonTexto = userDB.botActive ? "Desconectar Bot" : "Conectar Bot";
-
-    res.send(`
-        <h1>Panel de ${req.session.user.login}</h1>
-        <p>Estado del bot: ${estadoBot}</p>
-        <a href="/bot/toggle">${botonTexto}</a>
-        <br><br>
-        <a href="/logout">Cerrar sesión</a>
-    `);
-});
-
 
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
@@ -153,59 +176,101 @@ app.get("/bot/toggle", isAuthenticated, async (req, res) => {
     if (!userDB) return res.redirect("/dashboard");
 
     if (userDB.botActive) {
-        // Desactivar bot
+
         await client.part(userDB.login);
         userDB.botActive = false;
-        await userDB.save();
+
         console.log(`⛔ Bot desconectado de ${userDB.login}`);
     } else {
-        // Activar bot
+
         await client.join(userDB.login);
         userDB.botActive = true;
-        await userDB.save();
+
         console.log(`✅ Bot reconectado a ${userDB.login}`);
     }
 
+    await userDB.save();
     res.redirect("/dashboard");
+});
+
+app.get("/api/user", isAuthenticated, async (req, res) => {
+
+    const userDB = await User.findOne({ twitchId: req.session.user.id });
+
+    if (!userDB) {
+        return res.json({ error: "Usuario no encontrado" });
+    }
+
+    res.json({
+        id: userDB.twitchId,
+        login: userDB.login,
+        botActive: userDB.botActive,
+        createdAt: userDB.createdAt,
+        profile_image_url: userDB.profileImageUrl || null
+    });
+
+});
+
+
+app.delete("/api/delete-account", isAuthenticated, async (req, res) => {
+
+    const userDB = await User.findOne({ twitchId: req.session.user.id });
+
+    if (!userDB) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    // Si el bot está activo lo desconectamos primero
+    if (userDB.botActive) {
+        await client.part(userDB.login);
+        console.log(`⛔ Bot desconectado de ${userDB.login} antes de eliminar cuenta`);
+    }
+
+    await User.deleteOne({ twitchId: req.session.user.id });
+
+    req.session.destroy(() => {
+        res.json({ success: true });
+    });
+});
+
+app.post("/api/toggle-bot", isAuthenticated, async (req, res) => {
+
+    const userDB = await User.findOne({ twitchId: req.session.user.id });
+    if (!userDB) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    if (userDB.botActive) {
+        await client.part(userDB.login);
+        userDB.botActive = false;
+        console.log(`⛔ Bot desconectado de ${userDB.login}`);
+    } else {
+        await client.join(userDB.login);
+        userDB.botActive = true;
+        console.log(`✅ Bot reconectado a ${userDB.login}`);
+    }
+
+    await userDB.save();
+
+    res.json({ botActive: userDB.botActive });
+});
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+app.get("/dashboard/profile", isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "profile.html"));
+});
+
+app.get("/dashboard", isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, "public/dashboard.html"));
 });
 
 
 server.listen(3000, () => {
-    console.log("🌐 Overlay iniciado en: http://localhost:3000");
+    console.log("🌐 Servidor iniciado en: http://localhost:3000");
 });
-
-// ========================
-// CONFIGURACIÓN DEL BOT
-// ========================
-
-const client = new tmi.Client({
-    options: { debug: true },
-    identity: {
-        username: process.env.BOT_USERNAME,
-        password: process.env.OAUTH_CHAT
-    },
-    channels: []
-});
-
-
-
-
-client.connect();
-
-client.on("connected", async () => {
-    console.log("🔄 Buscando usuarios guardados...");
-
-    const users = await User.find({ botActive: true });
-
-    for (const user of users) {
-        console.log(`👉 Uniéndose a ${user.login}`);
-        await client.join(user.login);
-    }
-
-    console.log("✅ Reconexión automática completa.");
-});
-
-console.log("🤖 Bot iniciado correctamente!");
 
 // ========================
 // FUNCIONES TWITCH API
@@ -224,7 +289,7 @@ async function twitchAPI(url, userDB) {
 
     } catch (error) {
 
-        // Si el token venció
+
         if (error.response && error.response.status === 401) {
 
             console.log(`⚠️ Token vencido para ${userDB.login}, refrescando...`);
@@ -233,8 +298,9 @@ async function twitchAPI(url, userDB) {
 
             if (!newAccessToken) return null;
 
-            // Reintentar con nuevo token
+            
             return await axios.get(url, {
+
                 headers: {
                     "Client-ID": process.env.TWITCH_CLIENT_ID,
                     "Authorization": `Bearer ${newAccessToken}`
@@ -246,8 +312,8 @@ async function twitchAPI(url, userDB) {
     }
 }
 
-
 async function refreshAccessToken(userDB) {
+
     try {
 
         const response = await axios.post("https://id.twitch.tv/oauth2/token", null, {
@@ -259,17 +325,12 @@ async function refreshAccessToken(userDB) {
             }
         });
 
-        const newAccessToken = response.data.access_token;
-        const newRefreshToken = response.data.refresh_token;
-
-        userDB.accessToken = newAccessToken;
-        userDB.refreshToken = newRefreshToken;
-
+        userDB.accessToken = response.data.access_token;
+        userDB.refreshToken = response.data.refresh_token;
         await userDB.save();
 
         console.log(`🔄 Token refrescado para ${userDB.login}`);
-
-        return newAccessToken;
+        return response.data.access_token;
 
     } catch (error) {
         console.log("❌ Error refrescando token:");
@@ -278,19 +339,19 @@ async function refreshAccessToken(userDB) {
     }
 }
 
-
 async function getUserId(username, userDB) {
+
     const res = await twitchAPI(
         `https://api.twitch.tv/helix/users?login=${username}`,
         userDB
     );
 
     if (!res || res.data.data.length === 0) return null;
-
     return res.data.data[0].id;
 }
 
 async function getRandomClip(userId, userDB) {
+
     const res = await twitchAPI(
         `https://api.twitch.tv/helix/clips?broadcaster_id=${userId}`,
         userDB
@@ -299,21 +360,6 @@ async function getRandomClip(userId, userDB) {
     if (!res) return null;
 
     const clips = res.data.data;
-
-    if (!clips || clips.length === 0) return null;
-
-    return clips[Math.floor(Math.random() * clips.length)];
-}
-
-
-async function getRandomClip(userId, accessToken) {
-    const res = await twitchAPI(
-        `https://api.twitch.tv/helix/clips?broadcaster_id=${userId}`,
-        accessToken
-    );
-
-    const clips = res.data.data;
-
     if (!clips || clips.length === 0) return null;
 
     return clips[Math.floor(Math.random() * clips.length)];
@@ -347,14 +393,11 @@ client.on("message", async (channel, tags, message, self) => {
 
         try {
 
-            // 🔥 Buscar dueño del canal actual
-            const channelName = channel.replace("#", "");
-            const userDB = await User.findOne({ login: channelName });
 
-            if (!userDB) {
-                console.log("⚠️ Usuario no encontrado en DB.");
-                return;
-            }
+            const channelName = channel.replace("#", "");
+
+            const userDB = await User.findOne({ login: channelName });
+            if (!userDB) return;
 
             const userId = await getUserId(usuario, userDB);
 
@@ -371,14 +414,15 @@ client.on("message", async (channel, tags, message, self) => {
                 return;
             }
 
-            // Enviar al chat
+
             client.say(channel, `🎬 Clip de ${usuario}: ${clip.url}`);
 
-            // Enviar al overlay OBS
+
             io.emit("newClip", clip.embed_url);
 
+
         } catch (error) {
-            console.log("❌ Error obteniendo clip:");
+            console.log(" Error obteniendo clip:");
             console.log(error.response?.data || error.message);
         }
 

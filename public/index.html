@@ -1,32 +1,131 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Clip Player</title>
-    <style>
-        body {
-            background: transparent;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        #player {
-            width: 100vw;
-            height: 100vh;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <title>Blotver — Widgets para Streamers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/styles.css" rel="stylesheet">
 </head>
 
-<body>
-    <iframe id="player"></iframe>
+<body class="bg-gray-950 text-white scroll-smooth">
 
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- NAVBAR -->
+    <header class="fixed w-full top-0 z-50 backdrop-blur-md bg-gray-950/70 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-purple-500">Blotver</h1>
 
-    <script>
-        const socket = io();
+            <nav class="hidden md:flex gap-8 text-gray-300 text-sm">
+                <a href="#features" class="hover:text-white transition">Features</a>
+                <a href="#about" class="hover:text-white transition">About</a>
+                <a href="#cta" class="hover:text-white transition">Get Started</a>
+            </nav>
 
-        socket.on("newClip", (url) => {
-            document.getElementById("player").src = url + "&parent=localhost&autoplay=true";
-        });
-    </script>
+            <a href="/auth/twitch"
+               class="bg-purple-600 hover:bg-purple-700 transition px-5 py-2 rounded-lg text-sm font-semibold">
+                Get Started
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="min-h-screen flex items-center justify-center text-center px-6 pt-32 relative overflow-hidden">
+
+        <!-- background glow -->
+        <div class="absolute w-[600px] h-[600px] bg-purple-600/20 blur-[160px] rounded-full top-[-200px]"></div>
+
+        <div class="max-w-3xl relative z-10">
+
+            <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6">
+                Automatiza tu stream
+                <span class="text-purple-500">como un pro</span>
+            </h2>
+
+            <p class="text-gray-400 text-lg mb-10">
+                Shoutouts automáticos, clips aleatorios y widgets dinámicos
+                diseñados para mejorar tu experiencia en Twitch.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/auth/twitch"
+                   class="bg-purple-600 hover:bg-purple-700 transition px-8 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-purple-600/20">
+                    Get Started
+                </a>
+
+                <a href="#features"
+                   class="border border-gray-700 hover:border-gray-500 transition px-8 py-4 rounded-xl text-lg">
+                    Ver características
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="py-24 px-6 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+
+            <h3 class="text-3xl font-bold mb-16">Todo lo que tu stream necesita</h3>
+
+            <div class="grid md:grid-cols-3 gap-10">
+
+                <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl hover:border-purple-600 transition">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-400">
+                        Shoutouts Automáticos
+                    </h4>
+                    <p class="text-gray-400">
+                        Detecta nuevos seguidores y lanza clips o mensajes
+                        personalizados sin intervención manual.
+                    </p>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl hover:border-purple-600 transition">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-400">
+                        Clips Aleatorios
+                    </h4>
+                    <p class="text-gray-400">
+                        Reproduce momentos destacados automáticamente
+                        cuando el chat lo solicite.
+                    </p>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl hover:border-purple-600 transition">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-400">
+                        Widgets Dinámicos
+                    </h4>
+                    <p class="text-gray-400">
+                        Overlays modernos y personalizables diseñados
+                        para integrarse perfecto con OBS.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section id="cta" class="py-24 px-6 border-t border-gray-800 text-center relative overflow-hidden">
+
+        <div class="absolute w-[500px] h-[500px] bg-purple-600/20 blur-[150px] rounded-full bottom-[-200px] right-[-100px]"></div>
+
+        <div class="relative z-10">
+            <h3 class="text-4xl font-bold mb-6">
+                ¿Listo para mejorar tu stream?
+            </h3>
+
+            <p class="text-gray-400 mb-10">
+                Conecta tu cuenta de Twitch en segundos y empieza a automatizar.
+            </p>
+
+            <a href="/auth/twitch"
+               class="bg-purple-600 hover:bg-purple-700 transition px-10 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-purple-600/20">
+                Conectar con Twitch
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-800 py-8 text-center text-gray-500 text-sm">
+        © 2026 Blotver. Built for streamers.
+    </footer>
+
 </body>
 </html>
