@@ -1,19 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Blotver</title>
-    <link href="/styles.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Overlay</title>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        #clip {
+            position: absolute;
+            width: 600px;
+            height: 340px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            object-fit: cover;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-    <div class="text-center space-y-6">
-        <h1 class="text-4xl font-bold text-purple-400">Blotver</h1>
+<body>
 
-        <a href="/auth/twitch"
-           class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-semibold">
-           Login con Twitch
-        </a>
+    <div id="clip">
+        <iframe id="clipFrame" width="600" height="340" frameborder="0" allowfullscreen>
+        </iframe>
     </div>
 
+    <script>
+        const projectId = window.location.pathname.split("/").pop();
+        const socket = io();
+        const clipDiv = document.getElementById("clip");
+        const iframe = document.getElementById("clipFrame");
+
+        let queue = [];
+        let playing = false;
+
+        socket.emit("joinProject", projectId);
+
+        socket.on("newClip", (data) => {
+            queue.push(data);
+            playNext();
+        });
+
+        function playNext() {
+            if (playing || queue.length === 0) return;
+
+            playing = true;
+            const data = queue.shift();
+
+            console.log("VIDEO URL:", data.videoUrl);
+
+            // Convertimos clip URL a embed
+            const clipId = data.videoUrl.split("/clip/")[1];
+
+            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=localhost&autoplay=true`;
+
+            clipDiv.style.display = "block";
+
+            setTimeout(resetPlayer, data.duration * 1000 || 15000);
+        }
+
+        function resetPlayer() {
+            iframe.src = "";
+            clipDiv.style.display = "none";
+            playing = false;
+            playNext();
+        }
+    </script>
+
 </body>
+
 </html>

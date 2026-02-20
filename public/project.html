@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blotver Dashboard</title>
+    <title>Blotver Projects</title>
     <link href="/styles.css" rel="stylesheet">
-
     <style>
         /* ============================= */
         /* SIDEBAR GLASS + PREMIUM STYLE */
@@ -123,10 +122,7 @@
 <body class="bg-gray-950 text-white min-h-screen flex">
 
     <!-- SIDEBAR -->
-
-
-
-    <aside class="sidebar-glass w-64 p-6 flex flex-col justify-between">
+    <aside class="w-64 bg-white/5 backdrop-blur-md border-r border-white/10 p-6 flex flex-col justify-between">
 
         <div>
             <h1
@@ -163,30 +159,39 @@
     <!-- MAIN -->
     <main class="flex-1 p-10">
 
+        <!-- TOP BAR -->
         <div class="flex justify-between items-center mb-10">
 
-            <h2 class="text-3xl font-bold">Dashboard</h2>
+            <div>
+                <h2 class="text-3xl font-bold">My Projects</h2>
+                <p class="text-gray-400 mt-2">
+                    Create and manage your overlays & widgets.
+                </p>
+            </div>
 
             <div class="flex items-center gap-6">
 
+                <!-- New Project -->
+                <button id="newProjectBtn"
+                    class="bg-purple-600 hover:bg-purple-700 transition px-6 py-3 rounded-xl font-semibold shadow-lg shadow-purple-600/20">
+                    New Project
+                </button>
+
+                <!-- User Menu -->
                 <div class="relative">
                     <button id="userMenuButton"
                         class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-full hover:bg-gray-800 transition">
 
                         <img id="userAvatar" src="/default-avatar.png" class="w-8 h-8 rounded-full object-cover">
-
                     </button>
 
+                    <!-- Dropdown -->
                     <div id="userDropdown"
                         class="opacity-0 scale-95 pointer-events-none transition duration-200 absolute right-0 mt-3 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
 
                         <a href="/dashboard/profile" class="block px-4 py-3 hover:bg-purple-600/20 transition">
                             Configuración
                         </a>
-
-                        <button class="w-full text-left px-4 py-3 hover:bg-purple-600/20 transition">
-                            Idiomas
-                        </button>
 
                         <button id="logoutBtn"
                             class="w-full text-left px-4 py-3 text-red-400 hover:bg-red-600/20 transition">
@@ -199,23 +204,9 @@
             </div>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6">
-
-            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
-                <p class="text-gray-400 text-sm">Users</p>
-                <h3 class="text-3xl font-bold mt-2">1,245</h3>
-            </div>
-
-            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
-                <p class="text-gray-400 text-sm">Revenue</p>
-                <h3 class="text-3xl font-bold mt-2">$8,420</h3>
-            </div>
-
-            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
-                <p class="text-gray-400 text-sm">Projects</p>
-                <h3 id="projectsCount" class="text-3xl font-bold mt-2">0</h3>
-            </div>
-
+        <!-- PROJECTS GRID -->
+        <div id="projectsContainer" class="grid md:grid-cols-3 gap-8">
+            <!-- dinámico -->
         </div>
 
     </main>
@@ -265,6 +256,10 @@
             });
         });
 
+        // ======================
+        // CARGAR USUARIO
+        // ======================
+
         async function loadUser() {
             try {
                 const res = await fetch("/api/user");
@@ -274,12 +269,18 @@
                 if (data.profile_image_url) {
                     document.getElementById("userAvatar").src = data.profile_image_url;
                 }
+
             } catch (err) {
                 console.error("Error loading user:", err);
             }
         }
 
         loadUser();
+
+
+        // ======================
+        // DROPDOWN
+        // ======================
 
         const button = document.getElementById("userMenuButton");
         const dropdown = document.getElementById("userDropdown");
@@ -296,24 +297,105 @@
             }
         });
 
-        document.getElementById("logoutBtn").addEventListener("click", async () => {
-            await fetch("/api/logout", { method: "POST" });
-            window.location.href = "/";
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            window.location.href = "/logout";
         });
 
-        async function loadProjectsCount() {
-            try {
-                const res = await fetch("/api/projects");
-                if (!res.ok) return;
 
+        // ======================
+        // CARGAR PROJECTS
+        // ======================
+
+        async function loadProjects() {
+            try {
+
+                const res = await fetch("/api/projects");
                 const projects = await res.json();
-                document.getElementById("projectsCount").textContent = projects.length;
+
+                const container = document.getElementById("projectsContainer");
+                container.innerHTML = "";
+
+                if (projects.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-3 bg-gray-900 border border-gray-800 p-12 rounded-2xl text-center">
+                            <h3 class="text-lg font-semibold mb-3">
+                                You don’t have any projects yet
+                            </h3>
+                            <p class="text-gray-500">
+                                Click "New Project" to create your first overlay system.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                projects.forEach(project => {
+                    container.innerHTML += `
+                        <div onclick="openProject('${project._id}')"
+                            class="bg-gray-900 border border-gray-800 p-6 rounded-2xl hover:border-purple-600 hover:scale-105 transition cursor-pointer">
+
+                            <h3 class="text-lg font-semibold">${project.name}</h3>
+
+                            <p class="text-gray-500 text-sm mt-2">
+                                Created ${new Date(project.createdAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                    `;
+                });
+
             } catch (err) {
                 console.error("Error loading projects:", err);
             }
         }
 
-        loadProjectsCount();
+        loadProjects();
+
+
+        // ======================
+        // CREAR PROJECT
+        // ======================
+
+        document.getElementById("newProjectBtn").addEventListener("click", async () => {
+
+            const name = prompt("Project name:");
+            if (!name) return;
+
+            const type = prompt("Type:\n1 = Blank Project\n2 = ShoutOut Widget");
+
+            const res = await fetch("/api/projects", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name })
+            });
+
+            const project = await res.json();
+
+            // Si elige shoutout, creamos widget automático
+            if (type === "2") {
+
+                await fetch("/api/widgets", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        projectId: project._id,
+                        name: "ShoutOut Widget",
+                        type: "shoutout"
+                    })
+                });
+
+            }
+
+            window.location.href = `/dashboard/project/${project._id}`;
+        });
+
+        // ======================
+        // ABRIR PROJECT
+        // ======================
+
+        function openProject(id) {
+            window.location.href = `/dashboard/project/${id}`;
+        }
+
     </script>
 
 </body>

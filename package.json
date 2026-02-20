@@ -18,6 +18,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mongoose": "^9.2.1",
+    "node-fetch": "^3.3.2",
     "socket.io": "^4.8.3",
     "tmi.js": "^1.8.5"
   },

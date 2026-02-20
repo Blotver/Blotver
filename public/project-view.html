@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Project Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-950 text-white min-h-screen flex">
+
+    <aside class="w-72 bg-gray-900 border-r border-gray-800 p-6">
+        <h2 class="text-xl font-bold mb-6">Widgets</h2>
+
+        <button id="newWidgetBtn" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl mb-6">
+            + New Widget
+        </button>
+
+        <div id="widgetsList" class="flex flex-col gap-3"></div>
+    </aside>
+
+    <main class="flex-1 bg-gray-300 overflow-hidden">
+        <div class="bg-gray-900 p-4 border-b border-gray-800 flex justify-between items-center">
+            <span class="text-sm text-gray-400">
+                Overlay URL:
+            </span>
+
+            <input id="overlayLink" class="bg-gray-800 text-sm px-3 py-2 rounded w-[400px]" readonly>
+        </div>
+        <div id="canvas" class="relative w-full h-full bg-white overflow-hidden" style="
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 20px 20px;
+        ">
+        </div>
+
+    </main>
+
+
+    <script>
+        const projectId = window.location.pathname.split("/").pop();
+
+        document.getElementById("overlayLink").value =
+            window.location.origin + "/overlay/" + projectId;
+        let widgets = [];
+
+        async function loadWidgets() {
+            const res = await fetch(`/api/widgets/${projectId}`);
+            widgets = await res.json();
+
+            const list = document.getElementById("widgetsList");
+            const canvas = document.getElementById("canvas");
+
+            list.innerHTML = "";
+            canvas.innerHTML = "";
+
+            widgets.forEach(widget => {
+
+                // Sidebar list
+                list.innerHTML += `
+                    <div class="bg-gray-800 p-3 rounded-lg">
+                        ${widget.name}
+                    </div>
+                `;
+
+                // Canvas element
+                const el = document.createElement("div");
+                if (widget.type === "text") {
+                    el.innerText = widget.data.text || "Sample Text";
+                }
+
+                if (widget.type === "shoutout") {
+                    el.innerText = "🎬 ShoutOut Widget";
+                    el.style.border = "2px solid purple";
+                }
+
+                el.className = "absolute cursor-move select-none";
+                el.style.left = (widget.data.x || 100) + "px";
+                el.style.top = (widget.data.y || 100) + "px";
+                el.style.color = widget.data.color ?? "#000000";
+                el.style.fontSize = (widget.data.fontSize || 32) + "px";
+
+                enableDrag(el, widget);
+
+                canvas.appendChild(el);
+            });
+        }
+
+        function enableDrag(element, widget) {
+
+            let offsetX, offsetY, isDragging = false;
+
+            element.addEventListener("mousedown", (e) => {
+                isDragging = true;
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+
+                const canvasRect = document.getElementById("canvas").getBoundingClientRect();
+
+                let x = e.clientX - canvasRect.left - offsetX;
+                let y = e.clientY - canvasRect.top - offsetY;
+
+                element.style.left = x + "px";
+                element.style.top = y + "px";
+            });
+
+            document.addEventListener("mouseup", async (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+
+                const x = parseInt(element.style.left);
+                const y = parseInt(element.style.top);
+
+                await fetch(`/api/widgets/${widget._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        data: {
+                            ...widget.data,
+                            x,
+                            y
+                        }
+                    })
+                });
+            });
+        }
+
+        document.getElementById("newWidgetBtn")
+            .addEventListener("click", async () => {
+
+                await fetch("/api/widgets", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ projectId })
+                });
+
+                loadWidgets();
+            });
+
+        loadWidgets();
+    </script>
+
+</body>
+
+</html>

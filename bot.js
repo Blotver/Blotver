@@ -2,9 +2,10 @@ require("dotenv").config();
 const session = require("express-session");
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const Project = require("./models/Project");
 const tmi = require("tmi.js");
-const axios = require("axios");
 const express = require("express");
+const axios = require("axios");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
@@ -14,9 +15,36 @@ const path = require("path");
 // ========================
 
 const app = express();
+console.log("🔥 Servidor cargado correctamente");
+app.get("/api/clip-proxy", async (req, res) => {
+    try {
+        console.log("🎬 Entró al proxy");
+
+        const videoUrl = req.query.url;
+        if (!videoUrl) {
+            return res.status(400).send("Falta url");
+        }
+
+        const response = await axios({
+            method: "GET",
+            url: videoUrl,
+            responseType: "stream",
+            headers: {
+                "User-Agent": "Mozilla/5.0",
+                Range: req.headers.range || ""
+            }
+        });
+
+        res.setHeader("Content-Type", "video/mp4");
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.log("❌ Error en proxy:", error.message);
+        res.sendStatus(500);
+    }
+});
 
 app.use(express.static("public"));
-
 app.use(express.json());
 
 app.use(session({
@@ -25,16 +53,26 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false // En producción poner true + trust proxy
+        secure: false
     }
 }));
 
 const server = http.createServer(app);
 const io = new Server(server);
 
+io.on("connection", (socket) => {
+
+    socket.on("joinProject", (projectId) => {
+        socket.join(projectId);
+        console.log("Overlay conectado al proyecto:", projectId);
+    });
+
+});
+
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("✅ Conectado a MongoDB"))
     .catch(err => console.error("❌ Error conectando a MongoDB:", err));
+
 
 // ========================
 // CONFIGURACIÓN DEL BOT
@@ -51,16 +89,51 @@ const client = new tmi.Client({
 
 client.connect();
 
-client.on("connected", async () => {
-    console.log("🔄 Buscando usuarios guardados...");
-    const users = await User.find({ botActive: true });
+client.on("disconnected", (reason) => {
+    console.log("❌ Bot desconectado:", reason);
+});
 
-    for (const user of users) {
-        console.log(`👉 Uniéndose a ${user.login}`);
-        await client.join(user.login);
+client.on("reconnect", () => {
+    console.log("🔁 Reintentando conexión...");
+});
+
+let syncing = false;
+
+async function syncChannels() {
+    if (syncing) return;
+    syncing = true;
+
+    try {
+        console.log("🔄 Sincronizando canales con base de datos...");
+
+        const activeUsers = await User.find({ botActive: true });
+        const activeChannels = activeUsers.map(u => `#${u.login}`);
+        const currentChannels = client.getChannels();
+
+        for (const channel of activeChannels) {
+            if (!currentChannels.includes(channel)) {
+                console.log(`👉 Uniéndose a ${channel}`);
+                await client.join(channel);
+            }
+        }
+
+        for (const channel of currentChannels) {
+            if (!activeChannels.includes(channel)) {
+                console.log(`👋 Saliendo de ${channel}`);
+                await client.part(channel);
+            }
+        }
+
+        console.log("✅ Sincronización completa.");
+    } finally {
+        syncing = false;
     }
+}
 
-    console.log("✅ Reconexión automática completa.");
+client.on("connected", async () => {
+    setTimeout(async () => {
+        await syncChannels();
+    }, 1000);
 });
 
 console.log("🤖 Bot iniciado correctamente!");
@@ -70,18 +143,13 @@ console.log("🤖 Bot iniciado correctamente!");
 // ========================
 
 app.get("/auth/twitch", (req, res) => {
-
     const redirect = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=chat:read+chat:edit+user:read:email+channel:read:subscriptions`;
-
     res.redirect(redirect);
 });
 
 app.get("/auth/twitch/callback", async (req, res) => {
 
-    console.log("QUERY:", req.query);
-
     const code = req.query.code;
-
 
     try {
 
@@ -120,12 +188,6 @@ app.get("/auth/twitch/callback", async (req, res) => {
             { upsert: true, new: true }
         );
 
-
-        if (!client.getChannels().includes(`#${user.login}`)) {
-            await client.join(user.login);
-        }
-
-
         req.session.user = {
             id: user.id,
             login: user.login
@@ -135,13 +197,83 @@ app.get("/auth/twitch/callback", async (req, res) => {
 
     } catch (err) {
         console.log("===== ERROR AUTH =====");
-        console.log("status:", err.response?.status);
-        console.log("data:", err.response?.data);
-        console.log("message:", err.message);
-        console.log("======================");
+        console.log(err.response?.data || err.message);
         res.send("❌ Error en autenticación");
     }
+});
 
+const Widget = require("./models/Widget");
+
+// Crear widget
+app.post("/api/widgets", isAuthenticated, async (req, res) => {
+
+    const project = await Project.findOne({
+        _id: req.body.projectId,
+        userId: req.session.user.id
+    });
+
+    if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+    }
+
+    const widgetType = req.body.type || "text";
+
+    let defaultData = {
+        x: 100,
+        y: 100
+    };
+
+    if (widgetType === "text") {
+        defaultData = {
+            ...defaultData,
+            text: "Sample Text",
+            color: "#000000",
+            fontSize: 32
+        };
+    }
+
+    if (widgetType === "shoutout") {
+        defaultData = {
+            ...defaultData,
+            command: "!so",
+            textTemplate: "Sigan a {user}",
+            color: "#ffffff",
+            fontSize: 40,
+            duration: 10000
+        };
+    }
+
+    const widget = await Widget.create({
+        projectId: project._id,
+        userId: req.session.user.id,
+        name: req.body.name || "New Widget",
+        type: widgetType,
+        data: defaultData
+    });
+
+    res.json(widget);
+});
+
+
+// Obtener widgets de un project
+app.get("/api/widgets/:projectId", isAuthenticated, async (req, res) => {
+    const widgets = await Widget.find({
+        projectId: req.params.projectId,
+        userId: req.session.user.id
+    });
+
+    res.json(widgets);
+});
+
+// Actualizar widget
+app.put("/api/widgets/:id", isAuthenticated, async (req, res) => {
+    const widget = await Widget.findOneAndUpdate(
+        { _id: req.params.id, userId: req.session.user.id },
+        { data: req.body.data },
+        { new: true }
+    );
+
+    res.json(widget);
 });
 
 // ========================
@@ -156,41 +288,22 @@ function isAuthenticated(req, res, next) {
 }
 
 // ========================
-// RUTAS
+// RUTAS API PROJECTS
 // ========================
 
-app.get("/overlay", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/overlay.html"));
-});
+app.post("/api/projects", isAuthenticated, async (req, res) => {
+    try {
+        const project = await Project.create({
+            userId: req.session.user.id,
+            name: req.body.name || "New Project"
+        });
 
-app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/");
-    });
-});
+        res.json(project);
 
-app.get("/bot/toggle", isAuthenticated, async (req, res) => {
-
-    const userDB = await User.findOne({ twitchId: req.session.user.id });
-
-    if (!userDB) return res.redirect("/dashboard");
-
-    if (userDB.botActive) {
-
-        await client.part(userDB.login);
-        userDB.botActive = false;
-
-        console.log(`⛔ Bot desconectado de ${userDB.login}`);
-    } else {
-
-        await client.join(userDB.login);
-        userDB.botActive = true;
-
-        console.log(`✅ Bot reconectado a ${userDB.login}`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error creating project" });
     }
-
-    await userDB.save();
-    res.redirect("/dashboard");
 });
 
 app.get("/api/user", isAuthenticated, async (req, res) => {
@@ -208,69 +321,96 @@ app.get("/api/user", isAuthenticated, async (req, res) => {
         createdAt: userDB.createdAt,
         profile_image_url: userDB.profileImageUrl || null
     });
-
 });
 
+app.get("/api/projects", isAuthenticated, async (req, res) => {
+    try {
+        const projects = await Project.find({
+            userId: req.session.user.id
+        });
 
-app.delete("/api/delete-account", isAuthenticated, async (req, res) => {
+        res.json(projects);
 
-    const userDB = await User.findOne({ twitchId: req.session.user.id });
-
-    if (!userDB) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching projects" });
     }
+});
 
-    // Si el bot está activo lo desconectamos primero
-    if (userDB.botActive) {
-        await client.part(userDB.login);
-        console.log(`⛔ Bot desconectado de ${userDB.login} antes de eliminar cuenta`);
-    }
+// ========================
+// OTRAS RUTAS
+// ========================
 
-    await User.deleteOne({ twitchId: req.session.user.id });
+app.get("/overlay/:projectId", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/overlay.html"));
+});
 
+app.get("/logout", (req, res) => {
     req.session.destroy(() => {
-        res.json({ success: true });
+        res.redirect("/");
     });
 });
 
-app.post("/api/toggle-bot", isAuthenticated, async (req, res) => {
-
-    const userDB = await User.findOne({ twitchId: req.session.user.id });
-    if (!userDB) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    if (userDB.botActive) {
-        await client.part(userDB.login);
-        userDB.botActive = false;
-        console.log(`⛔ Bot desconectado de ${userDB.login}`);
-    } else {
-        await client.join(userDB.login);
-        userDB.botActive = true;
-        console.log(`✅ Bot reconectado a ${userDB.login}`);
-    }
-
-    await userDB.save();
-
-    res.json({ botActive: userDB.botActive });
-});
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/index.html"));
+app.get("/dashboard/project", isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, "public/project.html"));
 });
 
 app.get("/dashboard/profile", isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "profile.html"));
+    res.sendFile(path.join(__dirname, "public/profile.html"));
 });
 
 app.get("/dashboard", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public/dashboard.html"));
 });
 
+app.get("/dashboard/project/:id", isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, "public/project-view.html"));
+});
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+// ========================
+// DELETE ACCOUNT (ahora borra también proyectos)
+// ========================
+
+app.delete("/api/delete-account", isAuthenticated, async (req, res) => {
+
+    await Widget.deleteMany({ userId: req.session.user.id });
+    await Project.deleteMany({ userId: req.session.user.id });
+    await User.deleteOne({ twitchId: req.session.user.id });
+
+    await syncChannels();
+
+    req.session.destroy(() => {
+        res.json({ success: true });
+    });
+});
+app.post("/api/toggle-bot", isAuthenticated, async (req, res) => {
+
+    const userDB = await User.findOne({ twitchId: req.session.user.id });
+
+    if (!userDB) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    userDB.botActive = !userDB.botActive;
+    await userDB.save();
+
+    await syncChannels();
+
+    res.json({ botActive: userDB.botActive });
+});
+
+// ========================
+// SERVIDOR
+// ========================
 
 server.listen(3000, () => {
     console.log("🌐 Servidor iniciado en: http://localhost:3000");
 });
+
 
 // ========================
 // FUNCIONES TWITCH API
@@ -298,7 +438,7 @@ async function twitchAPI(url, userDB) {
 
             if (!newAccessToken) return null;
 
-            
+
             return await axios.get(url, {
 
                 headers: {
@@ -418,7 +558,18 @@ client.on("message", async (channel, tags, message, self) => {
             client.say(channel, `🎬 Clip de ${usuario}: ${clip.url}`);
 
 
-            io.emit("newClip", clip.embed_url);
+            // Buscar proyectos del dueño del canal
+            const projects = await Project.find({ userId: userDB.twitchId });
+
+            for (const project of projects) {
+
+                console.log("Clip URL real:", clip.url);
+
+                io.to(project._id.toString()).emit("newClip", {
+                    videoUrl: clip.url,
+                    duration: clip.duration
+                });
+            }
 
 
         } catch (error) {
