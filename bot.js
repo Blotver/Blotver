@@ -567,12 +567,13 @@ client.on("message", async (channel, tags, message, self) => {
             // take the thumbnail URL and strip off the "-preview-<WxH>.jpg" suffix.
             // regex is more permissive so if they ever change the size we still
             // catch it. another safe alternative is `clip.thumbnail_url.split("-preview-")[0] + ".mp4"`.
-            const mp4Url = clip.thumbnail_url
-    .replace(/\/preview-\d+x\d+\.jpg$/, ".mp4");
+            const mp4Url = `https://clips-media-assets2.twitch.tv/${clip.id}.mp4`;
+
+            console.log("MP4 generado:", mp4Url);
 
             // optional sanity check: ping the url with a HEAD request so we fail early
             try {
-                await axios.head(mp4Url, { headers: { "User-Agent": "Mozilla/5.0" }});
+                await axios.head(mp4Url, { headers: { "User-Agent": "Mozilla/5.0" } });
             } catch (err) {
                 console.warn("⚠️ generated mp4Url is unreachable:", mp4Url, err.message);
             }
