@@ -91,9 +91,15 @@ const client = new tmi.Client({
 
 client.connect();
 
+client.on("connected", (addr, port) => {
+    console.log("✅ Bot conectado a Twitch en", addr, port);
+    console.log("📡 Canales actuales:", client.getChannels());
+});
+
 client.on("disconnected", (reason) => {
     console.log("❌ Bot desconectado:", reason);
 });
+
 
 client.on("reconnect", () => {
     console.log("🔁 Reintentando conexión...");
@@ -559,7 +565,23 @@ client.on("message", async (channel, tags, message, self) => {
             }
 
 
-            client.say(channel, `🎬 Clip de ${usuario}: ${clip.url}`);
+            // Obtener info del canal para saber qué está jugando
+            const userInfoRes = await twitchAPI(
+                `https://api.twitch.tv/helix/channels?broadcaster_id=${userId}`,
+                userDB
+            );
+
+            let gameName = "algo increíble";
+            if (userInfoRes && userInfoRes.data.data.length > 0) {
+                gameName = userInfoRes.data.data[0].game_name || "algo increíble";
+            }
+
+            const mensaje = `🚀 Shoutout para @${usuario} 🔥
+Actualmente jugando ${gameName} 🎮
+Miren el clip en pantalla y denle follow 💜`;
+
+            client.say(channel, mensaje);
+
             // Buscar proyectos del dueño del canal
             const projects = await Project.find({ userId: userDB.twitchId });
 
