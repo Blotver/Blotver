@@ -13,13 +13,15 @@
             overflow: hidden;
         }
 
-        #clip {
+        /* container for the clip video – give it a fixed size or make it fill the screen */
+        #clipContainer {
             position: absolute;
-            width: 600px;
-            height: 340px;
-            border-radius: 16px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* let clicks pass through if you stack other UI */
             overflow: hidden;
-            display: none;
         }
 
         video {
@@ -43,14 +45,20 @@ let playing = false;
 
 socket.emit("joinProject", projectId);
 
+console.log("overlay connected, projectId=", projectId);
+
+socket.on("connect", () => console.log("socket.io connected", socket.id));
+
 socket.on("newClip", (data) => {
+
+    console.log("received newClip event", data);
 
     if (playing) return;
 
     playing = true;
 
     container.innerHTML = `
-        <video id="clipVideo" autoplay>
+        <video id="clipVideo" autoplay playsinline>
             <source src="/api/clip-proxy?url=${encodeURIComponent(data.videoUrl)}" type="video/mp4">
         </video>
     `;
@@ -58,6 +66,7 @@ socket.on("newClip", (data) => {
     const video = document.getElementById("clipVideo");
 
     video.onended = reset;
+    video.onerror = (e) => console.error("video playback error", e);
     setTimeout(reset, (data.duration * 1000) || 15000);
 });
 

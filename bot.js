@@ -19,6 +19,7 @@ console.log("🔥 Servidor cargado correctamente");
 app.get("/api/clip-proxy", async (req, res) => {
     try {
         const videoUrl = req.query.url;
+        console.log("[proxy] request for url", videoUrl);
         if (!videoUrl) {
             return res.status(400).send("Falta url");
         }
@@ -29,7 +30,9 @@ app.get("/api/clip-proxy", async (req, res) => {
             responseType: "stream",
             headers: {
                 "User-Agent": "Mozilla/5.0",
-                Range: req.headers.range || ""
+                Range: req.headers.range || "",
+                // some twitch assets require an origin header
+                Origin: req.headers.origin || ""
             }
         });
 
@@ -38,7 +41,7 @@ app.get("/api/clip-proxy", async (req, res) => {
         response.data.pipe(res);
 
     } catch (error) {
-        console.log("❌ Error en proxy:", error.message);
+        console.log("❌ Error en proxy:", error.response?.status, error.message);
         res.sendStatus(500);
     }
 });
@@ -560,13 +563,24 @@ client.on("message", async (channel, tags, message, self) => {
             // Buscar proyectos del dueño del canal
             const projects = await Project.find({ userId: userDB.twitchId });
 
-            const mp4Url = clip.thumbnail_url
-                .replace(/\/preview-\d+x\d+\.jpg$/, ".mp4");
+            // Twitch doesn't give us a direct mp4 link – the usual trick is to
+            // take the thumbnail URL and strip off the "-preview-<WxH>.jpg" suffix.
+            // regex is more permissive so if they ever change the size we still
+            // catch it. another safe alternative is `clip.thumbnail_url.split("-preview-")[0] + ".mp4"`.
+            const mp4Url = clip.thumbnail_url.replace(/-preview-.*\.jpg$/, ".mp4");
+
+            // optional sanity check: ping the url with a HEAD request so we fail early
+            try {
+                await axios.head(mp4Url, { headers: { "User-Agent": "Mozilla/5.0" }});
+            } catch (err) {
+                console.warn("⚠️ generated mp4Url is unreachable:", mp4Url, err.message);
+            }
 
             console.log("THUMBNAIL ORIGINAL:", clip.thumbnail_url);
             console.log("MP4 generado:", mp4Url);
 
             for (const project of projects) {
+                console.log(`⤴  emit newClip to project=${project._id} user=${userDB.login}`);
                 io.to(project._id.toString()).emit("newClip", {
                     videoUrl: mp4Url,
                     duration: clip.duration
