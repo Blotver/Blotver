@@ -54,9 +54,9 @@
             container.innerHTML = `
     <iframe
         src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true&muted=true"
-        width="110%"
-        height="110%"
-        style="margin-top:-5%; margin-left:-5%;"
+        width="115%"
+        height="115%"
+        style="margin-top:-7%; margin-left:-7%;"
         frameborder="0"
         allow="autoplay; fullscreen"
         allowfullscreen>
@@ -67,7 +67,7 @@
             setTimeout(() => {
                 const frame = document.getElementById("clipFrame");
                 if (frame) frame.style.opacity = "1";
-            }, 2000);
+            }, 3500);
 
             setTimeout(reset, (data.duration * 1000) || 15000);
         });
