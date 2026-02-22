@@ -34,64 +34,38 @@
 <body>
     <div id="clipContainer"></div>
 
-    <script>
-        const projectId = window.location.pathname.split("/").pop();
-        const socket = io();
-        const clipDiv = document.getElementById("clip");
-        const video = document.getElementById("clipVideo");
+<script>
+const projectId = window.location.pathname.split("/").pop();
+const socket = io();
+const container = document.getElementById("clipContainer");
 
-        let queue = [];
-        let playing = false;
+let playing = false;
 
-        socket.emit("joinProject", projectId);
+socket.emit("joinProject", projectId);
 
-        socket.on("newClip", (data) => {
+socket.on("newClip", (data) => {
 
-            const container = document.getElementById("clipContainer");
+    if (playing) return;
 
-            container.innerHTML = `
-        <iframe
-            src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true"
-            frameborder="0"
-            allowfullscreen="true"
-            scrolling="no"
-            height="100%"
-            width="100%">
-        </iframe>
+    playing = true;
+
+    container.innerHTML = `
+        <video id="clipVideo" autoplay>
+            <source src="/api/clip-proxy?url=${encodeURIComponent(data.videoUrl)}" type="video/mp4">
+        </video>
     `;
-        });
 
-        function playNext() {
-            if (playing || queue.length === 0) return;
+    const video = document.getElementById("clipVideo");
 
-            playing = true;
-            const data = queue.shift();
+    video.onended = reset;
+    setTimeout(reset, (data.duration * 1000) || 15000);
+});
 
-            console.log("MP4 URL:", data.videoUrl);
-
-            video.src = data.videoUrl;
-            video.currentTime = 0;
-
-            clipDiv.style.display = "block";
-
-            video.play();
-
-            video.onended = () => {
-                resetPlayer();
-            };
-
-            // fallback por si no dispara onended
-            setTimeout(resetPlayer, (data.duration * 1000) || 15000);
-        }
-
-        function resetPlayer() {
-            video.pause();
-            video.src = "";
-            clipDiv.style.display = "none";
-            playing = false;
-            playNext();
-        }
-    </script>
+function reset() {
+    container.innerHTML = "";
+    playing = false;
+}
+</script>
 </body>
 
 </html>

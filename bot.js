@@ -18,8 +18,6 @@ const app = express();
 console.log("🔥 Servidor cargado correctamente");
 app.get("/api/clip-proxy", async (req, res) => {
     try {
-        console.log("🎬 Entró al proxy");
-
         const videoUrl = req.query.url;
         if (!videoUrl) {
             return res.status(400).send("Falta url");
@@ -35,7 +33,8 @@ app.get("/api/clip-proxy", async (req, res) => {
             }
         });
 
-        res.setHeader("Content-Type", "video/mp4");
+        res.status(response.status);
+        res.set(response.headers);
         response.data.pipe(res);
 
     } catch (error) {
@@ -558,15 +557,18 @@ client.on("message", async (channel, tags, message, self) => {
 
 
             client.say(channel, `🎬 Clip de ${usuario}: ${clip.url}`);
-
-
             // Buscar proyectos del dueño del canal
             const projects = await Project.find({ userId: userDB.twitchId });
 
-            for (const project of projects) {
+            // Generar URL MP4 real desde thumbnail
+            const mp4Url = clip.thumbnail_url
+                .split("-preview-")[0] + ".mp4";
 
+            console.log("MP4 generado:", mp4Url);
+
+            for (const project of projects) {
                 io.to(project._id.toString()).emit("newClip", {
-                    clipId: clip.id,
+                    videoUrl: mp4Url,
                     duration: clip.duration
                 });
             }
