@@ -20,7 +20,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* let clicks pass through if you stack other UI */
+            pointer-events: none;
+            /* let clicks pass through if you stack other UI */
             overflow: hidden;
         }
 
@@ -36,45 +37,45 @@
 <body>
     <div id="clipContainer"></div>
 
-<script>
-const projectId = window.location.pathname.split("/").pop();
-const socket = io();
-const container = document.getElementById("clipContainer");
+    <script>
+        const projectId = window.location.pathname.split("/").pop();
+        const socket = io();
+        const container = document.getElementById("clipContainer");
 
-let playing = false;
+        let playing = false;
 
-socket.emit("joinProject", projectId);
+        socket.emit("joinProject", projectId);
 
-console.log("overlay connected, projectId=", projectId);
+        console.log("overlay connected, projectId=", projectId);
 
-socket.on("connect", () => console.log("socket.io connected", socket.id));
+        socket.on("connect", () => console.log("socket.io connected", socket.id));
 
-socket.on("newClip", (data) => {
+        socket.on("newClip", (data) => {
 
-    console.log("received newClip event", data);
+            console.log("received newClip event", data);
 
-    if (playing) return;
+            if (playing) return;
 
-    playing = true;
+            playing = true;
 
-    container.innerHTML = `
-        <video id="clipVideo" autoplay playsinline>
+            container.innerHTML = `
+        <video id="clipVideo" autoplay muted playsinline>
             <source src="/api/clip-proxy?url=${encodeURIComponent(data.videoUrl)}" type="video/mp4">
         </video>
     `;
 
-    const video = document.getElementById("clipVideo");
+            const video = document.getElementById("clipVideo");
 
-    video.onended = reset;
-    video.onerror = (e) => console.error("video playback error", e);
-    setTimeout(reset, (data.duration * 1000) || 15000);
-});
+            video.onended = reset;
+            video.onerror = (e) => console.error("video playback error", e);
+            setTimeout(reset, (data.duration * 1000) || 15000);
+        });
 
-function reset() {
-    container.innerHTML = "";
-    playing = false;
-}
-</script>
+        function reset() {
+            container.innerHTML = "";
+            playing = false;
+        }
+    </script>
 </body>
 
 </html>
