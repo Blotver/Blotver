@@ -28,7 +28,6 @@
             /* let clicks pass through if you stack other UI */
             overflow: hidden;
         }
-
     </style>
 </head>
 
@@ -57,16 +56,23 @@
 
             container.innerHTML = `
         <iframe
-            src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com"
+            id="clipFrame"
+            src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true&muted=true"
             width="100%"
             height="100%"
             frameborder="0"
-            allowfullscreen>
+            allow="autoplay; fullscreen"
+            allowfullscreen
+            style="opacity:0; transition: opacity 0.3s ease;">
         </iframe>
     `;
 
-            // Como no podemos detectar cuándo termina el clip en un iframe,
-            // lo limpiamos usando la duración.
+            // Esperamos 2 segundos a que desaparezca la UI
+            setTimeout(() => {
+                const frame = document.getElementById("clipFrame");
+                if (frame) frame.style.opacity = "1";
+            }, 2000);
+
             setTimeout(reset, (data.duration * 1000) || 15000);
         });
 
