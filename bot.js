@@ -567,9 +567,6 @@ client.on("message", async (channel, tags, message, self) => {
             // take the thumbnail URL and strip off the "-preview-<WxH>.jpg" suffix.
             // regex is more permissive so if they ever change the size we still
             // catch it. another safe alternative is `clip.thumbnail_url.split("-preview-")[0] + ".mp4"`.
-            const mp4Url = `https://clips-media-assets2.twitch.tv/${clip.id}.mp4`;
-
-            console.log("MP4 generado:", mp4Url);
 
             // optional sanity check: ping the url with a HEAD request so we fail early
             try {
@@ -582,9 +579,8 @@ client.on("message", async (channel, tags, message, self) => {
             console.log("MP4 generado:", mp4Url);
 
             for (const project of projects) {
-                console.log(`⤴  emit newClip to project=${project._id} user=${userDB.login}`);
                 io.to(project._id.toString()).emit("newClip", {
-                    videoUrl: mp4Url,
+                    clipId: clip.id,
                     duration: clip.duration
                 });
             }
