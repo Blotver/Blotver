@@ -32,17 +32,15 @@
 </head>
 
 <body>
-
     <div id="clip">
-        <iframe id="clipFrame" width="600" height="340" frameborder="0" allowfullscreen>
-        </iframe>
+        <video id="clipVideo" autoplay></video>
     </div>
 
     <script>
         const projectId = window.location.pathname.split("/").pop();
         const socket = io();
         const clipDiv = document.getElementById("clip");
-        const iframe = document.getElementById("clipFrame");
+        const video = document.getElementById("clipVideo");
 
         let queue = [];
         let playing = false;
@@ -60,26 +58,31 @@
             playing = true;
             const data = queue.shift();
 
-            console.log("VIDEO URL:", data.videoUrl);
+            console.log("MP4 URL:", data.videoUrl);
 
-            // Convertimos clip URL a embed
-            const clipId = data.videoUrl.split("/clip/")[1];
-
-            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=localhost&autoplay=true`;
+            video.src = data.videoUrl;
+            video.currentTime = 0;
 
             clipDiv.style.display = "block";
 
-            setTimeout(resetPlayer, data.duration * 1000 || 15000);
+            video.play();
+
+            video.onended = () => {
+                resetPlayer();
+            };
+
+            // fallback por si no dispara onended
+            setTimeout(resetPlayer, (data.duration * 1000) || 15000);
         }
 
         function resetPlayer() {
-            iframe.src = "";
+            video.pause();
+            video.src = "";
             clipDiv.style.display = "none";
             playing = false;
             playNext();
         }
     </script>
-
 </body>
 
 </html>
