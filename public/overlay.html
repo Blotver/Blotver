@@ -28,10 +28,12 @@
 
         #clipContainer iframe {
             position: absolute;
-            width: 120%;
-            height: 130%;
-            top: -18%;
-            left: -10%;
+            height: 140%;
+            width: auto;
+            min-width: 110%;
+            top: -22%;
+            left: 50%;
+            transform: translateX(-50%);
             border: none;
         }
     </style>
@@ -67,12 +69,6 @@
         allowfullscreen>
     </iframe>
 `;
-
-            // Esperamos 2 segundos a que desaparezca la UI
-            setTimeout(() => {
-                const frame = document.getElementById("clipFrame");
-                if (frame) frame.style.opacity = "1";
-            }, 3500);
 
             setTimeout(reset, (data.duration * 1000) || 15000);
         });
