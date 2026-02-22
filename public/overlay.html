@@ -25,6 +25,15 @@
             height: 100%;
             overflow: hidden;
         }
+
+        #clipContainer iframe {
+            position: absolute;
+            width: 120%;
+            height: 130%;
+            top: -18%;
+            left: -10%;
+            border: none;
+        }
     </style>
 </head>
 
@@ -54,10 +63,6 @@
             container.innerHTML = `
     <iframe
         src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true&muted=true"
-        width="115%"
-        height="115%"
-        style="margin-top:-7%; margin-left:-7%;"
-        frameborder="0"
         allow="autoplay; fullscreen"
         allowfullscreen>
     </iframe>
