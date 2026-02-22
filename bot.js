@@ -563,21 +563,6 @@ client.on("message", async (channel, tags, message, self) => {
             // Buscar proyectos del dueño del canal
             const projects = await Project.find({ userId: userDB.twitchId });
 
-            // Twitch doesn't give us a direct mp4 link – the usual trick is to
-            // take the thumbnail URL and strip off the "-preview-<WxH>.jpg" suffix.
-            // regex is more permissive so if they ever change the size we still
-            // catch it. another safe alternative is `clip.thumbnail_url.split("-preview-")[0] + ".mp4"`.
-
-            // optional sanity check: ping the url with a HEAD request so we fail early
-            try {
-                await axios.head(mp4Url, { headers: { "User-Agent": "Mozilla/5.0" } });
-            } catch (err) {
-                console.warn("⚠️ generated mp4Url is unreachable:", mp4Url, err.message);
-            }
-
-            console.log("THUMBNAIL ORIGINAL:", clip.thumbnail_url);
-            console.log("MP4 generado:", mp4Url);
-
             for (const project of projects) {
                 io.to(project._id.toString()).emit("newClip", {
                     clipId: clip.id,
