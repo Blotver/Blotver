@@ -561,7 +561,7 @@ client.on("message", async (channel, tags, message, self) => {
             const projects = await Project.find({ userId: userDB.twitchId });
 
             const mp4Url = clip.thumbnail_url
-                .replace(/-preview-\d+x\d+\.jpg$/, ".mp4");
+                .replace(/\/preview-\d+x\d+\.jpg$/, ".mp4");
 
             console.log("THUMBNAIL ORIGINAL:", clip.thumbnail_url);
             console.log("MP4 generado:", mp4Url);
