@@ -560,10 +560,10 @@ client.on("message", async (channel, tags, message, self) => {
             // Buscar proyectos del dueño del canal
             const projects = await Project.find({ userId: userDB.twitchId });
 
-            // Generar URL MP4 real desde thumbnail
             const mp4Url = clip.thumbnail_url
-                .split("-preview-")[0] + ".mp4";
+                .replace(/-preview-\d+x\d+\.jpg$/, ".mp4");
 
+            console.log("THUMBNAIL ORIGINAL:", clip.thumbnail_url);
             console.log("MP4 generado:", mp4Url);
 
             for (const project of projects) {
