@@ -247,7 +247,10 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
             textTemplate: "Sigan a {user}",
             color: "#ffffff",
             fontSize: 40,
-            duration: 10000
+            duration: 10000,
+            overlayText: "",
+            animationIn: "fade",
+            animationOut: "fade"
         };
     }
 
@@ -525,78 +528,93 @@ client.on("message", async (channel, tags, message, self) => {
     const args = message.trim().split(" ");
     const command = args[0].toLowerCase();
 
-    if (command === "!so") {
+    // ========================
+    // SISTEMA SHOUTOUT DINÁMICO
+    // ========================
 
-        const esMod = tags.mod || tags.badges?.broadcaster;
+    // Buscar canal
+    const channelName = channel.replace("#", "");
+    const userDB = await User.findOne({ login: channelName });
+    if (!userDB) return;
 
-        if (!esMod) {
-            client.say(channel, "⛔ Solo los moderadores pueden usar este comando.");
+    // Buscar widgets shoutout activos
+    const widgets = await Widget.find({
+        userId: userDB.twitchId,
+        type: "shoutout"
+    });
+
+    // Buscar si algún widget coincide con el comando escrito
+    const matchedWidget = widgets.find(w =>
+        w.data.command?.toLowerCase() === command
+    );
+
+    if (!matchedWidget) return;
+
+    // Verificar permisos
+    const esMod = tags.mod || tags.badges?.broadcaster;
+
+    if (!esMod) {
+        client.say(channel, "⛔ Solo los moderadores pueden usar este comando.");
+        return;
+    }
+
+    if (!args[1]) {
+        client.say(channel, `❌ Debes escribir un usuario. Ejemplo: ${matchedWidget.data.command} nombre`);
+        return;
+    }
+
+    const usuario = args[1].replace("@", "").toLowerCase();
+
+    try {
+
+        const userId = await getUserId(usuario, userDB);
+        if (!userId) {
+            client.say(channel, "❌ Usuario no encontrado.");
             return;
         }
 
-        if (!args[1]) {
-            client.say(channel, "❌ Debes escribir un usuario. Ejemplo: !so nombre");
+        const clip = await getRandomClip(userId, userDB);
+        if (!clip) {
+            client.say(channel, "⚠️ Ese canal no tiene clips.");
             return;
         }
 
-        const usuario = args[1].replace("@", "").toLowerCase();
+        // Obtener juego actual
+        const userInfoRes = await twitchAPI(
+            `https://api.twitch.tv/helix/channels?broadcaster_id=${userId}`,
+            userDB
+        );
 
-        try {
-
-
-            const channelName = channel.replace("#", "");
-
-            const userDB = await User.findOne({ login: channelName });
-            if (!userDB) return;
-
-            const userId = await getUserId(usuario, userDB);
-
-            if (!userId) {
-                client.say(channel, "❌ Usuario no encontrado.");
-                return;
-            }
-
-            const clip = await getRandomClip(userId, userDB);
-
-
-            if (!clip) {
-                client.say(channel, "⚠️ Ese canal no tiene clips.");
-                return;
-            }
-
-
-            // Obtener info del canal para saber qué está jugando
-            const userInfoRes = await twitchAPI(
-                `https://api.twitch.tv/helix/channels?broadcaster_id=${userId}`,
-                userDB
-            );
-
-            let gameName = "algo increíble";
-            if (userInfoRes && userInfoRes.data.data.length > 0) {
-                gameName = userInfoRes.data.data[0].game_name || "algo increíble";
-            }
-
-            const mensaje = `🚀 Shoutout para @${usuario} 🔥
-Actualmente jugando ${gameName} 🎮
-Miren el clip en pantalla y denle follow 💜`;
-
-            client.say(channel, mensaje);
-
-            // Buscar proyectos del dueño del canal
-            const projects = await Project.find({ userId: userDB.twitchId });
-
-            for (const project of projects) {
-                io.to(project._id.toString()).emit("newClip", {
-                    clipId: clip.id,
-                    duration: clip.duration
-                });
-            }
-
-
-        } catch (error) {
-            console.log(" Error obteniendo clip:");
-            console.log(error.response?.data || error.message);
+        let gameName = "algo increíble";
+        if (userInfoRes && userInfoRes.data.data.length > 0) {
+            gameName = userInfoRes.data.data[0].game_name || "algo increíble";
         }
 
+        // Usar template dinámico
+        let template = matchedWidget.data.textTemplate ||
+            "🚀 Shoutout para @{user} jugando {game} 🎮";
+
+        const mensaje = template
+            .replaceAll("{user}", usuario)
+            .replaceAll("{game}", gameName);
+
+        client.say(channel, mensaje);
+
+        // Emitir al overlay
+        const projects = await Project.find({ userId: userDB.twitchId });
+
+        for (const project of projects) {
+            io.to(matchedWidget.projectId.toString()).emit("newClip", {
+                clipId: clip.id,
+                duration: matchedWidget.data.duration || clip.duration,
+                overlayText: matchedWidget.data.overlayText || "",
+                animationIn: matchedWidget.data.animationIn || "fade",
+                animationOut: matchedWidget.data.animationOut || "fade"
+            });
+        }
+
+    } catch (error) {
+        console.log("❌ Error obteniendo clip:");
+        console.log(error.response?.data || error.message);
     }
 });

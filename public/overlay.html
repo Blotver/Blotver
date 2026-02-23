@@ -28,19 +28,114 @@
 
         #clipContainer iframe {
             position: absolute;
-            height: 130%;
+            height: 110%;
             width: auto;
             min-width: 110%;
-            top: -16%;
+            top: -10%;
             left: 50%;
             transform: translateX(-50%);
             border: none;
+        }
+                .fade-in {
+            animation: fadeIn 0.6s forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.6s forwards;
+        }
+
+        .zoom-in {
+            animation: zoomIn 0.6s forwards;
+        }
+
+        .zoom-out {
+            animation: zoomOut 0.6s forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s forwards;
+        }
+
+        .slide-out {
+            animation: slideOut 0.6s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1
+            }
+
+            to {
+                opacity: 0
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        @keyframes zoomOut {
+            from {
+                transform: scale(1);
+                opacity: 1
+            }
+
+            to {
+                transform: scale(0.8);
+                opacity: 0
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1
+            }
+
+            to {
+                transform: translateY(50px);
+                opacity: 0
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="clipContainer"></div>
+    <div id="clipContainer">
+        <div id="overlayText" style="position:absolute; top:5%; width:100%; text-align:center;
+        font-size:48px; color:white; font-weight:bold; text-shadow:0 0 20px black;">
+        </div>
+    </div>
 
     <script>
         const projectId = window.location.pathname.split("/").pop();
@@ -57,20 +152,25 @@
 
         socket.on("newClip", (data) => {
 
-            console.log("received newClip event", data);
-
             if (playing) return;
             playing = true;
 
-            container.innerHTML = `
+            document.getElementById("overlayText").innerText = data.overlayText || "";
+
+            container.innerHTML += `
     <iframe
         src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true&muted=true"
         allow="autoplay; fullscreen"
         allowfullscreen>
     </iframe>
 `;
+            container.className = `${data.animationIn}-in`;
+            setTimeout(() => {
+                container.className = `${data.animationOut}-out`;
+            }, data.duration - 600);
 
-            setTimeout(reset, (data.duration * 1000) || 15000);
+            setTimeout(reset, data.duration);
+
         });
 
         function reset() {

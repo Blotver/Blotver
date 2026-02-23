@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Project Editor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/styles.css" rel="stylesheet">
 </head>
 
 <body class="bg-gray-950 text-white min-h-screen flex">
@@ -19,7 +19,7 @@
         <div id="widgetsList" class="flex flex-col gap-3"></div>
     </aside>
 
-    <main class="flex-1 bg-gray-300 overflow-hidden">
+    <main class="flex-1 bg-gray-300 overflow-hidden relative">
         <div class="bg-gray-900 p-4 border-b border-gray-800 flex justify-between items-center">
             <span class="text-sm text-gray-400">
                 Overlay URL:
@@ -27,21 +27,29 @@
 
             <input id="overlayLink" class="bg-gray-800 text-sm px-3 py-2 rounded w-[400px]" readonly>
         </div>
+
         <div id="canvas" class="relative w-full h-full bg-white overflow-hidden" style="
-            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
-            background-size: 20px 20px;
-        ">
+                background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+                background-size: 20px 20px;
+            ">
         </div>
 
-    </main>
+        <!-- PANEL CONFIG -->
+        <div id="configPanel"
+            class="absolute right-0 top-0 w-80 h-full bg-gray-900 border-l border-gray-800 p-6 hidden overflow-y-auto">
 
+            <h3 class="text-lg font-bold mb-6">Widget Settings</h3>
+            <div id="configContent"></div>
+        </div>
+    </main>
 
     <script>
         const projectId = window.location.pathname.split("/").pop();
-
         document.getElementById("overlayLink").value =
             window.location.origin + "/overlay/" + projectId;
+
         let widgets = [];
+        let selectedWidget = null;
 
         async function loadWidgets() {
             const res = await fetch(`/api/widgets/${projectId}`);
@@ -55,15 +63,16 @@
 
             widgets.forEach(widget => {
 
-                // Sidebar list
+                // Sidebar
                 list.innerHTML += `
-                    <div class="bg-gray-800 p-3 rounded-lg">
-                        ${widget.name}
-                    </div>
-                `;
+            <div class="bg-gray-800 p-3 rounded-lg cursor-pointer"
+                 onclick="openConfigById('${widget._id}')">
+                ${widget.name}
+            </div>
+        `;
 
-                // Canvas element
                 const el = document.createElement("div");
+
                 if (widget.type === "text") {
                     el.innerText = widget.data.text || "Sample Text";
                 }
@@ -71,6 +80,8 @@
                 if (widget.type === "shoutout") {
                     el.innerText = "🎬 ShoutOut Widget";
                     el.style.border = "2px solid purple";
+                    el.style.padding = "8px 12px";
+                    el.style.background = "rgba(128,0,128,0.1)";
                 }
 
                 el.className = "absolute cursor-move select-none";
@@ -81,12 +92,16 @@
 
                 enableDrag(el, widget);
 
+                el.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    openConfig(widget);
+                });
+
                 canvas.appendChild(el);
             });
         }
 
         function enableDrag(element, widget) {
-
             let offsetX, offsetY, isDragging = false;
 
             element.addEventListener("mousedown", (e) => {
@@ -99,7 +114,6 @@
                 if (!isDragging) return;
 
                 const canvasRect = document.getElementById("canvas").getBoundingClientRect();
-
                 let x = e.clientX - canvasRect.left - offsetX;
                 let y = e.clientY - canvasRect.top - offsetY;
 
@@ -107,7 +121,7 @@
                 element.style.top = y + "px";
             });
 
-            document.addEventListener("mouseup", async (e) => {
+            document.addEventListener("mouseup", async () => {
                 if (!isDragging) return;
                 isDragging = false;
 
@@ -125,7 +139,104 @@
                         }
                     })
                 });
+
+                widget.data.x = x;
+                widget.data.y = y;
             });
+        }
+
+        function openConfigById(id) {
+            const widget = widgets.find(w => w._id === id);
+            if (widget) openConfig(widget);
+        }
+
+        function openConfig(widget) {
+            selectedWidget = widget;
+
+            const panel = document.getElementById("configPanel");
+            const content = document.getElementById("configContent");
+
+            panel.classList.remove("hidden");
+
+            if (widget.type === "shoutout") {
+                content.innerHTML = `
+            <label class="block mb-2 text-sm">Command</label>
+            <input id="cfgCommand"
+                class="w-full mb-4 p-2 bg-gray-800 rounded"
+                value="${widget.data.command || "!so"}">
+
+            <label class="block mb-2 text-sm">Chat Message Template</label>
+            <textarea id="cfgTemplate"
+                class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</textarea>
+
+            <label class="block mb-2 text-sm">Duration (ms)</label>
+            <input id="cfgDuration"
+                type="number"
+                class="w-full mb-4 p-2 bg-gray-800 rounded"
+                value="${widget.data.duration || 10000}">
+
+            <label class="block mb-2 text-sm">Overlay Text</label>
+            <input id="cfgOverlayText"
+                class="w-full mb-4 p-2 bg-gray-800 rounded"
+                value="${widget.data.overlayText || ""}">
+
+            <label class="block mb-2 text-sm">Animation In</label>
+            <select id="cfgAnimIn"
+                class="w-full mb-4 p-2 bg-gray-800 rounded">
+                <option value="fade">Fade</option>
+                <option value="zoom">Zoom</option>
+                <option value="slide">Slide</option>
+            </select>
+
+            <label class="block mb-2 text-sm">Animation Out</label>
+            <select id="cfgAnimOut"
+                class="w-full mb-6 p-2 bg-gray-800 rounded">
+                <option value="fade">Fade</option>
+                <option value="zoom">Zoom</option>
+                <option value="slide">Slide</option>
+            </select>
+
+            <button onclick="saveConfig()"
+                class="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded">
+                Save
+            </button>
+        `;
+
+                // Set selected animations
+                setTimeout(() => {
+                    document.getElementById("cfgAnimIn").value =
+                        widget.data.animationIn || "fade";
+
+                    document.getElementById("cfgAnimOut").value =
+                        widget.data.animationOut || "fade";
+                });
+            }
+        }
+
+        async function saveConfig() {
+            if (!selectedWidget) return;
+
+            const updatedData = {
+                command: document.getElementById("cfgCommand").value.trim(),
+                textTemplate: document.getElementById("cfgTemplate").value,
+                duration: parseInt(document.getElementById("cfgDuration").value),
+                overlayText: document.getElementById("cfgOverlayText").value,
+                animationIn: document.getElementById("cfgAnimIn").value,
+                animationOut: document.getElementById("cfgAnimOut").value
+            };
+
+            await fetch(`/api/widgets/${selectedWidget._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: {
+                        ...selectedWidget.data,
+                        ...updatedData
+                    }
+                })
+            });
+
+            loadWidgets();
         }
 
         document.getElementById("newWidgetBtn")
@@ -134,7 +245,10 @@
                 await fetch("/api/widgets", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ projectId })
+                    body: JSON.stringify({
+                        projectId,
+                        type: "shoutout"
+                    })
                 });
 
                 loadWidgets();
