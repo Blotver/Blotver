@@ -294,7 +294,16 @@ app.put("/api/widgets/:id", isAuthenticated, async (req, res) => {
 
     res.json(widget);
 });
+app.put("/api/projects/:id", isAuthenticated, async (req, res) => {
 
+    const project = await Project.findOneAndUpdate(
+        { _id: req.params.id, userId: req.session.user.id },
+        { name: req.body.name },
+        { new: true }
+    );
+
+    res.json(project);
+});
 // ========================
 // MIDDLEWARE AUTH
 // ========================
