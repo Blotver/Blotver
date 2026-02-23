@@ -333,21 +333,6 @@ function isAuthenticated(req, res, next) {
 // RUTAS API PROJECTS
 // ========================
 
-app.post("/api/projects", isAuthenticated, async (req, res) => {
-    try {
-        const project = await Project.create({
-            userId: req.session.user.id,
-            name: req.body.name || "New Project"
-        });
-
-        res.json(project);
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error creating project" });
-    }
-});
-
 app.get("/api/user", isAuthenticated, async (req, res) => {
 
     const userDB = await User.findOne({ twitchId: req.session.user.id });
@@ -365,17 +350,17 @@ app.get("/api/user", isAuthenticated, async (req, res) => {
     });
 });
 
-app.get("/api/projects", isAuthenticated, async (req, res) => {
+app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
-        const projects = await Project.find({
-            userId: req.session.user.id
+        const project = await Project.create({
+            userId: req.session.user.id,
+            name: req.body.name || "Untitled Project",
+            type: req.body.type || "blank"
         });
-
-        res.json(projects);
-
+        res.json(project);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error fetching projects" });
+        res.status(500).json({ error: "Error creating project" });
     }
 });
 
@@ -630,9 +615,6 @@ client.on("message", async (channel, tags, message, self) => {
             .replaceAll("{game}", gameName);
 
         client.say(channel, mensaje);
-
-        // Emitir al overlay
-        const projects = await Project.find({ userId: userDB.twitchId });
 
         io.to(matchedWidget.projectId.toString()).emit("newClip", {
             clipId: clip.id,

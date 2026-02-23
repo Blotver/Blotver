@@ -153,14 +153,17 @@
                     </div>
 
                     <!-- DELETE BUTTON -->
-                    <button onclick="deleteSelectedWidget()"
-                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-red-500/20 transition group">
+                    <button class="delete-btn absolute right-2 opacity-0 group-hover:opacity-100 transition"
+                        onclick="deleteWidget('ID_DEL_WIDGET')">
+
+                        <!-- SVG Trash -->
                         <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4 text-gray-400 group-hover:text-red-400 transition" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
+                            class="w-4 h-4 text-red-400 hover:text-red-500 transition" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-1 14H6L5 7m5-4h4m-6 4h8" />
                         </svg>
+
                     </button>
                 </div>
 
@@ -199,8 +202,17 @@
         </main>
     </div>
 
+    <script src="/widgets/registry.js"></script>
+
+    <script src="/widgets/shoutout.js"></script>
+
     <script>
 
+        const widgetDef = window.WidgetRegistry[widget.type];
+
+        if (widgetDef && widgetDef.renderConfig) {
+            widgetDef.renderConfig(widget, content, updateSelectedWidget);
+        }
         const projectId = window.location.pathname.split("/").pop();
         document.getElementById("overlayLink").value =
             window.location.origin + "/overlay/" + projectId;
@@ -239,10 +251,11 @@
                     el.appendChild(img);
                 }
 
-                if (widget.type === "shoutout") {
-                    el.innerText = "🎬 ShoutOut Widget";
-                    el.style.border = "2px solid purple";
-                    el.style.padding = "8px 12px";
+                const widgetDef = window.WidgetRegistry[widget.type];
+
+                if (widgetDef && widgetDef.renderCanvas) {
+                    const rendered = widgetDef.renderCanvas(widget);
+                    el.appendChild(rendered);
                 }
 
                 el.className = "absolute cursor-move select-none";
@@ -461,7 +474,7 @@ class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</t
             document.querySelectorAll("#layersPanel > div")
                 .forEach(i => i.classList.remove("ring-2", "ring-purple-500"));
         }
-        
+
         async function deleteSelectedWidget() {
             if (!selectedWidget) return;
 
