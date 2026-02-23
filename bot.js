@@ -304,6 +304,14 @@ app.put("/api/projects/:id", isAuthenticated, async (req, res) => {
 
     res.json(project);
 });
+
+app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
+    await Widget.deleteOne({
+        _id: req.params.id,
+        userId: req.session.user.id
+    });
+    res.json({ success: true });
+});
 // ========================
 // MIDDLEWARE AUTH
 // ========================

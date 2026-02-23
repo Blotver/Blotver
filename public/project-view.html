@@ -5,6 +5,21 @@
     <meta charset="UTF-8">
     <title>Project Editor</title>
     <link href="/styles.css" rel="stylesheet">
+    <style>
+        .selected-widget {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+            transition: all 0.15s ease;
+        }
+
+        .layer-item {
+            transition: background 0.15s ease;
+        }
+
+        .layer-item.active {
+            background: #1f2937;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-950 text-white overflow-hidden">
@@ -49,6 +64,12 @@
     <div class="pt-16 h-screen flex">
 
         <!-- CONFIG PANEL -->
+        <!-- LAYERS PANEL -->
+        <aside class="w-64 bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
+            <h3 class="text-sm text-gray-400 mb-3">Layers</h3>
+            <div id="layersPanel" class="flex flex-col gap-1"></div>
+        </aside>
+
         <aside id="configPanel" class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden">
             <h3 class="text-lg font-bold mb-6">Widget Settings</h3>
             <div id="configContent"></div>
@@ -132,6 +153,8 @@
 
         let widgets = [];
         let selectedWidget = null;
+        let selectedElement = null;
+
         // ================= LOAD PROJECT =================
 
         async function loadProject() {
@@ -186,12 +209,38 @@
 
                 el.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    openConfig(widget);
+                    selectWidget(widget, el);
                 });
 
                 canvas.appendChild(el);
             });
         }
+
+        // ================= SELECT SYSTEM =================
+
+        function selectWidget(widget, element) {
+
+            if (selectedElement) {
+                selectedElement.style.outline = "none";
+            }
+
+            selectedWidget = widget;
+            selectedElement = element;
+
+            element.style.outline = "2px solid #3b82f6"; // azul tipo Figma
+            element.style.outlineOffset = "2px";
+
+            openConfig(widget);
+        }
+
+        document.getElementById("canvas").addEventListener("click", () => {
+            if (selectedElement) {
+                selectedElement.style.outline = "none";
+            }
+            selectedWidget = null;
+            selectedElement = null;
+            document.getElementById("configPanel").classList.add("hidden");
+        });
 
         // ================= DRAG SYSTEM =================
 
@@ -239,6 +288,8 @@
                 widget.data.y = y;
             });
         }
+
+        // ================= CONFIG PANEL =================
 
         function openConfig(widget) {
 
@@ -298,6 +349,49 @@
             }
         }
 
+        // ================= DELETE =================
+
+        async function deleteSelectedWidget() {
+            if (!selectedWidget) return;
+
+            await fetch(`/api/widgets/${selectedWidget._id}`, {
+                method: "DELETE"
+            });
+
+            selectedWidget = null;
+            selectedElement = null;
+            document.getElementById("configPanel").classList.add("hidden");
+
+            loadWidgets();
+        }
+
+        // ================= DUPLICATE (CTRL + D) =================
+
+        document.addEventListener("keydown", async (e) => {
+
+            if (e.ctrlKey && e.key === "d") {
+                e.preventDefault();
+
+                if (!selectedWidget) return;
+
+                await fetch("/api/widgets", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        projectId,
+                        type: selectedWidget.type,
+                        data: {
+                            ...selectedWidget.data,
+                            x: (selectedWidget.data.x || 100) + 20,
+                            y: (selectedWidget.data.y || 100) + 20
+                        }
+                    })
+                });
+
+                loadWidgets();
+            }
+        });
+
         // ================= SAVE =================
 
         async function saveConfig() {
@@ -331,14 +425,14 @@
             });
 
             await res.json();
-            location.reload();
+            loadWidgets();
         }
 
         loadProject();
         loadWidgets();
 
     </script>
-
+    
 </body>
 
 </html>
