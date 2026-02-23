@@ -63,7 +63,6 @@
     <!-- ================= MAIN LAYOUT ================= -->
     <div class="pt-16 h-screen flex">
 
-        <!-- CONFIG PANEL -->
         <!-- LAYERS PANEL -->
         <aside class="w-64 bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
             <h3 class="text-sm text-gray-400 mb-3">Layers</h3>
@@ -71,7 +70,7 @@
         </aside>
 
         <aside id="configPanel" class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden">
-            <h3 class="text-lg font-bold mb-6">Widget Settings</h3>
+            <h3 class="text-lg font-bold mb-6">Settings</h3>
             <div id="configContent"></div>
         </aside>
 
@@ -176,6 +175,9 @@
             const canvas = document.getElementById("canvas");
             canvas.innerHTML = "";
 
+            const layersPanel = document.getElementById("layersPanel");
+            layersPanel.innerHTML = "";
+
             widgets.forEach(widget => {
 
                 const el = document.createElement("div");
@@ -213,6 +215,32 @@
                 });
 
                 canvas.appendChild(el);
+                // === CREATE LAYER ITEM ===
+                const layerItem = document.createElement("div");
+                layerItem.className =
+                    "layer-item flex items-center justify-between px-3 py-2 rounded cursor-pointer bg-gray-800 hover:bg-gray-700 text-sm";
+
+                layerItem.dataset.id = widget._id;
+
+                // Click para seleccionar desde layers
+                layerItem.addEventListener("click", (e) => {
+                    if (e.target.tagName === "BUTTON") return;
+                    selectWidget(widget, el);
+                    updateActiveLayer(widget._id);
+                });
+
+                // Botón delete
+                layerItem.querySelector("button").addEventListener("click", async (e) => {
+                    e.stopPropagation();
+
+                    await fetch(`/api/widgets/${widget._id}`, {
+                        method: "DELETE"
+                    });
+
+                    loadWidgets();
+                });
+
+                layersPanel.appendChild(layerItem);
             });
         }
 
@@ -231,6 +259,16 @@
             element.style.outlineOffset = "2px";
 
             openConfig(widget);
+            updateActiveLayer(widget._id);
+        }
+
+        function updateActiveLayer(id) {
+            document.querySelectorAll(".layer-item").forEach(item => {
+                item.classList.remove("active");
+            });
+
+            const active = document.querySelector(`.layer-item[data-id="${id}"]`);
+            if (active) active.classList.add("active");
         }
 
         document.getElementById("canvas").addEventListener("click", () => {
@@ -338,10 +376,6 @@
                         <option value="zoom">Zoom</option>
                         <option value="slide">Slide</option>
                     </select>
-                    <button onclick="deleteSelectedWidget()"
-    class="w-full bg-red-600 hover:bg-red-700 py-2 rounded">
-    Delete Widget
-</button>
                 `;
 
                 setTimeout(() => {
