@@ -216,26 +216,37 @@
 
                 canvas.appendChild(el);
                 // === CREATE LAYER ITEM ===
+                // === CREATE LAYER ITEM ===
                 const layerItem = document.createElement("div");
                 layerItem.className =
                     "layer-item flex items-center justify-between px-3 py-2 rounded cursor-pointer bg-gray-800 hover:bg-gray-700 text-sm";
 
                 layerItem.dataset.id = widget._id;
 
-                // Click para seleccionar desde layers
+                layerItem.innerHTML = `
+    <span>${widget.name || widget.type}</span>
+    <button class="text-red-400 hover:text-red-500">🗑</button>
+`;
+
+                // Click seleccionar
                 layerItem.addEventListener("click", (e) => {
                     if (e.target.tagName === "BUTTON") return;
                     selectWidget(widget, el);
-                    updateActiveLayer(widget._id);
                 });
 
-                // Botón delete
+                // Delete button
                 layerItem.querySelector("button").addEventListener("click", async (e) => {
                     e.stopPropagation();
 
                     await fetch(`/api/widgets/${widget._id}`, {
                         method: "DELETE"
                     });
+
+                    if (selectedWidget?._id === widget._id) {
+                        document.getElementById("configPanel").classList.add("hidden");
+                        selectedWidget = null;
+                        selectedElement = null;
+                    }
 
                     loadWidgets();
                 });
