@@ -226,9 +226,14 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
 
     const widgetType = req.body.type || "text";
 
-    let defaultData = req.body.data || { x: 100, y: 100 };
+    let defaultData;
 
-    if (!req.body.data) {
+    // Si viene data (ej: duplicate), usarla directamente
+    if (req.body.data) {
+        defaultData = req.body.data;
+    } else {
+
+        defaultData = { x: 100, y: 100 };
 
         if (widgetType === "text") {
             defaultData = {
@@ -261,28 +266,6 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
                 animationOut: "fade"
             };
         }
-    }
-
-    if (widgetType === "image") {
-        defaultData = {
-            ...defaultData,
-            url: "",
-            width: 200,
-            height: 200
-        };
-    }
-    if (widgetType === "shoutout") {
-        defaultData = {
-            ...defaultData,
-            command: "!so",
-            textTemplate: "Sigan a {user}",
-            color: "#ffffff",
-            fontSize: 40,
-            duration: 10000,
-            overlayText: "",
-            animationIn: "fade",
-            animationOut: "fade"
-        };
     }
 
     const widget = await Widget.create({
