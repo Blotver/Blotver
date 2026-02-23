@@ -332,6 +332,18 @@ function isAuthenticated(req, res, next) {
 // ========================
 // RUTAS API PROJECTS
 // ========================
+app.get("/api/projects", isAuthenticated, async (req, res) => {
+    try {
+        const projects = await Project.find({
+            userId: req.session.user.id
+        }).sort({ createdAt: -1 });
+
+        res.json(projects);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error fetching projects" });
+    }
+});
 
 app.get("/api/user", isAuthenticated, async (req, res) => {
 
