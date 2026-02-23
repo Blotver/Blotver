@@ -226,18 +226,41 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
 
     const widgetType = req.body.type || "text";
 
-    let defaultData = {
-        x: 100,
-        y: 100
-    };
+    let defaultData = req.body.data || { x: 100, y: 100 };
 
-    if (widgetType === "text") {
-        defaultData = {
-            ...defaultData,
-            text: "Sample Text",
-            color: "#000000",
-            fontSize: 32
-        };
+    if (!req.body.data) {
+
+        if (widgetType === "text") {
+            defaultData = {
+                ...defaultData,
+                text: "Sample Text",
+                color: "#000000",
+                fontSize: 32
+            };
+        }
+
+        if (widgetType === "image") {
+            defaultData = {
+                ...defaultData,
+                url: "",
+                width: 200,
+                height: 200
+            };
+        }
+
+        if (widgetType === "shoutout") {
+            defaultData = {
+                ...defaultData,
+                command: "!so",
+                textTemplate: "Sigan a {user}",
+                color: "#ffffff",
+                fontSize: 40,
+                duration: 10000,
+                overlayText: "",
+                animationIn: "fade",
+                animationOut: "fade"
+            };
+        }
     }
 
     if (widgetType === "image") {

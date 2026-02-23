@@ -338,6 +338,10 @@
                         <option value="zoom">Zoom</option>
                         <option value="slide">Slide</option>
                     </select>
+                    <button onclick="deleteSelectedWidget()"
+    class="w-full bg-red-600 hover:bg-red-700 py-2 rounded">
+    Delete Widget
+</button>
                 `;
 
                 setTimeout(() => {
@@ -347,6 +351,28 @@
                         widget.data.animationOut || "fade";
                 });
             }
+        }
+
+        async function updateSelectedWidget(dataUpdates) {
+            if (!selectedWidget) return;
+
+            const updatedData = {
+                ...selectedWidget.data,
+                ...dataUpdates
+            };
+
+            const res = await fetch(`/api/widgets/${selectedWidget._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: updatedData
+                })
+            });
+
+            const updated = await res.json();
+            selectedWidget = updated;
+
+            loadWidgets();
         }
 
         // ================= DELETE =================
@@ -432,7 +458,7 @@
         loadWidgets();
 
     </script>
-    
+
 </body>
 
 </html>
