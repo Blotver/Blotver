@@ -7,77 +7,78 @@
     <link href="/styles.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-950 text-white min-h-screen">
+<body class="bg-gray-950 text-white overflow-hidden">
 
-    <main class="w-full h-screen bg-gray-300 overflow-hidden relative">
+    <!-- ================= HEADER ================= -->
+    <header class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
 
-        <!-- TOP BAR -->
-        <div class="bg-gray-900 p-4 border-b border-gray-800 flex items-center gap-6">
-
-            <div>
-                <label class="text-xs text-gray-400 block">Project Name</label>
-                <input id="projectNameInput"
-                    class="bg-gray-800 text-sm px-3 py-2 rounded w-64">
-            </div>
+        <div class="flex items-center gap-6">
+            <input id="projectNameInput"
+                class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-64"
+                placeholder="Untitled Overlay">
 
             <div>
-                <label class="text-xs text-gray-400 block">Overlay URL</label>
+                <span class="text-xs text-gray-400 block">Overlay URL</span>
                 <input id="overlayLink"
-                    class="bg-gray-800 text-sm px-3 py-2 rounded w-[400px]" readonly>
-            </div>
-
-            <button onclick="saveConfig()"
-                class="ml-auto bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
-                Save
-            </button>
-
-        </div>
-
-        <!-- CANVAS -->
-        <div id="canvas" class="relative w-full h-[calc(100%-80px)] bg-white overflow-hidden"
-            style="background-image: radial-gradient(#d1d5db 1px, transparent 1px);
-                   background-size: 20px 20px;">
-        </div>
-
-        <!-- ADD WIDGET BUTTON -->
-        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 relative">
-
-            <button id="newWidgetBtn"
-                class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-full shadow-lg">
-                + Add Widget
-            </button>
-
-            <div id="widgetSelector"
-                class="hidden absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-xl shadow-lg p-3 flex flex-col gap-2 w-56">
-
-                <div onclick="createWidget('text')"
-                    class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
-                    📝 Text
-                </div>
-
-                <div onclick="createWidget('image')"
-                    class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
-                    🖼 Image
-                </div>
-
-                <div onclick="createWidget('shoutout')"
-                    class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
-                    🎬 Shoutout
-                </div>
-
+                    class="bg-gray-800 text-xs px-3 py-1 rounded w-[380px]" readonly>
             </div>
         </div>
+
+        <button onclick="saveConfig()"
+            class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
+            Save
+        </button>
+
+    </header>
+
+    <!-- ================= MAIN LAYOUT ================= -->
+    <div class="pt-16 h-screen flex">
 
         <!-- CONFIG PANEL (LEFT) -->
-        <div id="configPanel"
-            class="absolute left-0 top-0 w-80 h-full bg-gray-900 border-r border-gray-800 p-6 hidden overflow-y-auto z-40">
+        <aside id="configPanel"
+            class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden overflow-y-auto">
 
             <h3 class="text-lg font-bold mb-6">Widget Settings</h3>
             <div id="configContent"></div>
 
-        </div>
+        </aside>
 
-    </main>
+        <!-- CANVAS -->
+        <main class="flex-1 relative bg-white overflow-hidden"
+            style="background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+                   background-size: 20px 20px;">
+
+            <div id="canvas" class="w-full h-full relative"></div>
+
+            <!-- FLOATING + BUTTON -->
+            <button id="newWidgetBtn"
+                class="fixed bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-purple-600 hover:bg-purple-700 rounded-full shadow-2xl text-3xl z-40">
+                +
+            </button>
+
+            <!-- FLOATING MENU -->
+            <div id="widgetSelector"
+                class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 border border-gray-700 rounded-xl shadow-xl p-4 flex flex-col gap-2 w-56 z-40">
+
+                <div onclick="createWidget('text')"
+                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
+                    📝 Text
+                </div>
+
+                <div onclick="createWidget('image')"
+                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
+                    🖼 Image
+                </div>
+
+                <div onclick="createWidget('shoutout')"
+                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
+                    🎬 Shoutout
+                </div>
+
+            </div>
+
+        </main>
+    </div>
 
     <script>
 
@@ -89,9 +90,7 @@
         let widgets = [];
         let selectedWidget = null;
 
-        // ========================
-        // LOAD PROJECT NAME
-        // ========================
+        // ================= LOAD PROJECT =================
 
         async function loadProject() {
             const res = await fetch("/api/projects");
@@ -103,9 +102,7 @@
             }
         }
 
-        // ========================
-        // LOAD WIDGETS
-        // ========================
+        // ================= LOAD WIDGETS =================
 
         async function loadWidgets() {
             const res = await fetch(`/api/widgets/${projectId}`);
@@ -154,9 +151,7 @@
             });
         }
 
-        // ========================
-        // DRAG SYSTEM
-        // ========================
+        // ================= DRAG =================
 
         function enableDrag(element, widget) {
 
@@ -190,11 +185,7 @@
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        data: {
-                            ...widget.data,
-                            x,
-                            y
-                        }
+                        data: { ...widget.data, x, y }
                     })
                 });
 
@@ -203,9 +194,7 @@
             });
         }
 
-        // ========================
-        // CONFIG PANEL
-        // ========================
+        // ================= CONFIG PANEL =================
 
         function openConfig(widget) {
 
@@ -220,54 +209,18 @@
 
                 content.innerHTML = `
                     <label class="block mb-2 text-sm">Command</label>
-                    <input id="cfgCommand"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded"
+                    <input id="cfgCommand" class="w-full mb-4 p-2 bg-gray-800 rounded"
                         value="${widget.data.command || "!so"}">
 
-                    <label class="block mb-2 text-sm">Chat Message Template</label>
-                    <textarea id="cfgTemplate"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</textarea>
-
                     <label class="block mb-2 text-sm">Duration (ms)</label>
-                    <input id="cfgDuration"
-                        type="number"
+                    <input id="cfgDuration" type="number"
                         class="w-full mb-4 p-2 bg-gray-800 rounded"
                         value="${widget.data.duration || 10000}">
-
-                    <label class="block mb-2 text-sm">Overlay Text</label>
-                    <input id="cfgOverlayText"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded"
-                        value="${widget.data.overlayText || ""}">
-
-                    <label class="block mb-2 text-sm">Animation In</label>
-                    <select id="cfgAnimIn"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">
-                        <option value="fade">Fade</option>
-                        <option value="zoom">Zoom</option>
-                        <option value="slide">Slide</option>
-                    </select>
-
-                    <label class="block mb-2 text-sm">Animation Out</label>
-                    <select id="cfgAnimOut"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">
-                        <option value="fade">Fade</option>
-                        <option value="zoom">Zoom</option>
-                        <option value="slide">Slide</option>
-                    </select>
                 `;
-
-                setTimeout(() => {
-                    document.getElementById("cfgAnimIn").value =
-                        widget.data.animationIn || "fade";
-                    document.getElementById("cfgAnimOut").value =
-                        widget.data.animationOut || "fade";
-                });
             }
         }
 
-        // ========================
-        // SAVE
-        // ========================
+        // ================= SAVE =================
 
         async function saveConfig() {
 
@@ -279,54 +232,31 @@
                 body: JSON.stringify({ name: newName })
             });
 
-            if (selectedWidget) {
-
-                const updatedData = {
-                    command: document.getElementById("cfgCommand")?.value?.trim(),
-                    textTemplate: document.getElementById("cfgTemplate")?.value,
-                    duration: parseInt(document.getElementById("cfgDuration")?.value),
-                    overlayText: document.getElementById("cfgOverlayText")?.value,
-                    animationIn: document.getElementById("cfgAnimIn")?.value,
-                    animationOut: document.getElementById("cfgAnimOut")?.value
-                };
-
-                await fetch(`/api/widgets/${selectedWidget._id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        data: {
-                            ...selectedWidget.data,
-                            ...updatedData
-                        }
-                    })
-                });
-            }
-
             await loadWidgets();
         }
 
-        // ========================
-        // ADD WIDGET
-        // ========================
+        // ================= ADD WIDGET =================
 
-        document.getElementById("newWidgetBtn")
-            .addEventListener("click", () => {
-                document.getElementById("widgetSelector")
-                    .classList.toggle("hidden");
-            });
+        const btn = document.getElementById("newWidgetBtn");
+        const selector = document.getElementById("widgetSelector");
+
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selector.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", () => {
+            selector.classList.add("hidden");
+        });
 
         async function createWidget(type) {
 
-            document.getElementById("widgetSelector")
-                .classList.add("hidden");
+            selector.classList.add("hidden");
 
             const res = await fetch("/api/widgets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    projectId,
-                    type: type
-                })
+                body: JSON.stringify({ projectId, type })
             });
 
             const newWidget = await res.json();
@@ -341,5 +271,4 @@
     </script>
 
 </body>
-
 </html>
