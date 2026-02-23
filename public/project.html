@@ -122,27 +122,31 @@
 <body class="bg-gray-950 text-white min-h-screen flex">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-white/5 backdrop-blur-md border-r border-white/10 p-6 flex flex-col justify-between">
+    <aside class="sidebar-glass w-64 p-6 flex flex-col justify-between">
+
         <div>
             <h1
                 class="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent mb-10">
                 Blotver
             </h1>
 
-            <nav class="flex flex-col gap-2 mt-10">
-                <a href="/dashboard"
-                    class="px-6 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition">
+            <nav class="relative flex flex-col gap-2 mt-10">
+
+                <a href="/dashboard" class="sidebar-item px-6 py-3 rounded-xl">
                     Overview
                 </a>
 
-                <a href="/dashboard/project" class="px-6 py-3 rounded-xl text-white bg-white/5">
+                <a href="/dashboard/project" class="sidebar-item px-6 py-3 rounded-xl">
                     Projects
                 </a>
 
-                <a href="/dashboard/profile"
-                    class="px-6 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition">
+                <a href="/dashboard/profile" class="sidebar-item px-6 py-3 rounded-xl">
                     Settings
                 </a>
+
+                <!-- Línea animada -->
+                <div id="activeIndicator"></div>
+
             </nav>
         </div>
 
@@ -194,7 +198,7 @@
                 Create New Project
             </h2>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid md:grid-cols-3 gap-4">
 
                 <div onclick="createProjectType('blank')"
                     class="p-6 bg-gray-800 hover:bg-gray-700 rounded-xl cursor-pointer transition border border-transparent hover:border-purple-500/40">
@@ -245,20 +249,6 @@
             menu.classList.toggle("hidden");
         }
 
-        function toggleProjectMenu(event, id) {
-            event.stopPropagation();
-
-            document.querySelectorAll('[id^="menu-"]')
-                .forEach(m => {
-                    if (m.id !== `menu-${id}`) {
-                        m.classList.add("hidden");
-                    }
-                });
-
-            const menu = document.getElementById(`menu-${id}`);
-            menu.classList.toggle("hidden");
-        }
-
         function openProjectModal() {
             document.getElementById("projectTypeModal").classList.remove("hidden");
         }
@@ -285,8 +275,6 @@
         // ======================
         // CARGAR PROJECTS
         // ======================
-
- 
 
         async function loadProjects() {
 
@@ -329,13 +317,6 @@
                 `;
             });
         }
-
-        window.addEventListener("click", () => {
-            document.querySelectorAll('[id^="menu-"]')
-                .forEach(m => m.classList.add("hidden"));
-        });
-
-
 
         window.addEventListener("click", () => {
             document.querySelectorAll('[id^="menu-"]')
@@ -406,68 +387,6 @@
         }
 
         loadUser();
-
-
-        // ======================
-        // DROPDOWN
-        // ======================
-
-        const button = document.getElementById("userMenuButton");
-        const dropdown = document.getElementById("userDropdown");
-
-        button.addEventListener("click", () => {
-            dropdown.classList.toggle("opacity-0");
-            dropdown.classList.toggle("scale-95");
-            dropdown.classList.toggle("pointer-events-none");
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add("opacity-0", "scale-95", "pointer-events-none");
-            }
-        });
-
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            window.location.href = "/logout";
-        });
-
-
-        // ======================
-        // CREAR PROJECT
-        // ======================
-
-        document.getElementById("newProjectBtn").addEventListener("click", async () => {
-
-            const name = prompt("Project name:");
-            if (!name) return;
-
-            const type = prompt("Type:\n1 = Blank Project\n2 = ShoutOut Widget");
-
-            const res = await fetch("/api/projects", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name })
-            });
-
-            const project = await res.json();
-
-            // Si elige shoutout, creamos widget automático
-            if (type === "2") {
-
-                await fetch("/api/widgets", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        projectId: project._id,
-                        name: "ShoutOut Widget",
-                        type: "shoutout"
-                    })
-                });
-
-            }
-
-            window.location.href = `/dashboard/project/${project._id}`;
-        });
 
         // ======================
         // ABRIR PROJECT
