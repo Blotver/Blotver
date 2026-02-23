@@ -240,6 +240,14 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
         };
     }
 
+    if (widgetType === "image") {
+        defaultData = {
+            ...defaultData,
+            url: "",
+            width: 200,
+            height: 200
+        };
+    }
     if (widgetType === "shoutout") {
         defaultData = {
             ...defaultData,
@@ -603,15 +611,13 @@ client.on("message", async (channel, tags, message, self) => {
         // Emitir al overlay
         const projects = await Project.find({ userId: userDB.twitchId });
 
-        for (const project of projects) {
-            io.to(matchedWidget.projectId.toString()).emit("newClip", {
-                clipId: clip.id,
-                duration: matchedWidget.data.duration || clip.duration,
-                overlayText: matchedWidget.data.overlayText || "",
-                animationIn: matchedWidget.data.animationIn || "fade",
-                animationOut: matchedWidget.data.animationOut || "fade"
-            });
-        }
+        io.to(matchedWidget.projectId.toString()).emit("newClip", {
+            clipId: clip.id,
+            duration: matchedWidget.data.duration || clip.duration,
+            overlayText: matchedWidget.data.overlayText || "",
+            animationIn: matchedWidget.data.animationIn || "fade",
+            animationOut: matchedWidget.data.animationOut || "fade"
+        });
 
     } catch (error) {
         console.log("❌ Error obteniendo clip:");

@@ -12,9 +12,28 @@
     <aside class="w-72 bg-gray-900 border-r border-gray-800 p-6">
         <h2 class="text-xl font-bold mb-6">Widgets</h2>
 
-        <button id="newWidgetBtn" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl mb-6">
-            + New Widget
-        </button>
+        <div class="mb-6 relative">
+            <button id="newWidgetBtn" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl">
+                + Add Widget
+            </button>
+
+            <div id="widgetSelector"
+                class="hidden absolute top-full left-0 mt-2 w-full bg-gray-800 rounded-xl shadow-lg p-3 flex flex-col gap-2 z-50">
+
+                <div onclick="createWidget('text')" class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
+                    📝 Text
+                </div>
+
+                <div onclick="createWidget('image')" class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
+                    🖼 Image
+                </div>
+
+                <div onclick="createWidget('shoutout')"
+                    class="p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer">
+                    🎬 Shoutout
+                </div>
+            </div>
+        </div>
 
         <div id="widgetsList" class="flex flex-col gap-3"></div>
     </aside>
@@ -75,6 +94,14 @@
 
                 if (widget.type === "text") {
                     el.innerText = widget.data.text || "Sample Text";
+                }
+
+                if (widget.type === "image") {
+                    const img = document.createElement("img");
+                    img.src = widget.data.url || "https://via.placeholder.com/150";
+                    img.style.width = (widget.data.width || 150) + "px";
+                    img.style.height = (widget.data.height || 150) + "px";
+                    el.appendChild(img);
                 }
 
                 if (widget.type === "shoutout") {
@@ -240,19 +267,31 @@
         }
 
         document.getElementById("newWidgetBtn")
-            .addEventListener("click", async () => {
-
-                await fetch("/api/widgets", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        projectId,
-                        type: "shoutout"
-                    })
-                });
-
-                loadWidgets();
+            .addEventListener("click", () => {
+                document.getElementById("widgetSelector")
+                    .classList.toggle("hidden");
             });
+
+        async function createWidget(type) {
+
+            document.getElementById("widgetSelector")
+                .classList.add("hidden");
+
+            const res = await fetch("/api/widgets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    projectId,
+                    type: type
+                })
+            });
+
+            const newWidget = await res.json();
+
+            await loadWidgets();
+
+            openConfig(newWidget);
+        }
 
         loadWidgets();
     </script>
