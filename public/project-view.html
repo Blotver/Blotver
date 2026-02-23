@@ -122,31 +122,54 @@
     <div class="pt-16 h-screen flex">
 
         <!-- SIDEBAR -->
-        <aside id="sidePanel" class="w-72 bg-gray-900 border-r border-gray-800 flex flex-col">
+        <aside class="w-72 bg-gradient-to-b from-gray-950 to-gray-900 border-r border-gray-800 flex flex-col relative">
 
-            <div class="sidebar-header" onclick="showLayers()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-                <span id="sidebarTitle">Layers</span>
+            <!-- HEADER -->
+            <div class="h-14 flex items-center px-4 border-b border-gray-800">
+                <h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
+                    Layers
+                </h2>
             </div>
 
-            <div class="sidebar-wrapper">
+            <!-- LAYERS LIST -->
+            <div id="layersPanel" class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2"></div>
 
-                <!-- LAYERS PANEL -->
-                <div class="panel no-scrollbar">
-                    <h3 class="text-xs text-gray-400 mb-3">LAYERS</h3>
-                    <div id="layersPanel" class="flex flex-col gap-1"></div>
+            <!-- SETTINGS OVERLAY -->
+            <div id="settingsOverlay" class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col">
+
+                <!-- SETTINGS HEADER -->
+                <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
+                    <div class="flex items-center gap-2">
+                        <button onclick="closeSettings()"
+                            class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-800 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span id="settingsTitle" class="text-sm font-medium text-gray-200">
+                            Widget Settings
+                        </span>
+                    </div>
+
+                    <!-- DELETE BUTTON -->
+                    <button onclick="deleteSelectedWidget()"
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-red-500/20 transition group">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4 text-gray-400 group-hover:text-red-400 transition" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
+                        </svg>
+                    </button>
                 </div>
 
-                <!-- SETTINGS PANEL -->
-                <div class="panel no-scrollbar">
-                    <h3 class="text-sm font-semibold mb-4 text-gray-300">Settings</h3>
-                    <div id="configContent"></div>
+                <!-- SETTINGS CONTENT -->
+                <div id="configContent" class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
                 </div>
 
             </div>
+
         </aside>
 
         <!-- CANVAS -->
@@ -237,8 +260,38 @@
 
                 canvas.appendChild(el);
 
+
                 const layerItem = document.createElement("div");
-                layerItem.className = "layer-item px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 cursor-pointer text-sm";
+
+                layerItem.className = `
+flex items-center justify-between px-3 py-2 rounded-lg
+bg-gray-800/60 hover:bg-gray-700/70
+border border-transparent hover:border-gray-700
+cursor-pointer text-sm transition-all
+`;
+
+                layerItem.dataset.id = widget._id;
+
+                layerItem.innerHTML = `
+<div class="flex items-center gap-2 truncate">
+    <span class="text-gray-300 truncate">
+        ${widget.name || widget.type}
+    </span>
+</div>
+
+<button class="delete-btn w-6 h-6 flex items-center justify-center
+rounded hover:bg-red-500/20 transition group">
+
+<svg xmlns="http://www.w3.org/2000/svg"
+class="w-3.5 h-3.5 text-gray-400 group-hover:text-red-400 transition"
+fill="none" viewBox="0 0 24 24"
+stroke="currentColor" stroke-width="2">
+<path stroke-linecap="round" stroke-linejoin="round"
+d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
+</svg>
+
+</button>
+`;
                 layerItem.innerText = widget.name || widget.type;
 
                 layerItem.addEventListener("click", () => {
@@ -330,15 +383,17 @@ class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</t
         }
 
         function openConfig(widget) {
+            selectedWidget = widget;
 
-            document.getElementById("sidePanel").classList.add("show-settings");
-            document.getElementById("sidebarTitle").innerText = widget.name || widget.type;
+            document.getElementById("settingsOverlay").classList.remove("hidden");
+            document.getElementById("settingsTitle").innerText =
+                widget.name || widget.type;
+
+            updateActiveLayer(widget._id);
 
             const content = document.getElementById("configContent");
 
             if (widget.type === "shoutout") {
-
-
                 content.innerHTML = `
                     <label class="block mb-2 text-sm">Command</label>
                     <input id="cfgCommand"
@@ -400,6 +455,27 @@ class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</t
             }
         }
 
+        function closeSettings() {
+            document.getElementById("settingsOverlay").classList.add("hidden");
+
+            document.querySelectorAll("#layersPanel > div")
+                .forEach(i => i.classList.remove("ring-2", "ring-purple-500"));
+        }
+        
+        async function deleteSelectedWidget() {
+            if (!selectedWidget) return;
+
+            await fetch(`/api/widgets/${selectedWidget._id}`, {
+                method: "DELETE"
+            });
+
+            selectedWidget = null;
+            selectedElement = null;
+
+            document.getElementById("settingsOverlay").classList.add("hidden");
+
+            loadWidgets();
+        }
         /* ================= UPDATE ================= */
 
         async function updateWidget(updates) {
@@ -416,7 +492,16 @@ class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</t
 
             selectedWidget = await res.json();
         }
+        function updateActiveLayer(id) {
+            document.querySelectorAll("#layersPanel > div").forEach(item => {
+                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
+            });
 
+            const active = document.querySelector(`#layersPanel > div[data-id="${id}"]`);
+            if (active) {
+                active.classList.add("ring-2", "ring-purple-500", "bg-gray-700/80");
+            }
+        }
         /* ================= DRAG ================= */
 
         function enableDrag(el, widget) {
