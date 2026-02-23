@@ -198,7 +198,7 @@
                 Create New Project
             </h2>
 
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 gap-4">
 
                 <div onclick="createProjectType('blank')"
                     class="p-6 bg-gray-800 hover:bg-gray-700 rounded-xl cursor-pointer transition border border-transparent hover:border-purple-500/40">
@@ -301,20 +301,52 @@
             projects.forEach(project => {
 
                 container.innerHTML += `
-                    <div onclick="openProject('${project._id}')"
-                        class="relative bg-gradient-to-br from-gray-900 to-gray-800 
-                               border border-gray-800 hover:border-purple-500/40
-                               rounded-2xl p-6 transition-all cursor-pointer group">
+    <div onclick="openProject('${project._id}')"
+        class="relative bg-gradient-to-br from-gray-900 to-gray-800 
+               border border-gray-800 hover:border-purple-500/40
+               rounded-2xl p-6 transition-all cursor-pointer group">
 
-                        <h3 class="text-lg font-semibold text-gray-200 group-hover:text-white transition">
-                            ${project.name}
-                        </h3>
+        <!-- HEADER -->
+        <div class="flex justify-between items-start">
 
-                        <p class="text-gray-500 text-sm mt-2">
-                            Created ${new Date(project.createdAt).toLocaleDateString()}
-                        </p>
-                    </div>
-                `;
+            <h3 class="text-lg font-semibold text-gray-200 group-hover:text-white transition">
+                ${project.name}
+            </h3>
+
+            <!-- 3 DOTS BUTTON -->
+            <div class="relative" onclick="event.stopPropagation()">
+                <button onclick="toggleProjectMenu(event, '${project._id}')"
+                    class="p-2 rounded-lg hover:bg-gray-700/60 transition">
+                    
+                    <!-- SVG DOTS -->
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                         class="w-5 h-5 text-gray-400 hover:text-white transition"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+
+                <!-- DROPDOWN -->
+                <div id="menu-${project._id}"
+                    class="hidden absolute right-0 mt-2 w-36 
+                           bg-gray-900 border border-gray-800
+                           rounded-xl shadow-lg shadow-black/40
+                           overflow-hidden z-20">
+
+                    <button onclick="deleteProject('${project._id}')"
+                        class="w-full text-left px-4 py-3 text-sm 
+                               text-red-400 hover:bg-red-500/10 transition">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+`;
             });
         }
 
@@ -395,6 +427,22 @@
             window.location.href = `/dashboard/project/${id}`;
         }
 
+        async function deleteProject(id) {
+            const confirmDelete = confirm("Are you sure you want to delete this project?");
+            if (!confirmDelete) return;
+
+            try {
+                await fetch(`/api/projects/${id}`, {
+                    method: "DELETE"
+                });
+
+                loadProjects(); // recargar lista
+
+            } catch (err) {
+                console.error("Error deleting project:", err);
+            }
+        }
+        
         loadProjects();
 
     </script>
