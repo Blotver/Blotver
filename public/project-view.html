@@ -64,14 +64,22 @@
     <div class="pt-16 h-screen flex">
 
         <!-- LAYERS PANEL -->
-        <aside class="w-64 bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
-            <h3 class="text-sm text-gray-400 mb-3">Layers</h3>
-            <div id="layersPanel" class="flex flex-col gap-1"></div>
-        </aside>
+        <aside id="sidePanel" class="w-64 bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
 
-        <aside id="configPanel" class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden">
-            <h3 class="text-lg font-bold mb-6">Settings</h3>
-            <div id="configContent"></div>
+            <div id="layersView">
+                <h3 class="text-sm text-gray-400 mb-3">Layers</h3>
+                <div id="layersPanel" class="flex flex-col gap-1"></div>
+            </div>
+
+            <div id="settingsView" class="hidden">
+                <button onclick="backToLayers()" class="mb-4 text-sm text-purple-400 hover:text-purple-300">
+                    ← Back
+                </button>
+
+                <h3 class="text-lg font-bold mb-6">Settings</h3>
+                <div id="configContent"></div>
+            </div>
+
         </aside>
 
         <!-- CANVAS -->
@@ -344,10 +352,11 @@
 
             selectedWidget = widget;
 
-            const panel = document.getElementById("configPanel");
-            const content = document.getElementById("configContent");
+            // Cambiar vista
+            document.getElementById("layersView").classList.add("hidden");
+            document.getElementById("settingsView").classList.remove("hidden");
 
-            panel.classList.remove("hidden");
+            const content = document.getElementById("configContent");
 
             if (widget.type === "shoutout") {
 
@@ -389,12 +398,38 @@
                     </select>
                 `;
 
-                setTimeout(() => {
-                    document.getElementById("cfgAnimIn").value =
-                        widget.data.animationIn || "fade";
-                    document.getElementById("cfgAnimOut").value =
-                        widget.data.animationOut || "fade";
-                });
+                // Listeners
+                document.getElementById("cfgCommand")
+                    .addEventListener("input", e =>
+                        updateSelectedWidget({ command: e.target.value })
+                    );
+
+                document.getElementById("cfgTemplate")
+                    .addEventListener("input", e =>
+                        updateSelectedWidget({ textTemplate: e.target.value })
+                    );
+
+                document.getElementById("cfgDuration")
+                    .addEventListener("input", e =>
+                        updateSelectedWidget({ duration: parseInt(e.target.value) })
+                    );
+
+                document.getElementById("cfgOverlayText")
+                    .addEventListener("input", e =>
+                        updateSelectedWidget({ overlayText: e.target.value })
+                    );
+            }
+        }
+
+        function backToLayers() {
+            document.getElementById("settingsView").classList.add("hidden");
+            document.getElementById("layersView").classList.remove("hidden");
+
+            selectedWidget = null;
+
+            if (selectedElement) {
+                selectedElement.style.outline = "none";
+                selectedElement = null;
             }
         }
 
@@ -431,7 +466,6 @@
 
             selectedWidget = null;
             selectedElement = null;
-            document.getElementById("configPanel").classList.add("hidden");
 
             loadWidgets();
         }
