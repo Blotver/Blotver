@@ -10,7 +10,8 @@
 <body class="bg-gray-950 text-white overflow-hidden">
 
     <!-- ================= HEADER ================= -->
-    <header class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
+    <header
+        class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
 
         <div class="flex items-center gap-6">
             <input id="projectNameInput"
@@ -19,13 +20,11 @@
 
             <div>
                 <span class="text-xs text-gray-400 block">Overlay URL</span>
-                <input id="overlayLink"
-                    class="bg-gray-800 text-xs px-3 py-1 rounded w-[380px]" readonly>
+                <input id="overlayLink" class="bg-gray-800 text-xs px-3 py-1 rounded w-[380px]" readonly>
             </div>
         </div>
 
-        <button onclick="saveConfig()"
-            class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
+        <button onclick="saveConfig()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
             Save
         </button>
 
@@ -35,8 +34,7 @@
     <div class="pt-16 h-screen flex">
 
         <!-- CONFIG PANEL (LEFT) -->
-        <aside id="configPanel"
-            class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden overflow-y-auto">
+        <aside id="configPanel" class="w-80 bg-gray-900 border-r border-gray-800 p-6 hidden overflow-y-auto">
 
             <h3 class="text-lg font-bold mb-6">Widget Settings</h3>
             <div id="configContent"></div>
@@ -44,8 +42,7 @@
         </aside>
 
         <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-hidden"
-            style="background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+        <main class="flex-1 relative bg-white overflow-hidden" style="background-image: radial-gradient(#d1d5db 1px, transparent 1px);
                    background-size: 20px 20px;">
 
             <div id="canvas" class="w-full h-full relative"></div>
@@ -60,13 +57,11 @@
             <div id="widgetSelector"
                 class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 border border-gray-700 rounded-xl shadow-xl p-4 flex flex-col gap-2 w-56 z-40">
 
-                <div onclick="createWidget('text')"
-                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
+                <div onclick="createWidget('text')" class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
                     📝 Text
                 </div>
 
-                <div onclick="createWidget('image')"
-                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
+                <div onclick="createWidget('image')" class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
                     🖼 Image
                 </div>
 
@@ -90,7 +85,9 @@
         let widgets = [];
         let selectedWidget = null;
 
-        // ================= LOAD PROJECT =================
+        // ========================
+        // LOAD PROJECT NAME
+        // ========================
 
         async function loadProject() {
             const res = await fetch("/api/projects");
@@ -102,7 +99,9 @@
             }
         }
 
-        // ================= LOAD WIDGETS =================
+        // ========================
+        // LOAD WIDGETS
+        // ========================
 
         async function loadWidgets() {
             const res = await fetch(`/api/widgets/${projectId}`);
@@ -151,7 +150,9 @@
             });
         }
 
-        // ================= DRAG =================
+        // ========================
+        // DRAG SYSTEM
+        // ========================
 
         function enableDrag(element, widget) {
 
@@ -185,7 +186,11 @@
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        data: { ...widget.data, x, y }
+                        data: {
+                            ...widget.data,
+                            x,
+                            y
+                        }
                     })
                 });
 
@@ -194,8 +199,20 @@
             });
         }
 
-        // ================= CONFIG PANEL =================
+        // ========================
+        // CONFIG PANEL
+        // ========================
+        function openAddMenu() {
+            const menu = document.getElementById("addMenu");
+            menu.classList.toggle("hidden");
+        }
 
+        document.addEventListener("click", function (e) {
+            const menu = document.getElementById("addMenu");
+            if (!e.target.closest("#addMenu") && !e.target.closest("button[onclick='openAddMenu()']")) {
+                menu.classList.add("hidden");
+            }
+        });
         function openConfig(widget) {
 
             selectedWidget = widget;
@@ -209,18 +226,54 @@
 
                 content.innerHTML = `
                     <label class="block mb-2 text-sm">Command</label>
-                    <input id="cfgCommand" class="w-full mb-4 p-2 bg-gray-800 rounded"
+                    <input id="cfgCommand"
+                        class="w-full mb-4 p-2 bg-gray-800 rounded"
                         value="${widget.data.command || "!so"}">
 
+                    <label class="block mb-2 text-sm">Chat Message Template</label>
+                    <textarea id="cfgTemplate"
+                        class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</textarea>
+
                     <label class="block mb-2 text-sm">Duration (ms)</label>
-                    <input id="cfgDuration" type="number"
+                    <input id="cfgDuration"
+                        type="number"
                         class="w-full mb-4 p-2 bg-gray-800 rounded"
                         value="${widget.data.duration || 10000}">
+
+                    <label class="block mb-2 text-sm">Overlay Text</label>
+                    <input id="cfgOverlayText"
+                        class="w-full mb-4 p-2 bg-gray-800 rounded"
+                        value="${widget.data.overlayText || ""}">
+
+                    <label class="block mb-2 text-sm">Animation In</label>
+                    <select id="cfgAnimIn"
+                        class="w-full mb-4 p-2 bg-gray-800 rounded">
+                        <option value="fade">Fade</option>
+                        <option value="zoom">Zoom</option>
+                        <option value="slide">Slide</option>
+                    </select>
+
+                    <label class="block mb-2 text-sm">Animation Out</label>
+                    <select id="cfgAnimOut"
+                        class="w-full mb-4 p-2 bg-gray-800 rounded">
+                        <option value="fade">Fade</option>
+                        <option value="zoom">Zoom</option>
+                        <option value="slide">Slide</option>
+                    </select>
                 `;
+
+                setTimeout(() => {
+                    document.getElementById("cfgAnimIn").value =
+                        widget.data.animationIn || "fade";
+                    document.getElementById("cfgAnimOut").value =
+                        widget.data.animationOut || "fade";
+                });
             }
         }
 
-        // ================= SAVE =================
+        // ========================
+        // SAVE
+        // ========================
 
         async function saveConfig() {
 
@@ -232,31 +285,54 @@
                 body: JSON.stringify({ name: newName })
             });
 
+            if (selectedWidget) {
+
+                const updatedData = {
+                    command: document.getElementById("cfgCommand")?.value?.trim(),
+                    textTemplate: document.getElementById("cfgTemplate")?.value,
+                    duration: parseInt(document.getElementById("cfgDuration")?.value),
+                    overlayText: document.getElementById("cfgOverlayText")?.value,
+                    animationIn: document.getElementById("cfgAnimIn")?.value,
+                    animationOut: document.getElementById("cfgAnimOut")?.value
+                };
+
+                await fetch(`/api/widgets/${selectedWidget._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        data: {
+                            ...selectedWidget.data,
+                            ...updatedData
+                        }
+                    })
+                });
+            }
+
             await loadWidgets();
         }
 
-        // ================= ADD WIDGET =================
+        // ========================
+        // ADD WIDGET
+        // ========================
 
-        const btn = document.getElementById("newWidgetBtn");
-        const selector = document.getElementById("widgetSelector");
-
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            selector.classList.toggle("hidden");
-        });
-
-        document.addEventListener("click", () => {
-            selector.classList.add("hidden");
-        });
+        document.getElementById("newWidgetBtn")
+            .addEventListener("click", () => {
+                document.getElementById("widgetSelector")
+                    .classList.toggle("hidden");
+            });
 
         async function createWidget(type) {
 
-            selector.classList.add("hidden");
+            document.getElementById("widgetSelector")
+                .classList.add("hidden");
 
             const res = await fetch("/api/widgets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ projectId, type })
+                body: JSON.stringify({
+                    projectId,
+                    type: type
+                })
             });
 
             const newWidget = await res.json();
@@ -271,4 +347,5 @@
     </script>
 
 </body>
+
 </html>
