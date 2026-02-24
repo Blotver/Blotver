@@ -34,3 +34,4 @@ window.ShoutoutWidget = {
             );
     }
 };
+registerWidget(window.ShoutoutWidget);

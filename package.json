@@ -2,7 +2,7 @@
   "name": "blotver",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "bot/index.js",
   "scripts": {
     "start": "node bot.js",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --minify",

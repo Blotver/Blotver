@@ -3,6 +3,7 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const Project = require("./models/Project");
+const handleShoutout = require("./bot/commands/shoutout");
 const tmi = require("tmi.js");
 const express = require("express");
 const axios = require("axios");
@@ -565,94 +566,21 @@ async function getRandomClip(userId, userDB) {
 // COMANDOS
 // ========================
 
+const handleWidgetCommands = require("./bot/handlers/widgetHandler");
+
 client.on("message", async (channel, tags, message, self) => {
     if (self) return;
 
-    const args = message.trim().split(" ");
-    const command = args[0].toLowerCase();
-
-    // ========================
-    // SISTEMA SHOUTOUT DINÁMICO
-    // ========================
-
-    // Buscar canal
-    const channelName = channel.replace("#", "");
-    const userDB = await User.findOne({ login: channelName });
-    if (!userDB) return;
-
-    // Buscar widgets shoutout activos
-    const widgets = await Widget.find({
-        userId: userDB.twitchId,
-        type: "shoutout"
+    await handleWidgetCommands({
+        client,
+        io,
+        channel,
+        tags,
+        message,
+        User,
+        Widget,
+        getUserId,
+        getRandomClip,
+        twitchAPI
     });
-
-    // Buscar si algún widget coincide con el comando escrito
-    const matchedWidget = widgets.find(w =>
-        w.data.command?.toLowerCase() === command
-    );
-
-    if (!matchedWidget) return;
-
-    // Verificar permisos
-    const esMod = tags.mod || tags.badges?.broadcaster;
-
-    if (!esMod) {
-        client.say(channel, "⛔ Solo los moderadores pueden usar este comando.");
-        return;
-    }
-
-    if (!args[1]) {
-        client.say(channel, `❌ Debes escribir un usuario. Ejemplo: ${matchedWidget.data.command} nombre`);
-        return;
-    }
-
-    const usuario = args[1].replace("@", "").toLowerCase();
-
-    try {
-
-        const userId = await getUserId(usuario, userDB);
-        if (!userId) {
-            client.say(channel, "❌ Usuario no encontrado.");
-            return;
-        }
-
-        const clip = await getRandomClip(userId, userDB);
-        if (!clip) {
-            client.say(channel, "⚠️ Ese canal no tiene clips.");
-            return;
-        }
-
-        // Obtener juego actual
-        const userInfoRes = await twitchAPI(
-            `https://api.twitch.tv/helix/channels?broadcaster_id=${userId}`,
-            userDB
-        );
-
-        let gameName = "algo increíble";
-        if (userInfoRes && userInfoRes.data.data.length > 0) {
-            gameName = userInfoRes.data.data[0].game_name || "algo increíble";
-        }
-
-        // Usar template dinámico
-        let template = matchedWidget.data.textTemplate ||
-            "🚀 Shoutout para @{user} jugando {game} 🎮";
-
-        const mensaje = template
-            .replaceAll("{user}", usuario)
-            .replaceAll("{game}", gameName);
-
-        client.say(channel, mensaje);
-
-        io.to(matchedWidget.projectId.toString()).emit("newClip", {
-            clipId: clip.id,
-            duration: matchedWidget.data.duration || clip.duration,
-            overlayText: matchedWidget.data.overlayText || "",
-            animationIn: matchedWidget.data.animationIn || "fade",
-            animationOut: matchedWidget.data.animationOut || "fade"
-        });
-
-    } catch (error) {
-        console.log("❌ Error obteniendo clip:");
-        console.log(error.response?.data || error.message);
-    }
 });
