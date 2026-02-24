@@ -223,7 +223,10 @@
             const projectRes = await fetch("/api/projects");
             const allProjects = await projectRes.json();
             currentProject = allProjects.find(p => p._id === projectId);
-
+            if (currentProject) {
+                document.getElementById("projectNameInput").value =
+                    currentProject.name || currentProject.title || "";
+            }
             const res = await fetch(`/api/widgets/${projectId}`);
             widgets = await res.json();
 
@@ -359,12 +362,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             };
 
             try {
-                const res = await fetch(`/api/projects/${currentProject._id}`, {
+                const projectTitle = document.getElementById("projectNameInput").value;
+
+                await fetch(`/api/projects/${currentProject._id}`, {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: projectTitle })
                 });
 
                 const data = await res.json();
