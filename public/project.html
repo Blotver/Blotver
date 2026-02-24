@@ -365,7 +365,7 @@
                 }
                 container.innerHTML += `
 <div onclick="openProject('${project._id}')"
-    class="bg-gray-900 rounded-2xl overflow-hidden
+    class="relative bg-gray-900 rounded-2xl overflow-hidden
            shadow-xl shadow-black/40
            hover:-translate-y-1
            hover:shadow-2xl hover:shadow-purple-500/10
@@ -373,25 +373,46 @@
            cursor-pointer group">
 
     <!-- TOP PREVIEW -->
-<div class="absolute -bottom-10 -right-10 w-40 h-40 
-            bg-white/10 rounded-full blur-3xl ${previewBackground}">
+    <div class="h-32 relative overflow-hidden
+                bg-gradient-to-br ${previewBackground}">
 
-    <!-- Glow layer -->
-    <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        <!-- Glow circle -->
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 
+                    bg-white/10 rounded-full blur-3xl">
+        </div>
 
-    <!-- Noise pattern -->
-    <div class="absolute inset-0 opacity-20 
-        bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)]
-        bg-[size:12px_12px]">
+        <!-- Dark overlay -->
+        <div class="absolute inset-0 bg-black/20"></div>
+
+        <!-- Noise -->
+        <div class="absolute inset-0 opacity-20 
+            bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)]
+            bg-[size:12px_12px]">
+        </div>
+
+        <!-- Floating icon -->
+        <div class="absolute inset-0 flex items-center justify-center
+                    transition-transform duration-500 group-hover:scale-110">
+            ${previewIcon}
+        </div>
+
+        <!-- 3 DOTS MENU -->
+        <button onclick="event.stopPropagation(); deleteProject('${project._id}')"
+            class="absolute top-3 right-3 w-8 h-8
+                   flex items-center justify-center
+                   rounded-lg bg-black/30 hover:bg-black/50
+                   backdrop-blur-sm transition">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 text-white/70"
+                fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 12h.01M12 12h.01M18 12h.01"/>
+            </svg>
+        </button>
+
     </div>
-
-    <!-- Floating icon -->
-    <div class="absolute inset-0 flex items-center justify-center
-                transition-transform duration-500 group-hover:scale-110">
-        ${previewIcon}
-    </div>
-
-</div>
 
     <!-- CONTENT -->
     <div class="p-6">

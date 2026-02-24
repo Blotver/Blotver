@@ -660,6 +660,14 @@ video {
   right: -2.5rem;
 }
 
+.right-3 {
+  right: 0.75rem;
+}
+
+.top-3 {
+  top: 0.75rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -1159,6 +1167,10 @@ video {
 
 .bg-white\/10 {
   background-color: rgb(255 255 255 / 0.1);
+}
+
+.bg-black\/30 {
+  background-color: rgb(0 0 0 / 0.3);
 }
 
 .bg-gradient-to-b {
@@ -1731,6 +1743,10 @@ video {
 .hover\:bg-red-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(185 28 28 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-black\/50:hover {
+  background-color: rgb(0 0 0 / 0.5);
 }
 
 .hover\:text-red-500:hover {
