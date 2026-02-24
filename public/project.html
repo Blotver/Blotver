@@ -350,7 +350,8 @@
     `;
                 }
                 container.innerHTML += `
-class="relative bg-gray-900 rounded-2xl overflow-hidden
+<div onclick="openProject('${project._id}')"
+    class="relative bg-gray-900 rounded-2xl overflow-hidden
        shadow-[0_20px_60px_rgba(0,0,0,0.6)]
        hover:-translate-y-2
        hover:shadow-[0_35px_120px_rgba(168,85,247,0.35)]
@@ -405,10 +406,10 @@ class="relative bg-gray-900 rounded-2xl overflow-hidden
 <svg class="w-5 h-5 transition-transform duration-200 group-hover/delete:scale-110"
      fill="none"
      stroke="currentColor"
-     stroke-width="1.8"
+     stroke-width="1.6"
      viewBox="0 0 24 24">
   <path stroke-linecap="round" stroke-linejoin="round"
-        d="M6 7h12M9 7V4h6v3M8 7v12m8-12v12"/>
+        d="M9 3h6m-7 4h8m-7 4v6m6-6v6M5 7h14l-1 13H6L5 7z"/>
 </svg>
     </button>
 
