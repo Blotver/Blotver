@@ -350,12 +350,11 @@
     `;
                 }
                 container.innerHTML += `
-<div onclick="openProject('${project._id}')"
-    class="relative bg-gray-900 rounded-2xl overflow-hidden
-       shadow-lg shadow-black/40
+class="relative bg-gray-900 rounded-2xl overflow-hidden
+       shadow-[0_20px_60px_rgba(0,0,0,0.6)]
        hover:-translate-y-2
-       hover:shadow-2xl hover:shadow-purple-600/25
-       transition-all duration-300 ease-out
+       hover:shadow-[0_35px_120px_rgba(168,85,247,0.35)]
+       transition-all duration-500 ease-out
        cursor-pointer group"
 
     <!-- TOP PREVIEW -->
@@ -403,14 +402,14 @@
                transition-all duration-200
                group/delete">
 
-        <svg class="w-5 h-5 transition-transform duration-200 group-hover/delete:scale-110"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="1.8"
-             viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                d="M6 7h12M9 7V4h6v3M8 7v13m8-13v13M5 7h14"/>
-        </svg>
+<svg class="w-5 h-5 transition-transform duration-200 group-hover/delete:scale-110"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.8"
+     viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="M6 7h12M9 7V4h6v3M8 7v12m8-12v12"/>
+</svg>
     </button>
 
     <!-- EDIT RIGHT -->
