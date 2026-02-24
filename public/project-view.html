@@ -207,12 +207,6 @@
     <script src="/widgets/shoutout.js"></script>
 
     <script>
-
-        const widgetDef = window.WidgetRegistry[widget.type];
-
-        if (widgetDef && widgetDef.renderConfig) {
-            widgetDef.renderConfig(widget, content, updateSelectedWidget);
-        }
         const projectId = window.location.pathname.split("/").pop();
         document.getElementById("overlayLink").value =
             window.location.origin + "/overlay/" + projectId;
@@ -226,8 +220,32 @@
         /* ================= LOAD ================= */
 
         async function loadWidgets() {
+            const projectRes = await fetch("/api/projects");
+            const allProjects = await projectRes.json();
+            const currentProject = allProjects.find(p => p._id === projectId);
+
             const res = await fetch(`/api/widgets/${projectId}`);
             widgets = await res.json();
+
+            // 🚀 Si es proyecto shoutout y no tiene widgets → crear uno automático
+            if (currentProject?.type === "shoutout" && widgets.length === 0) {
+
+                const def = window.ShoutoutWidget.defaultData;
+
+                await fetch("/api/widgets", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        projectId,
+                        type: "shoutout",
+                        data: def
+                    })
+                });
+
+                // Recargar widgets
+                const newRes = await fetch(`/api/widgets/${projectId}`);
+                widgets = await newRes.json();
+            }
 
             const canvas = document.getElementById("canvas");
             const layersPanel = document.getElementById("layersPanel");
@@ -305,12 +323,17 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
 </button>
 `;
-                layerItem.innerText = widget.name || widget.type;
 
                 layerItem.addEventListener("click", () => {
                     selectWidget(widget, el);
                 });
 
+                layerItem.querySelector(".delete-btn").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    selectedWidget = widget;
+                    deleteSelectedWidget();
+                });
+                
                 layersPanel.appendChild(layerItem);
 
             });
@@ -343,59 +366,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function openConfig(widget) {
 
-            document.getElementById("sidePanel").classList.add("show-settings");
-            document.getElementById("sidebarTitle").innerText = widget.name || widget.type;
-
-            const content = document.getElementById("configContent");
-
-            if (widget.type === "shoutout") {
-
-                content.innerHTML = `
-<label class="block mb-2 text-sm">Command</label>
-<input id="cfgCommand" class="w-full mb-4 p-2 bg-gray-800 rounded"
-value="${widget.data.command || "!so"}">
-
-<label class="block mb-2 text-sm">Template</label>
-<textarea id="cfgTemplate"
-class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</textarea>
-`;
-
-                document.getElementById("cfgCommand")
-                    .addEventListener("input", e => updateWidget({ command: e.target.value }));
-
-                document.getElementById("cfgTemplate")
-                    .addEventListener("input", e => updateWidget({ textTemplate: e.target.value }));
-
-            }
-
-        }
-
-        // ================= SELECT SYSTEM =================
-
-        function selectWidget(widget, element) {
-
-            if (selectedElement) selectedElement.style.outline = "none";
-
-            selectedWidget = widget;
-            selectedElement = element;
-
-            element.style.outline = "2px solid #3b82f6";
-            element.style.outlineOffset = "2px";
-
-            openConfig(widget);
-
-        }
-
-        function showLayers() {
-            document.getElementById("sidePanel").classList.remove("show-settings");
-            document.getElementById("sidebarTitle").innerText = "Layers";
-
-            if (selectedElement) selectedElement.style.outline = "none";
-            selectedWidget = null;
-            selectedElement = null;
-        }
-
-        function openConfig(widget) {
             selectedWidget = widget;
 
             document.getElementById("settingsOverlay").classList.remove("hidden");
@@ -406,68 +376,26 @@ class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</t
 
             const content = document.getElementById("configContent");
 
-            if (widget.type === "shoutout") {
-                content.innerHTML = `
-                    <label class="block mb-2 text-sm">Command</label>
-                    <input id="cfgCommand"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded"
-                        value="${widget.data.command || "!so"}">
+            const widgetDef = window.WidgetRegistry[widget.type];
 
-                    <label class="block mb-2 text-sm">Chat Message Template</label>
-                    <textarea id="cfgTemplate"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">${widget.data.textTemplate || ""}</textarea>
-
-                    <label class="block mb-2 text-sm">Duration (ms)</label>
-                    <input id="cfgDuration"
-                        type="number"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded"
-                        value="${widget.data.duration || 10000}">
-
-                    <label class="block mb-2 text-sm">Overlay Text</label>
-                    <input id="cfgOverlayText"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded"
-                        value="${widget.data.overlayText || ""}">
-
-                    <label class="block mb-2 text-sm">Animation In</label>
-                    <select id="cfgAnimIn"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">
-                        <option value="fade">Fade</option>
-                        <option value="zoom">Zoom</option>
-                        <option value="slide">Slide</option>
-                    </select>
-
-                    <label class="block mb-2 text-sm">Animation Out</label>
-                    <select id="cfgAnimOut"
-                        class="w-full mb-4 p-2 bg-gray-800 rounded">
-                        <option value="fade">Fade</option>
-                        <option value="zoom">Zoom</option>
-                        <option value="slide">Slide</option>
-                    </select>
-                `;
-
-                // Listeners
-                document.getElementById("cfgCommand")
-                    .addEventListener("input", e =>
-                        updateSelectedWidget({ command: e.target.value })
-                    );
-
-                document.getElementById("cfgTemplate")
-                    .addEventListener("input", e =>
-                        updateSelectedWidget({ textTemplate: e.target.value })
-                    );
-
-                document.getElementById("cfgDuration")
-                    .addEventListener("input", e =>
-                        updateSelectedWidget({ duration: parseInt(e.target.value) })
-                    );
-
-                document.getElementById("cfgOverlayText")
-                    .addEventListener("input", e =>
-                        updateSelectedWidget({ overlayText: e.target.value })
-                    );
+            if (widgetDef && widgetDef.renderConfig) {
+                widgetDef.renderConfig(widget, content, updateSelectedWidget);
             }
         }
+        async function updateSelectedWidget(updates) {
 
+            if (!selectedWidget) return;
+
+            const updatedData = { ...selectedWidget.data, ...updates };
+
+            const res = await fetch(`/api/widgets/${selectedWidget._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data: updatedData })
+            });
+
+            selectedWidget = await res.json();
+        }
         function closeSettings() {
             document.getElementById("settingsOverlay").classList.add("hidden");
 
