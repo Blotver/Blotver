@@ -330,79 +330,97 @@
             }
 
             projects.forEach(project => {
+                let previewBackground = '';
+                let previewIcon = '';
 
+                if (project.type === 'shoutout') {
+                    previewBackground = 'from-purple-600 via-indigo-600 to-purple-500';
+                    previewIcon = `
+        <svg class="w-10 h-10 text-white/70"
+             fill="none" stroke="currentColor" stroke-width="1.5"
+             viewBox="0 0 24 24">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+    `;
+                }
+                else if (project.type === 'voice') {
+                    previewBackground = 'from-blue-600 via-cyan-600 to-blue-500';
+                    previewIcon = `
+        <svg class="w-10 h-10 text-white/70"
+             fill="none" stroke="currentColor" stroke-width="1.5"
+             viewBox="0 0 24 24">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+        </svg>
+    `;
+                }
+                else {
+                    previewBackground = 'from-gray-700 via-gray-600 to-gray-700';
+                    previewIcon = `
+        <svg class="w-10 h-10 text-white/60"
+             fill="none" stroke="currentColor" stroke-width="1.5"
+             viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="16" rx="3"/>
+        </svg>
+    `;
+                }
                 container.innerHTML += `
-    <div onclick="openProject('${project._id}')"
-        class="relative bg-gradient-to-br from-gray-900 to-gray-800 
-               border border-gray-800 hover:border-purple-500/40
-               rounded-2xl p-6 transition-all duration-300
-               hover:shadow-xl hover:shadow-purple-500/5
-               cursor-pointer group">
+<div onclick="openProject('${project._id}')"
+    class="bg-gray-900 rounded-2xl overflow-hidden
+           shadow-xl shadow-black/40
+           hover:-translate-y-1
+           hover:shadow-2xl hover:shadow-purple-500/10
+           transition-all duration-300
+           cursor-pointer group">
 
-        <!-- HEADER -->
-        <div class="flex justify-between items-start mb-6">
+    <!-- TOP PREVIEW -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 
+            bg-white/10 rounded-full blur-3xl ${previewBackground}">
 
-            <div>
+    <!-- Glow layer -->
+    <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
 
-                <h3 class="text-lg font-semibold text-gray-200 group-hover:text-white transition">
-                    ${project.name}
-                </h3>
-                <p class="text-sm text-gray-500 mt-1">
-                    Created ${new Date(project.createdAt).toLocaleDateString()}
-                </p>
-            </div>
+    <!-- Noise pattern -->
+    <div class="absolute inset-0 opacity-20 
+        bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)]
+        bg-[size:12px_12px]">
+    </div>
 
-            <!-- 3 DOTS BUTTON -->
-            <div class="relative opacity-0 group-hover:opacity-100 transition"
-     onclick="event.stopPropagation()">
-                <button onclick="toggleProjectMenu(event, '${project._id}')"
-                    class="p-2 rounded-lg hover:bg-gray-700/60 transition">
+    <!-- Floating icon -->
+    <div class="absolute inset-0 flex items-center justify-center
+                transition-transform duration-500 group-hover:scale-110">
+        ${previewIcon}
+    </div>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                         class="w-5 h-5 text-gray-400 hover:text-white transition"
-                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
-                    </svg>
-                </button>
+</div>
 
-                <!-- DROPDOWN -->
-                <div id="menu-${project._id}"
-                    class="hidden absolute right-0 top-10 w-40
-                           bg-gray-900 border border-gray-800
-                           rounded-xl shadow-2xl shadow-black/50
-                           overflow-hidden z-50">
+    <!-- CONTENT -->
+    <div class="p-6">
 
-                    <button onclick="deleteProject('${project._id}')"
-    class="w-full flex items-center gap-2 px-4 py-3 text-sm 
-           text-red-400 hover:bg-red-500/10 transition">
+        <h3 class="text-lg font-semibold text-gray-200 
+                   group-hover:text-white transition">
+            ${project.name}
+        </h3>
 
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-         viewBox="0 0 24 24">
-        <path d="M3 6h18"/>
-        <path d="M8 6v14"/>
-        <path d="M16 6v14"/>
-        <path d="M5 6l1-2h12l1 2"/>
-    </svg>
+        <div class="mt-6 flex items-center justify-between">
 
-    Delete Project
-</button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-800 pt-4">
-            <span>${project.type}</span>
-            <span class="group-hover:text-purple-400 transition">
-                Open →
+            <span class="text-xs px-3 py-1 rounded-full
+                         bg-gray-800 text-gray-400">
+                ${project.type}
             </span>
+
+            <button onclick="event.stopPropagation(); openProject('${project._id}')"
+                class="px-5 py-2 text-sm rounded-full
+                       border border-gray-600
+                       text-gray-300 hover:border-purple-500
+                       hover:text-white transition">
+                Edit
+            </button>
+
         </div>
 
     </div>
-    `;
+</div>
+`;
             });
         }
 
