@@ -183,7 +183,7 @@
         </div>
 
         <!-- PROJECT GRID -->
-        <div id="projectsContainer" class="grid md:grid-cols-3 gap-8">
+        <div id="projectsContainer" class="grid md:grid-cols-3 gap-8 relative">
         </div>
 
     </main>
@@ -331,67 +331,78 @@
 
             projects.forEach(project => {
 
-container.innerHTML += `
-<div onclick="openProject('${project._id}')"
-    class="relative group bg-gradient-to-br 
-           from-gray-900 via-gray-900 to-gray-800
-           border border-gray-800
-           hover:border-purple-500/50
-           rounded-2xl p-6
-           transition-all duration-300
-           hover:scale-[1.02]
-           hover:shadow-2xl hover:shadow-purple-500/10
-           cursor-pointer overflow-hidden">
+                container.innerHTML += `
+    <div onclick="openProject('${project._id}')"
+        class="relative bg-gradient-to-br from-gray-900 to-gray-800 
+               border border-gray-800 hover:border-purple-500/40
+               rounded-2xl p-6 transition-all duration-300
+               hover:shadow-xl hover:shadow-purple-500/5
+               cursor-pointer group">
 
-    <!-- Glow effect -->
-    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition 
-                bg-gradient-to-br from-purple-600/10 via-transparent to-blue-500/10">
-    </div>
+        <!-- HEADER -->
+        <div class="flex justify-between items-start mb-6">
 
-    <div class="relative flex justify-between items-start">
+            <div>
 
-        <div>
-            <h3 class="text-lg font-semibold text-gray-200 group-hover:text-white transition">
-                ${project.name}
-            </h3>
-
-            <p class="text-xs text-gray-500 mt-2">
-                Created ${new Date(project.createdAt).toLocaleDateString()}
-            </p>
-        </div>
-
-        <!-- MENU -->
-        <div class="relative" onclick="event.stopPropagation()">
-            <button onclick="toggleProjectMenu(event, '${project._id}')"
-                class="p-2 rounded-lg hover:bg-gray-700/60 transition">
-
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="w-5 h-5 text-gray-400 hover:text-white transition"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-                    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                    <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
-                </svg>
-            </button>
-
-            <div id="menu-${project._id}"
-                class="hidden absolute right-0 mt-2 w-36 
-                       bg-gray-900 border border-gray-800
-                       rounded-xl shadow-xl shadow-black/40
-                       overflow-hidden z-20">
-
-                <button onclick="deleteProject('${project._id}')"
-                    class="w-full text-left px-4 py-3 text-sm 
-                           text-red-400 hover:bg-red-500/10 transition">
-                    Delete
-                </button>
+                <h3 class="text-lg font-semibold text-gray-200 group-hover:text-white transition">
+                    ${project.name}
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    Created ${new Date(project.createdAt).toLocaleDateString()}
+                </p>
             </div>
+
+            <!-- 3 DOTS BUTTON -->
+            <div class="relative opacity-0 group-hover:opacity-100 transition"
+     onclick="event.stopPropagation()">
+                <button onclick="toggleProjectMenu(event, '${project._id}')"
+                    class="p-2 rounded-lg hover:bg-gray-700/60 transition">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                         class="w-5 h-5 text-gray-400 hover:text-white transition"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+
+                <!-- DROPDOWN -->
+                <div id="menu-${project._id}"
+                    class="hidden absolute right-0 top-10 w-40
+                           bg-gray-900 border border-gray-800
+                           rounded-xl shadow-2xl shadow-black/50
+                           overflow-hidden z-50">
+
+                    <button onclick="deleteProject('${project._id}')"
+    class="w-full flex items-center gap-2 px-4 py-3 text-sm 
+           text-red-400 hover:bg-red-500/10 transition">
+
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24">
+        <path d="M3 6h18"/>
+        <path d="M8 6v14"/>
+        <path d="M16 6v14"/>
+        <path d="M5 6l1-2h12l1 2"/>
+    </svg>
+
+    Delete Project
+</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-800 pt-4">
+            <span>${project.type}</span>
+            <span class="group-hover:text-purple-400 transition">
+                Open →
+            </span>
         </div>
 
     </div>
-
-</div>
-`;
+    `;
             });
         }
 
