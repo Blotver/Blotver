@@ -668,6 +668,10 @@ video {
   top: 0.75rem;
 }
 
+.top-11 {
+  top: 2.75rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -817,6 +821,10 @@ video {
   height: 10rem;
 }
 
+.h-9 {
+  height: 2.25rem;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -903,6 +911,10 @@ video {
 
 .w-36 {
   width: 9rem;
+}
+
+.w-9 {
+  width: 2.25rem;
 }
 
 .max-w-3xl {
