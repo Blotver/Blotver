@@ -365,7 +365,7 @@
                 }
                 container.innerHTML += `
 <div onclick="openProject('${project._id}')"
-    class="relative bg-gray-900 rounded-2xl overflow-visible
+    class="relative bg-gray-900 rounded-2xl overflow-hidden"
            shadow-xl shadow-black/40
            hover:-translate-y-1
            hover:shadow-2xl hover:shadow-purple-500/10
@@ -441,22 +441,35 @@
             ${project.name}
         </h3>
 
-        <div class="mt-6 flex items-center justify-between">
+<div class="mt-6 flex items-center justify-end gap-3">
 
-            <span class="text-xs px-3 py-1 rounded-full
-                         bg-gray-800 text-gray-400">
-                ${project.type}
-            </span>
+    <!-- Delete -->
+    <button onclick="event.stopPropagation(); deleteProject('${project._id}')"
+        class="w-9 h-9 flex items-center justify-center
+               rounded-lg bg-gray-800/80 hover:bg-red-500/10
+               text-gray-400 hover:text-red-400
+               transition duration-200">
 
-            <button onclick="event.stopPropagation(); openProject('${project._id}')"
-                class="px-5 py-2 text-sm rounded-full
-                       border border-gray-600
-                       text-gray-300 hover:border-purple-500
-                       hover:text-white transition">
-                Edit
-            </button>
+        <svg class="w-4 h-4"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.8"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 7h12M9 7V4h6v3M8 7v13m8-13v13M5 7h14"/>
+        </svg>
+    </button>
 
-        </div>
+    <!-- Edit -->
+    <button onclick="event.stopPropagation(); openProject('${project._id}')"
+        class="px-5 py-2 text-sm rounded-full
+               border border-gray-600
+               text-gray-300 hover:border-purple-500
+               hover:text-white transition duration-200">
+        Edit
+    </button>
+
+</div>
 
     </div>
 </div>
