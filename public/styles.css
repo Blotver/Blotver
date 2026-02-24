@@ -901,6 +901,10 @@ video {
   width: 11rem;
 }
 
+.w-36 {
+  width: 9rem;
+}
+
 .max-w-3xl {
   max-width: 48rem;
 }
@@ -1016,6 +1020,10 @@ video {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-visible {
+  overflow: visible;
 }
 
 .overflow-y-auto {
