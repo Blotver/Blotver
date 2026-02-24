@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        <button onclick="saveConfig()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
+        <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
             Save
         </button>
     </header>
@@ -215,6 +215,7 @@
         let widgets = [];
         let selectedWidget = null;
         let selectedElement = null;
+        let currentProject = null;
 
         /* ================= LOAD ================= */
 
@@ -289,7 +290,7 @@
                 });
 
                 canvas.appendChild(el);
-                
+
                 if (widgets.length === 1) {
                     selectWidget(widget, el);
                 }
@@ -341,7 +342,40 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             });
 
         }
+        document.getElementById("saveBtn").addEventListener("click", saveConfig);
 
+        async function saveConfig() {
+
+            if (!currentProject) {
+                console.error("No project loaded");
+                return;
+            }
+
+            const projectTitle = document.getElementById("projectTitle").value;
+
+            const payload = {
+                title: projectTitle,
+                widgets: widgets // tu array global de widgets
+            };
+
+            try {
+                const res = await fetch(`/api/projects/${currentProject._id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                console.log("Project saved", data);
+
+                alert("Saved successfully!");
+
+            } catch (err) {
+                console.error("Save failed", err);
+            }
+        }
         /* ================= SELECT ================= */
 
         function selectWidget(widget, element) {
