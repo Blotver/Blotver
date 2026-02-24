@@ -442,6 +442,21 @@ app.post("/api/toggle-bot", isAuthenticated, async (req, res) => {
     res.json({ botActive: userDB.botActive });
 });
 
+app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
+
+    await Widget.deleteMany({
+        projectId: req.params.id,
+        userId: req.session.user.id
+    });
+
+    await Project.deleteOne({
+        _id: req.params.id,
+        userId: req.session.user.id
+    });
+
+    res.json({ success: true });
+});
+
 // ========================
 // SERVIDOR
 // ========================
