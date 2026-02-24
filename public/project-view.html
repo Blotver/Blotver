@@ -222,7 +222,7 @@
         async function loadWidgets() {
             const projectRes = await fetch("/api/projects");
             const allProjects = await projectRes.json();
-            const currentProject = allProjects.find(p => p._id === projectId);
+            currentProject = allProjects.find(p => p._id === projectId);
 
             const res = await fetch(`/api/widgets/${projectId}`);
             widgets = await res.json();
@@ -351,7 +351,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 return;
             }
 
-            const projectTitle = document.getElementById("projectTitle").value;
+            const projectTitle = document.getElementById("projectNameInput").value;
 
             const payload = {
                 title: projectTitle,
