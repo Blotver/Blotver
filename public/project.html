@@ -266,20 +266,6 @@
 
     <script>
 
-        function toggleProjectMenu(event, id) {
-            event.stopPropagation();
-
-            document.querySelectorAll('[id^="menu-"]')
-                .forEach(m => {
-                    if (m.id !== `menu-${id}`) {
-                        m.classList.add("hidden");
-                    }
-                });
-
-            const menu = document.getElementById(`menu-${id}`);
-            menu.classList.toggle("hidden");
-        }
-
         function openProjectModal() {
             document.getElementById("projectTypeModal").classList.remove("hidden");
         }
@@ -396,41 +382,6 @@
             ${previewIcon}
         </div>
 
-        <!-- 3 DOTS MENU -->
-        <div class="absolute top-3 right-3 z-40">
-    
-    <button onclick="toggleProjectMenu(event, '${project._id}')"
-    class="w-9 h-9 flex items-center justify-center
-           rounded-xl bg-black/30 hover:bg-black/50
-           backdrop-blur-md
-           transition duration-200">
-
-        <svg class="w-4 h-4 text-white/70"
-     fill="currentColor"
-     viewBox="0 0 20 20">
-    <circle cx="10" cy="4" r="1.5"/>
-    <circle cx="10" cy="10" r="1.5"/>
-    <circle cx="10" cy="16" r="1.5"/>
-    </svg>
-    </button>
-
-    <!-- DROPDOWN -->
-    <div id="menu-${project._id}"
-        class="hidden absolute right-0 top-11 w-40
-               bg-gray-900 border border-gray-800
-               rounded-xl shadow-xl z-50">
-
-        <button onclick="event.stopPropagation(); deleteProject('${project._id}')"
-            class="w-full text-left px-4 py-2 text-sm
-                   text-red-400 hover:bg-red-500/10
-                   rounded-xl transition">
-            Delete
-        </button>
-
-    </div>
-
-</div>
-
     </div>
 
     <!-- CONTENT -->
@@ -441,16 +392,18 @@
             ${project.name}
         </h3>
 
-<div class="mt-6 flex items-center justify-end gap-3">
+<div class="mt-6 flex items-center justify-between">
 
-    <!-- Delete -->
+    <!-- DELETE LEFT -->
     <button onclick="event.stopPropagation(); deleteProject('${project._id}')"
-        class="w-9 h-9 flex items-center justify-center
-               rounded-lg bg-gray-800/80 hover:bg-red-500/10
-               text-gray-400 hover:text-red-400
-               transition duration-200">
+        class="w-10 h-10 flex items-center justify-center
+               rounded-xl bg-gray-800/70
+               text-gray-400
+               hover:bg-red-500/10 hover:text-red-400
+               transition-all duration-200
+               group/delete">
 
-        <svg class="w-4 h-4"
+        <svg class="w-5 h-5 transition-transform duration-200 group-hover/delete:scale-110"
              fill="none"
              stroke="currentColor"
              stroke-width="1.8"
@@ -460,12 +413,13 @@
         </svg>
     </button>
 
-    <!-- Edit -->
+    <!-- EDIT RIGHT -->
     <button onclick="event.stopPropagation(); openProject('${project._id}')"
-        class="px-5 py-2 text-sm rounded-full
+        class="px-6 py-2 text-sm rounded-full
                border border-gray-600
-               text-gray-300 hover:border-purple-500
-               hover:text-white transition duration-200">
+               text-gray-300
+               hover:border-purple-500 hover:text-white
+               transition duration-200">
         Edit
     </button>
 
