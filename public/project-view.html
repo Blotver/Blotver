@@ -218,7 +218,7 @@
         document.getElementById("overlayLink").value =
             window.location.origin + "/overlay/" + projectId;
 
-        function goBack() { window.location.href = "/dashboard"; }
+        function goBack() { window.location.href = "/dashboard/project"; }
 
         let widgets = [];
         let selectedWidget = null;
@@ -467,22 +467,20 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 layersPanel.appendChild(layerItem);
 
                 layerItem.querySelector("input")
-                    .addEventListener("change", async (e) => {
+                    .addEventListener("input", (e) => {
 
                         e.stopPropagation();
 
-                        const newName = e.target.value;
+                        widget.name = e.target.value;
 
-                        await fetch(`/api/widgets/${widget._id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                name: newName
-                            })
-                        });
+                        if (selectedWidget && selectedWidget._id === widget._id) {
+                            document.getElementById("settingsTitle").innerText =
+                                widget.name || widget.type;
+                        }
 
                         markAsChanged();
                     });
+                    
             });
 
             resetChanges();
@@ -496,21 +494,35 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             const projectTitle =
                 document.getElementById("projectNameInput").value;
 
-            // Mostrar "Save..."
             showSaveToast("Save...");
 
             try {
-                const res = await fetch(`/api/projects/${currentProject._id}`, {
+
+                // 1️⃣ Guardar proyecto
+                const projectRes = await fetch(`/api/projects/${currentProject._id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name: projectTitle })
                 });
 
-                if (!res.ok) throw new Error("Save failed");
+                if (!projectRes.ok) throw new Error("Project save failed");
 
-                // Cambiar a "Saved ✔"
+                // 2️⃣ Guardar nombres de widgets
+                for (let widget of widgets) {
+
+                    await fetch(`/api/widgets/${widget._id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: widget.name
+                        })
+                    });
+                }
+
                 showSaveToast("Saved ✔");
                 resetChanges();
+
+                loadWidgets(); // refrescar
 
             } catch (error) {
                 console.error(error);
