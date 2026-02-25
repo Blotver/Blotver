@@ -224,6 +224,7 @@
         let selectedWidget = null;
         let selectedElement = null;
         let currentProject = null;
+        let hasUnsavedChanges = false;
 
         /* ================= LOAD ================= */
 
@@ -239,23 +240,27 @@
             widgets = await res.json();
 
             // 🚀 Si es proyecto shoutout y no tiene widgets → crear uno automático
-            if (currentProject?.type === "shoutout" && widgets.length === 0) {
+            if (currentProject?.type && widgets.length === 0) {
 
-                const def = window.ShoutoutWidget.defaultData;
+                const widgetType = currentProject.type;
+                const widgetDef = window.WidgetRegistry[widgetType];
 
-                await fetch("/api/widgets", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        projectId,
-                        type: "shoutout",
-                        data: def
-                    })
-                });
+                if (widgetDef?.defaultData) {
 
-                // Recargar widgets
-                const newRes = await fetch(`/api/widgets/${projectId}`);
-                widgets = await newRes.json();
+                    await fetch("/api/widgets", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            projectId,
+                            type: widgetType,
+                            name: widgetType,
+                            data: widgetDef.defaultData
+                        })
+                    });
+
+                    const newRes = await fetch(`/api/widgets/${projectId}`);
+                    widgets = await newRes.json();
+                }
             }
 
             const canvas = document.getElementById("canvas");
@@ -356,12 +361,44 @@ cursor-pointer text-sm transition-all
 
                 layerItem.innerHTML = `
 <div class="flex items-center gap-2 truncate">
-    <button class="visibility-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 transition">
-        ${widget.data.visible === false ? "🚫" : "👁"}
+    
+    <button 
+        class="visibility-btn w-7 h-7 flex items-center justify-center
+        rounded-md bg-gray-800/60 hover:bg-gray-700/80
+        border border-transparent hover:border-gray-600
+        transition group"
+    >
+        ${widget.data.visible === false
+                        ? `
+            <!-- Eye Off -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 3l18 18M10.73 5.08A10.94 10.94 0 0112 5c5 0 9 7 9 7a16.88 16.88 0 01-2.68 3.64M6.53 6.53A16.88 16.88 0 003 12s4 7 9 7a10.94 10.94 0 005.27-1.42"/>
+            </svg>
+            `
+                        : `
+            <!-- Eye -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 text-gray-400 group-hover:text-white transition"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            `
+                    }
     </button>
-    <span class="text-gray-300 truncate">
-        ${widget.name || widget.type}
-    </span>
+
+    <input 
+        class="bg-transparent text-gray-300 focus:text-white
+        outline-none w-full truncate text-sm
+        border-b border-transparent focus:border-purple-500
+        transition"
+        value="${widget.name || widget.type}"
+        data-id="${widget._id}"
+    />
 </div>
 
 <button class="delete-btn w-6 h-6 flex items-center justify-center
@@ -410,7 +447,26 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
                 layersPanel.appendChild(layerItem);
 
+                layerItem.querySelector("input")
+                    .addEventListener("change", async (e) => {
+
+                        e.stopPropagation();
+
+                        const newName = e.target.value;
+
+                        await fetch(`/api/widgets/${widget._id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                name: newName
+                            })
+                        });
+
+                        markAsChanged();
+                    });
             });
+
+            resetChanges();
 
         }
         document.getElementById("saveBtn").addEventListener("click", saveConfig);
@@ -435,12 +491,34 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
                 // Cambiar a "Saved ✔"
                 showSaveToast("Saved ✔");
+                resetChanges();
 
             } catch (error) {
                 console.error(error);
                 showSaveToast("Error ✖");
             }
         }
+
+        function markAsChanged() {
+            if (hasUnsavedChanges) return;
+
+            hasUnsavedChanges = true;
+
+            const btn = document.getElementById("saveBtn");
+            btn.disabled = false;
+            btn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+
+        function resetChanges() {
+            hasUnsavedChanges = false;
+
+            const btn = document.getElementById("saveBtn");
+            btn.disabled = true;
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+        }
+
+        document.getElementById("projectNameInput")
+            .addEventListener("input", markAsChanged);
 
         /* ================= SELECT ================= */
         function showSaveToast(message) {
@@ -513,6 +591,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             });
 
             selectedWidget = await res.json();
+            markAsChanged();
         }
         function closeSettings() {
             document.getElementById("settingsOverlay").classList.add("hidden");
@@ -550,6 +629,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             });
 
             selectedWidget = await res.json();
+            markAsChanged();
         }
 
         async function updateLayerOrder() {
@@ -618,12 +698,18 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             });
 
         async function createWidget(type) {
-            document.getElementById("widgetSelector").classList.add("hidden");
+
+            const widgetDef = window.WidgetRegistry[type];
 
             await fetch("/api/widgets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ projectId, type })
+                body: JSON.stringify({
+                    projectId,
+                    type,
+                    name: type,
+                    data: widgetDef?.defaultData || {}
+                })
             });
 
             loadWidgets();
