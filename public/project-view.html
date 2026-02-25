@@ -202,13 +202,15 @@
         </main>
     </div>
     <div id="saveToast" class="fixed bottom-6 right-6
-           bg-green-600 text-white
-           px-6 py-3 rounded-lg
-           shadow-lg
+           bg-gray-900/80 backdrop-blur-md
+           border border-purple-500/30
+           text-gray-200
+           px-6 py-3 rounded-xl
+           shadow-2xl
            opacity-0 pointer-events-none
            transition-all duration-300
            translate-y-4">
-        ✔ Saved successfully
+        Save...
     </div>
 
     <script src="/widgets/registry.js"></script>
@@ -392,7 +394,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             toast.classList.remove("opacity-0", "translate-y-4");
             toast.classList.add("opacity-100", "translate-y-0");
 
-            // Si NO es "Save..." entonces ocultar después de 2s
             if (message !== "Save...") {
                 setTimeout(() => {
                     toast.classList.remove("opacity-100", "translate-y-0");
