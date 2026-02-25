@@ -195,10 +195,6 @@
                     Text</div>
                 <div onclick="createWidget('image')" class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
                     Image</div>
-                <div onclick="createWidget('shoutout')"
-                    class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">Shoutout</div>
-            </div>
-
         </main>
     </div>
     <div id="saveToast" class="fixed bottom-6 right-6
@@ -268,6 +264,9 @@
             canvas.innerHTML = "";
             layersPanel.innerHTML = "";
 
+            widgets.sort((a, b) => (a.data.zIndex ?? 0) - (b.data.zIndex ?? 0));
+            const reversedWidgets = [...widgets].reverse();
+
             widgets.forEach(widget => {
 
                 const el = document.createElement("div");
@@ -296,6 +295,11 @@
                 el.style.top = (widget.data.y || 100) + "px";
                 el.style.color = widget.data.color ?? "#000";
                 el.style.fontSize = (widget.data.fontSize || 32) + "px";
+                el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
+
+                if (widget.data.visible === false) {
+                    el.style.display = "none";
+                }
 
                 enableDrag(el, widget);
 
@@ -321,8 +325,40 @@ cursor-pointer text-sm transition-all
 
                 layerItem.dataset.id = widget._id;
 
+                layerItem.draggable = true;
+
+                layerItem.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("id", widget._id);
+                });
+
+                layerItem.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+
+                layerItem.addEventListener("drop", async (e) => {
+                    e.preventDefault();
+
+                    const draggedId = e.dataTransfer.getData("id");
+                    const targetId = widget._id;
+
+                    if (draggedId === targetId) return;
+
+                    const fromIndex = widgets.findIndex(w => w._id === draggedId);
+                    const toIndex = widgets.findIndex(w => w._id === targetId);
+
+                    const moved = widgets.splice(fromIndex, 1)[0];
+                    widgets.splice(toIndex, 0, moved);
+
+                    await updateLayerOrder();
+
+                    loadWidgets();
+                });
+
                 layerItem.innerHTML = `
 <div class="flex items-center gap-2 truncate">
+    <button class="visibility-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 transition">
+        ${widget.data.visible === false ? "🚫" : "👁"}
+    </button>
     <span class="text-gray-300 truncate">
         ${widget.name || widget.type}
     </span>
@@ -341,6 +377,26 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
 </button>
 `;
+
+                layerItem.querySelector(".visibility-btn")
+                    .addEventListener("click", async (e) => {
+                        e.stopPropagation();
+
+                        const newVisibility = widget.data.visible === false ? true : false;
+
+                        await fetch(`/api/widgets/${widget._id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                data: {
+                                    ...widget.data,
+                                    visible: newVisibility
+                                }
+                            })
+                        });
+
+                        loadWidgets();
+                    });
 
                 layerItem.addEventListener("click", () => {
                     selectWidget(widget, el);
@@ -418,7 +474,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
 
         function showLayers() {
-            document.getElementById("sidePanel").classList.remove("show-settings");
             document.getElementById("sidebarTitle").innerText = "Layers";
 
             if (selectedElement) selectedElement.style.outline = "none";
@@ -496,6 +551,22 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             selectedWidget = await res.json();
         }
+
+        async function updateLayerOrder() {
+            for (let i = 0; i < widgets.length; i++) {
+                await fetch(`/api/widgets/${widgets[i]._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        data: {
+                            ...widgets[i].data,
+                            zIndex: i
+                        }
+                    })
+                });
+            }
+        }
+
         function updateActiveLayer(id) {
             document.querySelectorAll("#layersPanel > div").forEach(item => {
                 item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
