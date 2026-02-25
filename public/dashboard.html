@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blotver Dashboard</title>
+    <link href="/styles.css" rel="stylesheet">
+
+    <style>
+        /* ============================= */
+        /* SIDEBAR GLASS + PREMIUM STYLE */
+        /* ============================= */
+
+        .sidebar-glass {
+            position: relative;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+
+            /* Border luminoso sutil */
+            box-shadow:
+                inset -1px 0 0 rgba(168, 85, 247, 0.15),
+                0 0 40px rgba(168, 85, 247, 0.05);
+        }
+
+        /* Noise texture tipo Vercel */
+        .sidebar-glass::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        /* ============================= */
+        /* SIDEBAR ITEMS */
+        /* ============================= */
+
+        .sidebar-item {
+            position: relative;
+            overflow: hidden;
+            color: #9ca3af;
+            font-weight: 500;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+
+        .sidebar-item:hover {
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .sidebar-item::before {
+            content: "";
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            top: 0;
+            bottom: 0;
+            border-radius: 12px;
+
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+
+            background:
+                /* Morado */
+                radial-gradient(180px 50px at var(--mouse-x, 50%) var(--mouse-y, 100%),
+                    rgba(168, 85, 247, 0.35) 0%,
+                    rgba(168, 85, 247, 0.25) 30%,
+                    rgba(168, 85, 247, 0.15) 55%,
+                    rgba(168, 85, 247, 0.08) 70%,
+                    transparent 85%),
+
+                /* Gris inverso */
+                radial-gradient(220px 80px at var(--mouse-x, 50%) var(--mouse-y, 100%),
+                    transparent 40%,
+                    rgba(120, 120, 120, 0.226) 70%,
+                    rgba(120, 120, 120, 0.15) 100%);
+        }
+
+
+
+        .sidebar-item:hover::before {
+            opacity: 1;
+        }
+
+        .sidebar-item.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ============================= */
+        /* INDICADOR ACTIVO ANIMADO */
+        /* ============================= */
+
+        #activeIndicator {
+            position: absolute;
+            height: 2px;
+            width: 48px;
+            border-radius: 10px;
+
+            background: linear-gradient(to right,
+                    #a855f7,
+                    #9333ea);
+
+            transition:
+                transform 0.35s cubic-bezier(.4, 0, .2, 1),
+                opacity 0.25s ease;
+
+            /* Micro glow */
+            box-shadow:
+                0 0 6px rgba(168, 85, 247, 0.6),
+                0 0 12px rgba(168, 85, 247, 0.3);
+
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-white min-h-screen flex">
+
+    <!-- SIDEBAR -->
+
+
+
+    <aside class="sidebar-glass w-64 p-6 flex flex-col justify-between">
+
+        <div>
+            <h1
+                class="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent mb-10">
+                Blotver
+            </h1>
+
+            <nav class="relative flex flex-col gap-2 mt-10">
+
+                <a href="/dashboard" class="sidebar-item px-6 py-3 rounded-xl">
+                    Overview
+                </a>
+
+                <a href="/dashboard/project" class="sidebar-item px-6 py-3 rounded-xl">
+                    Projects
+                </a>
+
+                <a href="/dashboard/profile" class="sidebar-item px-6 py-3 rounded-xl">
+                    Settings
+                </a>
+
+                <!-- Línea animada -->
+                <div id="activeIndicator"></div>
+
+            </nav>
+        </div>
+
+        <div class="text-sm text-gray-400">
+            © 2026 Blotver
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 p-10">
+
+        <div class="flex justify-between items-center mb-10">
+
+            <h2 class="text-3xl font-bold">Dashboard</h2>
+
+            <div class="flex items-center gap-6">
+
+                <div class="relative">
+                    <button id="userMenuButton"
+                        class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-full hover:bg-gray-800 transition">
+
+                        <img id="userAvatar" src="/default-avatar.png" class="w-8 h-8 rounded-full object-cover">
+
+                    </button>
+
+                    <div id="userDropdown"
+                        class="opacity-0 scale-95 pointer-events-none transition duration-200 absolute right-0 mt-3 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
+
+                        <a href="/dashboard/profile" class="block px-4 py-3 hover:bg-purple-600/20 transition">
+                            Configuración
+                        </a>
+
+                        <button class="w-full text-left px-4 py-3 hover:bg-purple-600/20 transition">
+                            Idiomas
+                        </button>
+
+                        <button id="logoutBtn"
+                            class="w-full text-left px-4 py-3 text-red-400 hover:bg-red-600/20 transition">
+                            Cerrar sesión
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
+                <p class="text-gray-400 text-sm">Users</p>
+                <h3 class="text-3xl font-bold mt-2">1,245</h3>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
+                <p class="text-gray-400 text-sm">Revenue</p>
+                <h3 class="text-3xl font-bold mt-2">$8,420</h3>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md">
+                <p class="text-gray-400 text-sm">Projects</p>
+                <h3 id="projectsCount" class="text-3xl font-bold mt-2">0</h3>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        const items = document.querySelectorAll(".sidebar-item");
+        const indicator = document.getElementById("activeIndicator");
+
+        items.forEach(item => {
+            item.addEventListener("mousemove", e => {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                item.style.setProperty("--mouse-x", `${x}px`);
+                item.style.setProperty("--mouse-y", `${y}px`);
+            });
+
+            item.addEventListener("mouseenter", () => {
+                item.style.setProperty("--mouse-y", "100%");
+            });
+        });
+
+        function moveIndicator(target) {
+            const rect = target.getBoundingClientRect();
+            const navRect = target.parentElement.getBoundingClientRect();
+
+            const offsetY = rect.bottom - navRect.top - 7;
+            const offsetX = 24;
+
+            indicator.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            indicator.style.opacity = "1";
+        }
+
+        const currentPath = window.location.pathname;
+
+        items.forEach(link => {
+            if (link.getAttribute("href") === currentPath) {
+                link.classList.add("active");
+                moveIndicator(link);
+            }
+
+            link.addEventListener("click", () => {
+                items.forEach(i => i.classList.remove("active"));
+                link.classList.add("active");
+                moveIndicator(link);
+            });
+        });
+
+        async function loadUser() {
+            try {
+                const res = await fetch("/api/user");
+                if (!res.ok) return;
+
+                const data = await res.json();
+                if (data.profile_image_url) {
+                    document.getElementById("userAvatar").src = data.profile_image_url;
+                }
+            } catch (err) {
+                console.error("Error loading user:", err);
+            }
+        }
+
+        loadUser();
+
+        const button = document.getElementById("userMenuButton");
+        const dropdown = document.getElementById("userDropdown");
+
+        button.addEventListener("click", () => {
+            dropdown.classList.toggle("opacity-0");
+            dropdown.classList.toggle("scale-95");
+            dropdown.classList.toggle("pointer-events-none");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add("opacity-0", "scale-95", "pointer-events-none");
+            }
+        });
+
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await fetch("/api/logout", { method: "POST" });
+            window.location.href = "/";
+        });
+
+        async function loadProjectsCount() {
+            try {
+                const res = await fetch("/api/projects");
+                if (!res.ok) return;
+
+                const projects = await res.json();
+                document.getElementById("projectsCount").textContent = projects.length;
+            } catch (err) {
+                console.error("Error loading projects:", err);
+            }
+        }
+
+        loadProjectsCount();
+    </script>
+
+</body>
+
+</html>
