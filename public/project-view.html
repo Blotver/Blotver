@@ -269,7 +269,14 @@
             canvas.innerHTML = "";
             layersPanel.innerHTML = "";
 
-            widgets.sort((a, b) => (a.data.zIndex ?? 0) - (b.data.zIndex ?? 0));
+            widgets = widgets.map(w => ({
+                ...w,
+                data: w.data || {}
+            }));
+
+            widgets.sort((a, b) =>
+                (a.data?.zIndex ?? 0) - (b.data?.zIndex ?? 0)
+            );
             const reversedWidgets = [...widgets].reverse();
 
             widgets.forEach(widget => {
@@ -282,7 +289,13 @@
 
                 if (widget.type === "image") {
                     const img = document.createElement("img");
-                    img.src = widget.data.url || "https://via.placeholder.com/150";
+
+                    if (widget.data.url && widget.data.url.startsWith("http")) {
+                        img.src = widget.data.url;
+                    } else {
+                        img.src = "https://via.placeholder.com/150";
+                    }
+
                     img.style.width = (widget.data.width || 150) + "px";
                     img.style.height = (widget.data.height || 150) + "px";
                     el.appendChild(img);
@@ -435,7 +448,13 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         loadWidgets();
                     });
 
-                layerItem.addEventListener("click", () => {
+                layerItem.addEventListener("click", (e) => {
+                    if (
+                        e.target.closest(".visibility-btn") ||
+                        e.target.closest(".delete-btn") ||
+                        e.target.tagName === "INPUT"
+                    ) return;
+
                     selectWidget(widget, el);
                 });
 
@@ -701,6 +720,13 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             const widgetDef = window.WidgetRegistry[type];
 
+            const defaultData = widgetDef?.defaultData || {
+                x: 100,
+                y: 100,
+                visible: true,
+                zIndex: widgets.length
+            };
+
             await fetch("/api/widgets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -708,13 +734,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     projectId,
                     type,
                     name: type,
-                    data: widgetDef?.defaultData || {}
+                    data: defaultData
                 })
             });
 
             loadWidgets();
         }
-
         loadWidgets();
 
     </script>
