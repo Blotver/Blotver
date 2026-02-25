@@ -1,6 +1,9 @@
 require("dotenv").config();
 const session = require("express-session");
 const mongoose = require("mongoose");
+const multer = require("multer");
+const sharp = require("sharp");
+const { v2: cloudinary } = require("cloudinary");
 const User = require("./models/User");
 const Project = require("./models/Project");
 const handleShoutout = require("./bot/commands/shoutout");
@@ -76,7 +79,55 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("✅ Conectado a MongoDB"))
     .catch(err => console.error("❌ Error conectando a MongoDB:", err));
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+app.post("/api/upload-image", isAuthenticated, upload.single("image"), async (req, res) => {
+
+    try {
+
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        // 🔥 Convertir a WebP ultra optimizado
+        const optimizedBuffer = await sharp(req.file.buffer)
+            .resize(1200) // máximo ancho
+            .webp({ quality: 60 })
+            .toBuffer();
+
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: "users/" + req.session.user.id,
+                resource_type: "image",
+                format: "webp"
+            },
+            (error, result) => {
+                if (error) {
+                    console.error(error);
+                    return res.status(500).json({ error: "Upload failed" });
+                }
+
+                res.json({ url: result.secure_url });
+            }
+        );
+
+        uploadStream.end(optimizedBuffer);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Processing failed" });
+    }
+
+});
 // ========================
 // CONFIGURACIÓN DEL BOT
 // ========================

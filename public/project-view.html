@@ -197,6 +197,21 @@
                     Image</div>
         </main>
     </div>
+
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+        <div class="bg-gray-900 w-[400px] p-6 rounded-xl border border-gray-700">
+
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-semibold text-gray-300">Upload Image</h2>
+                <button onclick="closeImageModal()" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+
+            <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm text-gray-300">
+
+        </div>
+    </div>
+
     <div id="saveToast" class="fixed bottom-6 right-6
            bg-gray-800/90 backdrop-blur-xl
            text-gray-100
@@ -212,6 +227,7 @@
 
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
+    <script src="/widgets/image.js"></script>
 
     <script>
         const projectId = window.location.pathname.split("/").pop();
@@ -448,6 +464,43 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         loadWidgets();
                     });
 
+                function openImageModal() {
+                    document.getElementById("imageModal").classList.remove("hidden");
+                }
+
+                function closeImageModal() {
+                    document.getElementById("imageModal").classList.add("hidden");
+                }
+
+                document.getElementById("imageUpload")
+                    .addEventListener("change", async (e) => {
+
+                        const file = e.target.files[0];
+                        if (!file || !selectedWidget) return;
+
+                        const formData = new FormData();
+                        formData.append("image", file);
+
+                        const res = await fetch("/api/upload-image", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        const data = await res.json();
+
+                        if (data.url) {
+
+                            await updateSelectedWidget({
+                                url: data.url,
+                                width: 300,
+                                height: 300
+                            });
+
+                            loadWidgets(); // refresca canvas
+                            closeImageModal();
+                        }
+                    });
+
                 layerItem.addEventListener("click", (e) => {
                     if (
                         e.target.closest(".visibility-btn") ||
@@ -603,6 +656,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             if (widgetDef && widgetDef.renderConfig) {
                 widgetDef.renderConfig(widget, content, updateSelectedWidget);
+
             }
         }
         async function updateSelectedWidget(updates) {
