@@ -293,14 +293,26 @@ app.get("/api/widgets/:projectId", isAuthenticated, async (req, res) => {
 
 // Actualizar widget
 app.put("/api/widgets/:id", isAuthenticated, async (req, res) => {
+
+    const updateFields = {};
+
+    if (req.body.name !== undefined) {
+        updateFields.name = req.body.name;
+    }
+
+    if (req.body.data !== undefined) {
+        updateFields.data = req.body.data;
+    }
+
     const widget = await Widget.findOneAndUpdate(
         { _id: req.params.id, userId: req.session.user.id },
-        { data: req.body.data },
+        updateFields,
         { new: true }
     );
 
     res.json(widget);
 });
+
 app.put("/api/projects/:id", isAuthenticated, async (req, res) => {
 
     const project = await Project.findOneAndUpdate(

@@ -480,7 +480,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
                         markAsChanged();
                     });
-                    
+
             });
 
             resetChanges();
@@ -498,31 +498,27 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             try {
 
-                // 1️⃣ Guardar proyecto
-                const projectRes = await fetch(`/api/projects/${currentProject._id}`, {
+                await fetch(`/api/projects/${currentProject._id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name: projectTitle })
                 });
 
-                if (!projectRes.ok) throw new Error("Project save failed");
-
-                // 2️⃣ Guardar nombres de widgets
                 for (let widget of widgets) {
 
                     await fetch(`/api/widgets/${widget._id}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            name: widget.name
+                            name: widget.name,
+                            data: widget.data   // 🔥 IMPORTANTE
                         })
                     });
                 }
 
                 showSaveToast("Saved ✔");
                 resetChanges();
-
-                loadWidgets(); // refrescar
+                loadWidgets();
 
             } catch (error) {
                 console.error(error);
