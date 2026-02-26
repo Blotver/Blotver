@@ -29,8 +29,8 @@ window.ImageWidget = {
         if (widget.data.url) {
             img.src = widget.data.url;
         } else {
-            wrapper.style.background = "#1f2937";
-            wrapper.style.border = "2px dashed #374151";
+            wrapper.style.background = "#1f293700";
+            wrapper.style.border = "2px dashed #37415100";
         }
 
         img.style.width = "100%";
