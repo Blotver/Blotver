@@ -241,7 +241,6 @@ window.ImageWidget = {
                     updateSelectedWidget({
                         objectFit: btn.dataset.fit
                     });
-                    openConfig(widget);
                 });
             });
 
@@ -250,7 +249,6 @@ window.ImageWidget = {
                 updateSelectedWidget({
                     lockRatio: !widget.data.lockRatio
                 });
-                openConfig(widget);
             });
     }
 };

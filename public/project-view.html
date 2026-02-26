@@ -869,8 +869,9 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function updateSelectedWidget(updates) {
 
-            if (!selectedWidget) return;
+            if (!selectedWidget || !selectedElement) return;
 
+            // 1️⃣ Actualizar data en memoria
             selectedWidget.data = {
                 ...selectedWidget.data,
                 ...updates
@@ -881,6 +882,51 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 widgets[index].data = selectedWidget.data;
             }
 
+            // 2️⃣ Actualizar visualmente el elemento en canvas
+
+            // posición
+            if (updates.x !== undefined) {
+                selectedElement.style.left = updates.x + "px";
+            }
+
+            if (updates.y !== undefined) {
+                selectedElement.style.top = updates.y + "px";
+            }
+
+            // tamaño
+            if (updates.width !== undefined) {
+                selectedElement.style.width = updates.width + "px";
+            }
+
+            if (updates.height !== undefined) {
+                selectedElement.style.height = updates.height + "px";
+            }
+
+            // buscar imagen interna
+            const img = selectedElement.querySelector("img");
+
+            if (img) {
+
+                if (updates.objectFit !== undefined) {
+                    img.style.objectFit = updates.objectFit;
+                }
+
+                if (updates.borderRadius !== undefined) {
+                    img.style.borderRadius = updates.borderRadius + "px";
+                }
+
+                if (updates.opacity !== undefined) {
+                    img.style.opacity = updates.opacity;
+                }
+
+                if (updates.shadow !== undefined) {
+                    img.style.boxShadow = updates.shadow
+                        ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
+                        : "none";
+                }
+            }
+
+            // 3️⃣ Marcar como cambiado
             markAsChanged();
         }
 
