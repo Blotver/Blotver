@@ -565,28 +565,27 @@
 
                                 const target = event.target;
 
-                                let left = parseFloat(target.style.left) || 0;
-                                let top = parseFloat(target.style.top) || 0;
+                                const { x, y } = event.deltaRect;
 
-                                left += event.deltaRect.left;
-                                top += event.deltaRect.top;
+                                const left = (parseFloat(target.dataset.x) || 0) + x;
+                                const top = (parseFloat(target.dataset.y) || 0) + y;
 
-                                target.style.left = left + "px";
-                                target.style.top = top + "px";
                                 target.style.width = event.rect.width + "px";
                                 target.style.height = event.rect.height + "px";
+                                target.style.left = left + "px";
+                                target.style.top = top + "px";
+
+                                target.dataset.x = left;
+                                target.dataset.y = top;
                             },
 
                             end(event) {
 
                                 const target = event.target;
 
-                                const left = parseFloat(target.style.left) || 0;
-                                const top = parseFloat(target.style.top) || 0;
-
                                 updateSelectedWidget({
-                                    x: left,
-                                    y: top,
+                                    x: parseFloat(target.style.left) || 0,
+                                    y: parseFloat(target.style.top) || 0,
                                     width: event.rect.width,
                                     height: event.rect.height
                                 });
