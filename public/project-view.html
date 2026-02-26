@@ -281,14 +281,19 @@
 
 
         function openImageModal() {
-            document.getElementById("imageModal").classList.remove("hidden");
+            document.getElementById("uploadModal").classList.remove("hidden");
         }
 
         function closeImageModal() {
-            document.getElementById("imageModal").classList.add("hidden");
+            document.getElementById("uploadModal").classList.add("hidden");
         }
 
-        document.getElementById("imageUpload")
+        // cerrar con botón X
+        document.getElementById("closeUpload")
+            .addEventListener("click", closeImageModal);
+
+        // subir imagen
+        document.getElementById("imageInput")
             .addEventListener("change", async (e) => {
 
                 const file = e.target.files[0];
@@ -312,7 +317,7 @@
                         height: 300
                     });
 
-                    loadWidgets(); // refresca canvas
+                    loadWidgets();
                     closeImageModal();
                 }
             });
