@@ -500,6 +500,14 @@
                 el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
                 el.classList.add("draggable-resizable");
 
+                if (widget.data.width) {
+                    el.style.width = widget.data.width + "px";
+                }
+
+                if (widget.data.height) {
+                    el.style.height = widget.data.height + "px";
+                }
+
                 if (widget.data.visible === false) {
                     el.style.display = "none";
                 }
