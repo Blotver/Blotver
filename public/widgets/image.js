@@ -14,7 +14,7 @@ window.ImageWidget = {
         shadow: 0,
         opacity: 1,
         lockRatio: false,
-        aspectRatio: 1
+        aspectRatio: null
     },
 
     renderCanvas(widget) {
@@ -46,7 +46,7 @@ window.ImageWidget = {
 
         // 🔥 Capturar proporción real cuando carga
         img.onload = () => {
-            if (!widget.data.aspectRatio && img.naturalWidth) {
+            if (img.naturalWidth) {
                 widget.data.aspectRatio =
                     img.naturalWidth / img.naturalHeight;
             }

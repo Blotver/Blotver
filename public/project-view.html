@@ -871,7 +871,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             if (!selectedWidget || !selectedElement) return;
 
-            // 1️⃣ Actualizar data en memoria
+            // ===== 1️⃣ Actualizar memoria =====
             selectedWidget.data = {
                 ...selectedWidget.data,
                 ...updates
@@ -882,51 +882,79 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 widgets[index].data = selectedWidget.data;
             }
 
-            // 2️⃣ Actualizar visualmente el elemento en canvas
-
-            // posición
-            if (updates.x !== undefined) {
+            // ===== 2️⃣ Actualizar canvas =====
+            if (updates.x !== undefined)
                 selectedElement.style.left = updates.x + "px";
-            }
 
-            if (updates.y !== undefined) {
+            if (updates.y !== undefined)
                 selectedElement.style.top = updates.y + "px";
-            }
 
-            // tamaño
-            if (updates.width !== undefined) {
+            if (updates.width !== undefined)
                 selectedElement.style.width = updates.width + "px";
-            }
 
-            if (updates.height !== undefined) {
+            if (updates.height !== undefined)
                 selectedElement.style.height = updates.height + "px";
-            }
 
-            // buscar imagen interna
             const img = selectedElement.querySelector("img");
 
             if (img) {
 
-                if (updates.objectFit !== undefined) {
+                if (updates.objectFit !== undefined)
                     img.style.objectFit = updates.objectFit;
-                }
 
-                if (updates.borderRadius !== undefined) {
+                if (updates.borderRadius !== undefined)
                     img.style.borderRadius = updates.borderRadius + "px";
-                }
 
-                if (updates.opacity !== undefined) {
+                if (updates.opacity !== undefined)
                     img.style.opacity = updates.opacity;
-                }
 
-                if (updates.shadow !== undefined) {
+                if (updates.shadow !== undefined)
                     img.style.boxShadow = updates.shadow
                         ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
                         : "none";
-                }
             }
 
-            // 3️⃣ Marcar como cambiado
+            // ===== 3️⃣ Sincronizar panel =====
+            const panel = document.getElementById("configContent");
+            if (!panel) return;
+
+            // actualizar inputs
+            panel.querySelectorAll("input[data-field]").forEach(input => {
+                const field = input.dataset.field;
+                if (selectedWidget.data[field] !== undefined) {
+                    input.value = selectedWidget.data[field];
+                }
+            });
+
+            // actualizar labels de sliders
+            panel.querySelectorAll("input[type='range']").forEach(range => {
+                const span = range.parentElement.querySelector("span");
+                if (span) {
+                    span.innerText = selectedWidget.data[range.dataset.field];
+                }
+            });
+
+            // actualizar botones fit
+            panel.querySelectorAll("[data-fit]").forEach(btn => {
+                const active = btn.dataset.fit === selectedWidget.data.objectFit;
+                btn.className =
+                    "flex-1 py-2 rounded-md border text-xs capitalize " +
+                    (active
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+            });
+
+            // actualizar botón lock
+            const lockBtn = panel.querySelector("#lockRatio");
+            if (lockBtn) {
+                lockBtn.className =
+                    "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
+                    (selectedWidget.data.lockRatio
+                        ? "bg-gray-600 border-gray-500 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+            }
+
+            // ===== 4️⃣ marcar cambios =====
             markAsChanged();
         }
 
