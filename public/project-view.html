@@ -552,31 +552,43 @@
                     .resizable({
                         edges: { left: true, right: true, bottom: true, top: true },
 
-                        modifiers: [
-                            interact.modifiers.aspectRatio({
-                                ratio: () => selectedWidget?.data?.aspectRatio || 1,
-                                enabled: () => selectedWidget?.data?.lockRatio === true
-                            })
-                        ],
-
                         listeners: {
 
                             move(event) {
 
                                 const target = event.target;
 
-                                const { x, y } = event.deltaRect;
+                                let width = event.rect.width;
+                                let height = event.rect.height;
 
-                                const left = (parseFloat(target.dataset.x) || 0) + x;
-                                const top = (parseFloat(target.dataset.y) || 0) + y;
+                                let left = parseFloat(target.style.left) || 0;
+                                let top = parseFloat(target.style.top) || 0;
 
-                                target.style.width = event.rect.width + "px";
-                                target.style.height = event.rect.height + "px";
+                                // 🔒 Si lock está activo → forzar proporción
+                                if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
+
+                                    const ratio = selectedWidget.data.aspectRatio;
+
+                                    if (width / height > ratio) {
+                                        width = height * ratio;
+                                    } else {
+                                        height = width / ratio;
+                                    }
+                                }
+
+                                // Ajustar posición si redimensiona desde izquierda o arriba
+                                if (event.edges.left) {
+                                    left = event.rect.right - width;
+                                }
+
+                                if (event.edges.top) {
+                                    top = event.rect.bottom - height;
+                                }
+
+                                target.style.width = width + "px";
+                                target.style.height = height + "px";
                                 target.style.left = left + "px";
                                 target.style.top = top + "px";
-
-                                target.dataset.x = left;
-                                target.dataset.y = top;
                             },
 
                             end(event) {
@@ -586,8 +598,8 @@
                                 updateSelectedWidget({
                                     x: parseFloat(target.style.left) || 0,
                                     y: parseFloat(target.style.top) || 0,
-                                    width: event.rect.width,
-                                    height: event.rect.height
+                                    width: parseFloat(target.style.width),
+                                    height: parseFloat(target.style.height)
                                 });
                             }
                         }
