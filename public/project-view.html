@@ -242,6 +242,44 @@
         let currentProject = null;
         let hasUnsavedChanges = false;
 
+
+        function openImageModal() {
+            document.getElementById("imageModal").classList.remove("hidden");
+        }
+
+        function closeImageModal() {
+            document.getElementById("imageModal").classList.add("hidden");
+        }
+
+        document.getElementById("imageUpload")
+            .addEventListener("change", async (e) => {
+
+                const file = e.target.files[0];
+                if (!file || !selectedWidget) return;
+
+                const formData = new FormData();
+                formData.append("image", file);
+
+                const res = await fetch("/api/upload-image", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.url) {
+
+                    await updateSelectedWidget({
+                        url: data.url,
+                        width: 300,
+                        height: 300
+                    });
+
+                    loadWidgets(); // refresca canvas
+                    closeImageModal();
+                }
+            });
+
         /* ================= LOAD ================= */
 
         async function loadWidgets() {
@@ -301,20 +339,6 @@
 
                 if (widget.type === "text") {
                     el.innerText = widget.data.text || "Sample Text";
-                }
-
-                if (widget.type === "image") {
-                    const img = document.createElement("img");
-
-                    if (widget.data.url && widget.data.url.startsWith("http")) {
-                        img.src = widget.data.url;
-                    } else {
-                        img.src = "https://via.placeholder.com/150";
-                    }
-
-                    img.style.width = (widget.data.width || 150) + "px";
-                    img.style.height = (widget.data.height || 150) + "px";
-                    el.appendChild(img);
                 }
 
                 const widgetDef = window.WidgetRegistry[widget.type];
@@ -462,43 +486,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         });
 
                         loadWidgets();
-                    });
-
-                function openImageModal() {
-                    document.getElementById("imageModal").classList.remove("hidden");
-                }
-
-                function closeImageModal() {
-                    document.getElementById("imageModal").classList.add("hidden");
-                }
-
-                document.getElementById("imageUpload")
-                    .addEventListener("change", async (e) => {
-
-                        const file = e.target.files[0];
-                        if (!file || !selectedWidget) return;
-
-                        const formData = new FormData();
-                        formData.append("image", file);
-
-                        const res = await fetch("/api/upload-image", {
-                            method: "POST",
-                            body: formData
-                        });
-
-                        const data = await res.json();
-
-                        if (data.url) {
-
-                            await updateSelectedWidget({
-                                url: data.url,
-                                width: 300,
-                                height: 300
-                            });
-
-                            loadWidgets(); // refresca canvas
-                            closeImageModal();
-                        }
                     });
 
                 layerItem.addEventListener("click", (e) => {
