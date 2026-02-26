@@ -11,20 +11,25 @@ window.ImageWidget = {
     },
 
     renderCanvas(widget) {
+
         const wrapper = document.createElement("div");
+
+        // 🔥 NO le ponemos tamaño acá
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
 
         const img = document.createElement("img");
 
         if (widget.data.url) {
             img.src = widget.data.url;
         } else {
-            img.style.background = "#1f2937";
-            img.style.border = "2px dashed #374151";
-            img.style.display = "flex";
+            wrapper.style.background = "#1f2937";
+            wrapper.style.border = "2px dashed #374151";
         }
 
-        img.style.width = (widget.data.width || 300) + "px";
-        img.style.height = (widget.data.height || 300) + "px";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
         img.draggable = false;
 
         wrapper.appendChild(img);
