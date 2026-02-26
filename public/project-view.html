@@ -403,7 +403,7 @@
                         const centerX = (canvasWidth - newWidth) / 2;
                         const centerY = (canvasHeight - newHeight) / 2;
 
-                        await updateSelectedWidget({
+                        updateSelectedWidget({
                             url: data.url,
                             width: Math.round(newWidth),
                             height: Math.round(newHeight),
@@ -411,7 +411,9 @@
                             y: Math.round(centerY)
                         });
 
-                        loadWidgets();
+                        // 🔥 actualizar solo el elemento visual actual
+                        selectedElement.querySelector("img").src = data.url;
+
                         closeImageModal();
                     };
 
@@ -904,22 +906,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             loadWidgets();
         }
         /* ================= UPDATE ================= */
-
-        async function updateWidget(updates) {
-
-            if (!selectedWidget) return;
-
-            const updatedData = { ...selectedWidget.data, ...updates };
-
-            const res = await fetch(`/api/widgets/${selectedWidget._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ data: updatedData })
-            });
-
-            selectedWidget = await res.json();
-            markAsChanged();
-        }
 
         async function updateLayerOrder() {
             for (let i = 0; i < widgets.length; i++) {
