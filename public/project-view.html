@@ -552,7 +552,15 @@
                     .resizable({
                         edges: { left: true, right: true, bottom: true, top: true },
 
+                        modifiers: [
+                            interact.modifiers.aspectRatio({
+                                ratio: () => selectedWidget?.data?.aspectRatio || 1,
+                                enabled: () => selectedWidget?.data?.lockRatio === true
+                            })
+                        ],
+
                         listeners: {
+
                             move(event) {
 
                                 const target = event.target;
@@ -584,7 +592,7 @@
                                 });
                             }
                         }
-                    });
+                    })
 
                 if (widgets.length === 1) {
                     selectWidget(widget, el);
