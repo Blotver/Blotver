@@ -121,6 +121,13 @@ app.post("/api/upload-image", isAuthenticated, upload.single("image"), async (re
         );
 
         uploadStream.end(optimizedBuffer);
+        
+        const result = await cloudinary.uploader.upload_stream({
+            folder: "users",
+            format: "webp",
+            quality: "auto:low",
+            fetch_format: "auto"
+        });
 
     } catch (err) {
         console.error(err);
