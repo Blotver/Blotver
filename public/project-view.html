@@ -271,21 +271,42 @@
         document.getElementById("overlayLink").value =
             window.location.origin + "/overlay/" + projectId;
 
-        function goBack() { window.location.href = "/dashboard/project"; }
+        function goBack() {
+
+            if (hasUnsavedChanges) {
+                const confirmExit = confirm(
+                    "¿Estás seguro que quieres salir sin guardar el progreso?"
+                );
+
+                if (!confirmExit) return;
+            }
+
+            window.location.href = "/dashboard/project";
+        }
 
         let widgets = [];
         let selectedWidget = null;
         let selectedElement = null;
         let currentProject = null;
+        let pendingImageFile = null;
         let hasUnsavedChanges = false;
 
+        window.addEventListener("beforeunload", function (e) {
+
+            if (!hasUnsavedChanges) return;
+
+            e.preventDefault();
+            e.returnValue = "";
+        });
 
         function openImageModal() {
             document.getElementById("uploadModal").classList.remove("hidden");
         }
 
         function closeImageModal() {
-            document.getElementById("uploadModal").classList.add("hidden");
+            pendingImageFile = null;
+            document.getElementById("confirmUpload").disabled = true;
+            document.getElementById("imagePreview").classList.add("hidden");
         }
 
         // cerrar con botón X
@@ -294,13 +315,31 @@
 
         // subir imagen
         document.getElementById("imageInput")
-            .addEventListener("change", async (e) => {
+            .addEventListener("change", (e) => {
 
                 const file = e.target.files[0];
-                if (!file || !selectedWidget) return;
+                if (!file) return;
+
+                pendingImageFile = file;
+
+                // Mostrar preview
+                const previewContainer = document.getElementById("imagePreview");
+                const previewImg = previewContainer.querySelector("img");
+
+                previewImg.src = URL.createObjectURL(file);
+                previewContainer.classList.remove("hidden");
+
+                // Activar botón Upload
+                document.getElementById("confirmUpload").disabled = false;
+            });
+
+        document.getElementById("confirmUpload")
+            .addEventListener("click", async () => {
+
+                if (!pendingImageFile || !selectedWidget) return;
 
                 const formData = new FormData();
-                formData.append("image", file);
+                formData.append("image", pendingImageFile);
 
                 const res = await fetch("/api/upload-image", {
                     method: "POST",
@@ -319,6 +358,11 @@
 
                     loadWidgets();
                     closeImageModal();
+
+                    // Reset modal
+                    pendingImageFile = null;
+                    document.getElementById("confirmUpload").disabled = true;
+                    document.getElementById("imagePreview").classList.add("hidden");
                 }
             });
 
@@ -710,6 +754,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             }
         }
+
         async function updateSelectedWidget(updates) {
 
             if (!selectedWidget) return;
@@ -723,8 +768,10 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             });
 
             selectedWidget = await res.json();
-            markAsChanged();
+
+            markAsChanged();   // 🔥 esto ya activa hasUnsavedChanges
         }
+
         function closeSettings() {
             document.getElementById("settingsOverlay").classList.add("hidden");
 
