@@ -338,7 +338,7 @@
                 }
 
             });
-            
+
         // subir imagen
         document.getElementById("imageInput")
             .addEventListener("change", (e) => {
@@ -376,14 +376,46 @@
 
                 if (data.url) {
 
-                    await updateSelectedWidget({
-                        url: data.url,
-                        width: 300,
-                        height: 300
-                    });
+                    const img = new Image();
 
-                    loadWidgets();
-                    closeImageModal();
+                    img.onload = async function () {
+
+                        const canvas = document.getElementById("canvas");
+
+                        const canvasWidth = canvas.clientWidth;
+                        const canvasHeight = canvas.clientHeight;
+
+                        const maxWidth = canvasWidth * 0.4;
+                        const maxHeight = canvasHeight * 0.4;
+
+                        let newWidth = img.width;
+                        let newHeight = img.height;
+
+                        const ratio = Math.min(
+                            maxWidth / newWidth,
+                            maxHeight / newHeight,
+                            1
+                        );
+
+                        newWidth = newWidth * ratio;
+                        newHeight = newHeight * ratio;
+
+                        const centerX = (canvasWidth - newWidth) / 2;
+                        const centerY = (canvasHeight - newHeight) / 2;
+
+                        await updateSelectedWidget({
+                            url: data.url,
+                            width: Math.round(newWidth),
+                            height: Math.round(newHeight),
+                            x: Math.round(centerX),
+                            y: Math.round(centerY)
+                        });
+
+                        loadWidgets();
+                        closeImageModal();
+                    };
+
+                    img.src = data.url;
 
                     // Reset modal
                     pendingImageFile = null;
@@ -472,8 +504,6 @@
                     el.style.display = "none";
                 }
 
-                enableDrag(el, widget);
-
                 el.addEventListener("click", (e) => {
                     e.stopPropagation();
                     selectWidget(widget, el);
@@ -481,24 +511,102 @@
 
                 canvas.appendChild(el);
 
-                interact(el).resizable({
-                    edges: { left: true, right: true, bottom: true, top: true },
-                    listeners: {
-                        move(event) {
-                            let target = event.target;
-                            target.style.width = event.rect.width + 'px';
-                            target.style.height = event.rect.height + 'px';
-                        },
-                        end(event) {
-                            if (selectedWidget && selectedWidget._id === widget._id) {
+                interact(el)
+                    .draggable({
+                        listeners: {
+                            move(event) {
+
+                                const target = event.target;
+
+                                const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+                                const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+                                target.style.transform = `translate(${x}px, ${y}px)`;
+
+                                target.setAttribute("data-x", x);
+                                target.setAttribute("data-y", y);
+                            },
+                            end(event) {
+
+                                const target = event.target;
+
+                                const x = parseFloat(target.getAttribute("data-x")) || 0;
+                                const y = parseFloat(target.getAttribute("data-y")) || 0;
+
+                                const left = (widget.data.x || 0) + x;
+                                const top = (widget.data.y || 0) + y;
+
+                                target.style.transform = "translate(0px,0px)";
+                                target.removeAttribute("data-x");
+                                target.removeAttribute("data-y");
+
+                                target.style.left = left + "px";
+                                target.style.top = top + "px";
+
                                 updateSelectedWidget({
+                                    x: left,
+                                    y: top
+                                });
+                            }
+                        }
+                    })
+
+                    .resizable({
+                        inertia: false,
+                        edges: { left: true, right: true, bottom: true, top: true },
+
+                        modifiers: [
+                            interact.modifiers.restrictEdges({
+                                outer: 'parent'
+                            })
+                        ],
+
+                        listeners: {
+                            move(event) {
+
+                                const target = event.target;
+
+                                let x = parseFloat(target.getAttribute("data-x")) || 0;
+                                let y = parseFloat(target.getAttribute("data-y")) || 0;
+
+                                target.style.width = event.rect.width + "px";
+                                target.style.height = event.rect.height + "px";
+
+                                x += event.deltaRect.left;
+                                y += event.deltaRect.top;
+
+                                target.style.transform = `translate(${x}px, ${y}px)`;
+
+                                target.setAttribute("data-x", x);
+                                target.setAttribute("data-y", y);
+                            },
+
+                            end(event) {
+
+                                const target = event.target;
+
+                                const x = parseFloat(target.getAttribute("data-x")) || 0;
+                                const y = parseFloat(target.getAttribute("data-y")) || 0;
+
+                                const left = (widget.data.x || 0) + x;
+                                const top = (widget.data.y || 0) + y;
+
+                                target.style.transform = "translate(0px,0px)";
+                                target.removeAttribute("data-x");
+                                target.removeAttribute("data-y");
+
+                                target.style.left = left + "px";
+                                target.style.top = top + "px";
+
+                                updateSelectedWidget({
+                                    x: left,
+                                    y: top,
                                     width: event.rect.width,
                                     height: event.rect.height
                                 });
                             }
                         }
-                    }
-                });
+                    });
 
                 if (widgets.length === 1) {
                     selectWidget(widget, el);
@@ -793,9 +901,17 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 body: JSON.stringify({ data: updatedData })
             });
 
-            selectedWidget = await res.json();
+            const updatedWidget = await res.json();
 
-            markAsChanged();   // 🔥 esto ya activa hasUnsavedChanges
+            // 🔥 ACTUALIZAR EN MEMORIA
+            selectedWidget.data = updatedWidget.data;
+
+            const index = widgets.findIndex(w => w._id === selectedWidget._id);
+            if (index !== -1) {
+                widgets[index] = updatedWidget;
+            }
+
+            markAsChanged();
         }
 
         function closeSettings() {
@@ -864,36 +980,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
         /* ================= DRAG ================= */
 
-        function enableDrag(el, widget) {
-            let offsetX, offsetY, isDragging = false;
 
-            el.addEventListener("mousedown", (e) => {
-                isDragging = true;
-                offsetX = e.offsetX;
-                offsetY = e.offsetY;
-            });
-
-            document.addEventListener("mousemove", (e) => {
-                if (!isDragging) return;
-
-                const rect = document.getElementById("canvas").getBoundingClientRect();
-                let x = e.clientX - rect.left - offsetX;
-                let y = e.clientY - rect.top - offsetY;
-
-                el.style.left = x + "px";
-                el.style.top = y + "px";
-            });
-
-            document.addEventListener("mouseup", async () => {
-                if (!isDragging) return;
-                isDragging = false;
-
-                await updateWidget({
-                    x: parseInt(el.style.left),
-                    y: parseInt(el.style.top)
-                });
-            });
-        }
 
         /* ================= ADD ================= */
 
