@@ -518,30 +518,18 @@
 
                                 const target = event.target;
 
-                                const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-                                const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+                                const left = parseFloat(target.style.left) || 0;
+                                const top = parseFloat(target.style.top) || 0;
 
-                                target.style.transform = `translate(${x}px, ${y}px)`;
-
-                                target.setAttribute("data-x", x);
-                                target.setAttribute("data-y", y);
+                                target.style.left = left + event.dx + "px";
+                                target.style.top = top + event.dy + "px";
                             },
                             end(event) {
 
                                 const target = event.target;
 
-                                const x = parseFloat(target.getAttribute("data-x")) || 0;
-                                const y = parseFloat(target.getAttribute("data-y")) || 0;
-
-                                const left = (widget.data.x || 0) + x;
-                                const top = (widget.data.y || 0) + y;
-
-                                target.style.transform = "translate(0px,0px)";
-                                target.removeAttribute("data-x");
-                                target.removeAttribute("data-y");
-
-                                target.style.left = left + "px";
-                                target.style.top = top + "px";
+                                const left = parseFloat(target.style.left) || 0;
+                                const top = parseFloat(target.style.top) || 0;
 
                                 updateSelectedWidget({
                                     x: left,
@@ -552,51 +540,31 @@
                     })
 
                     .resizable({
-                        inertia: false,
                         edges: { left: true, right: true, bottom: true, top: true },
-
-                        modifiers: [
-                            interact.modifiers.restrictEdges({
-                                outer: 'parent'
-                            })
-                        ],
 
                         listeners: {
                             move(event) {
 
                                 const target = event.target;
 
-                                let x = parseFloat(target.getAttribute("data-x")) || 0;
-                                let y = parseFloat(target.getAttribute("data-y")) || 0;
+                                let left = parseFloat(target.style.left) || 0;
+                                let top = parseFloat(target.style.top) || 0;
 
+                                left += event.deltaRect.left;
+                                top += event.deltaRect.top;
+
+                                target.style.left = left + "px";
+                                target.style.top = top + "px";
                                 target.style.width = event.rect.width + "px";
                                 target.style.height = event.rect.height + "px";
-
-                                x += event.deltaRect.left;
-                                y += event.deltaRect.top;
-
-                                target.style.transform = `translate(${x}px, ${y}px)`;
-
-                                target.setAttribute("data-x", x);
-                                target.setAttribute("data-y", y);
                             },
 
                             end(event) {
 
                                 const target = event.target;
 
-                                const x = parseFloat(target.getAttribute("data-x")) || 0;
-                                const y = parseFloat(target.getAttribute("data-y")) || 0;
-
-                                const left = (widget.data.x || 0) + x;
-                                const top = (widget.data.y || 0) + y;
-
-                                target.style.transform = "translate(0px,0px)";
-                                target.removeAttribute("data-x");
-                                target.removeAttribute("data-y");
-
-                                target.style.left = left + "px";
-                                target.style.top = top + "px";
+                                const left = parseFloat(target.style.left) || 0;
+                                const top = parseFloat(target.style.top) || 0;
 
                                 updateSelectedWidget({
                                     x: left,
@@ -889,26 +857,18 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             }
         }
 
-        async function updateSelectedWidget(updates) {
+        function updateSelectedWidget(updates) {
 
             if (!selectedWidget) return;
 
-            const updatedData = { ...selectedWidget.data, ...updates };
-
-            const res = await fetch(`/api/widgets/${selectedWidget._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ data: updatedData })
-            });
-
-            const updatedWidget = await res.json();
-
-            // 🔥 ACTUALIZAR EN MEMORIA
-            selectedWidget.data = updatedWidget.data;
+            selectedWidget.data = {
+                ...selectedWidget.data,
+                ...updates
+            };
 
             const index = widgets.findIndex(w => w._id === selectedWidget._id);
             if (index !== -1) {
-                widgets[index] = updatedWidget;
+                widgets[index].data = selectedWidget.data;
             }
 
             markAsChanged();
