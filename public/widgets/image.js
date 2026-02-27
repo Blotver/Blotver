@@ -211,6 +211,9 @@ window.ImageWidget = {
 
         container.querySelectorAll("input[data-field]")
             .forEach(input => {
+
+                const valueLabel = input.parentElement.querySelector("span");
+
                 input.addEventListener("input", (e) => {
 
                     const field = e.target.dataset.field;
@@ -218,18 +221,25 @@ window.ImageWidget = {
                         ? parseFloat(e.target.value)
                         : parseInt(e.target.value);
 
+                    // 🔥 ACTUALIZAR EL NUMERITO DEL PANEL
+                    if (valueLabel) {
+                        valueLabel.innerText = value;
+                    }
+
                     // 🔒 Lock aspect ratio
                     if (widget.data.lockRatio && widget.data.aspectRatio && field === "width") {
                         updateSelectedWidget({
                             width: value,
                             height: value / widget.data.aspectRatio
                         });
-                    } else if (widget.data.lockRatio && widget.data.aspectRatio && field === "height") {
+                    }
+                    else if (widget.data.lockRatio && widget.data.aspectRatio && field === "height") {
                         updateSelectedWidget({
                             height: value,
                             width: value * widget.data.aspectRatio
                         });
-                    } else {
+                    }
+                    else {
                         updateSelectedWidget({ [field]: value });
                     }
                 });
