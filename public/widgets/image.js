@@ -219,12 +219,12 @@ window.ImageWidget = {
                         : parseInt(e.target.value);
 
                     // 🔒 Lock aspect ratio
-                    if (widget.data.lockRatio && field === "width") {
+                    if (widget.data.lockRatio && widget.data.aspectRatio && field === "width") {
                         updateSelectedWidget({
                             width: value,
                             height: value / widget.data.aspectRatio
                         });
-                    } else if (widget.data.lockRatio && field === "height") {
+                    } else if (widget.data.lockRatio && widget.data.aspectRatio && field === "height") {
                         updateSelectedWidget({
                             height: value,
                             width: value * widget.data.aspectRatio

@@ -564,7 +564,8 @@
                                 const widget = widgets.find(w => w._id === id);
                                 if (!widget) return;
 
-                                let { width, height } = event.rect;
+                                let width = event.rect.width;
+                                let height = event.rect.height;
 
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
@@ -574,28 +575,16 @@
 
                                 if (lock && ratio) {
 
-                                    const dx = event.deltaRect.width;
-                                    const dy = event.deltaRect.height;
-
-                                    if (Math.abs(dx) > Math.abs(dy)) {
+                                    if (event.edges.left || event.edges.right) {
                                         height = width / ratio;
-                                    } else {
+                                    } else if (event.edges.top || event.edges.bottom) {
                                         width = height * ratio;
                                     }
 
-                                    if (event.edges.left) {
-                                        left = left + (event.rect.width - width);
-                                    }
-
-                                    if (event.edges.top) {
-                                        top = top + (event.rect.height - height);
-                                    }
-
-                                } else {
-
-                                    left += event.deltaRect.left;
-                                    top += event.deltaRect.top;
                                 }
+
+                                left += event.deltaRect.left;
+                                top += event.deltaRect.top;
 
                                 target.style.width = width + "px";
                                 target.style.height = height + "px";
