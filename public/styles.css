@@ -1270,6 +1270,10 @@ video {
   background-color: rgb(255 255 255 / 0.05);
 }
 
+.bg-black\/50 {
+  background-color: rgb(0 0 0 / 0.5);
+}
+
 .bg-\[radial-gradient\(circle_at_center\2c _white_1px\2c _transparent_1px\)\] {
   background-image: radial-gradient(circle at center, white 1px, transparent 1px);
 }
