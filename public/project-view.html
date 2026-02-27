@@ -411,8 +411,6 @@
                             y: Math.round(centerY)
                         });
 
-                        // 🔥 actualizar solo el elemento visual actual
-                                            
                         closeImageModal();
                     };
 
@@ -557,28 +555,40 @@
 
                                 const target = event.target;
 
-                                // Obtener valores actuales reales
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
-                                let width = parseFloat(target.style.width) || event.rect.width;
-                                let height = parseFloat(target.style.height) || event.rect.height;
 
-                                // 🔥 usar deltaRect (CLAVE)
-                                left += event.deltaRect.left;
-                                top += event.deltaRect.top;
+                                let width = event.rect.width;
+                                let height = event.rect.height;
 
-                                width = event.rect.width;
-                                height = event.rect.height;
+                                const isLocked =
+                                    selectedWidget?.data?.lockRatio &&
+                                    selectedWidget?.data?.aspectRatio;
 
-                                // 🔒 Lock ratio real
-                                if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
+                                if (!isLocked) {
+
+                                    left += event.deltaRect.left;
+                                    top += event.deltaRect.top;
+
+                                } else {
 
                                     const ratio = selectedWidget.data.aspectRatio;
+
+                                    const resizingFromLeft = event.deltaRect.left !== 0;
+                                    const resizingFromTop = event.deltaRect.top !== 0;
 
                                     if (width / height > ratio) {
                                         width = height * ratio;
                                     } else {
                                         height = width / ratio;
+                                    }
+
+                                    if (resizingFromLeft) {
+                                        left += event.deltaRect.left;
+                                    }
+
+                                    if (resizingFromTop) {
+                                        top += event.deltaRect.top;
                                     }
                                 }
 
