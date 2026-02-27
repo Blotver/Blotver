@@ -558,13 +558,11 @@
 
                                 const target = event.target;
 
-                                let width = event.rect.width;
-                                let height = event.rect.height;
+                                let { width, height } = event.rect;
 
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
 
-                                // 🔒 Si lock está activo → forzar proporción
                                 if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
 
                                     const ratio = selectedWidget.data.aspectRatio;
@@ -576,19 +574,21 @@
                                     }
                                 }
 
-                                // Ajustar posición si redimensiona desde izquierda o arriba
-                                if (event.edges.left) {
-                                    left = event.rect.right - width;
-                                }
-
-                                if (event.edges.top) {
-                                    top = event.rect.bottom - height;
-                                }
+                                left += event.deltaRect.left;
+                                top += event.deltaRect.top;
 
                                 target.style.width = width + "px";
                                 target.style.height = height + "px";
                                 target.style.left = left + "px";
                                 target.style.top = top + "px";
+
+                                // 🔥 sincronización en tiempo real
+                                updateSelectedWidget({
+                                    x: left,
+                                    y: top,
+                                    width: width,
+                                    height: height
+                                });
                             },
 
                             end(event) {
