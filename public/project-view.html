@@ -479,6 +479,7 @@
             widgets.forEach(widget => {
 
                 const el = document.createElement("div");
+                el.dataset.widgetId = widget._id;
 
                 if (widget.type === "text") {
                     el.innerText = widget.data.text || "Sample Text";
@@ -534,14 +535,23 @@
                             end(event) {
 
                                 const target = event.target;
+                                const widgetId = target.dataset.widgetId;
+
+                                const widget = widgets.find(w => w._id === widgetId);
+                                if (!widget) return;
 
                                 const left = parseFloat(target.style.left) || 0;
                                 const top = parseFloat(target.style.top) || 0;
 
-                                updateSelectedWidget({
-                                    x: left,
-                                    y: top
-                                });
+                                widget.data.x = left;
+                                widget.data.y = top;
+
+                                if (selectedWidget && selectedWidget._id === widgetId) {
+                                    selectedWidget.data.x = left;
+                                    selectedWidget.data.y = top;
+                                }
+
+                                markAsChanged();
                             }
                         }
                     })
@@ -601,13 +611,29 @@
                             end(event) {
 
                                 const target = event.target;
+                                const widgetId = target.dataset.widgetId;
 
-                                updateSelectedWidget({
-                                    x: parseFloat(target.style.left) || 0,
-                                    y: parseFloat(target.style.top) || 0,
-                                    width: parseFloat(target.style.width),
-                                    height: parseFloat(target.style.height)
-                                });
+                                const widget = widgets.find(w => w._id === widgetId);
+                                if (!widget) return;
+
+                                const left = parseFloat(target.style.left) || 0;
+                                const top = parseFloat(target.style.top) || 0;
+                                const width = parseFloat(target.style.width);
+                                const height = parseFloat(target.style.height);
+
+                                widget.data = {
+                                    ...widget.data,
+                                    x: left,
+                                    y: top,
+                                    width,
+                                    height
+                                };
+
+                                if (selectedWidget && selectedWidget._id === widgetId) {
+                                    selectedWidget.data = widget.data;
+                                }
+
+                                markAsChanged();
                             }
                         }
                     })
