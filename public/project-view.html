@@ -557,6 +557,7 @@
                             move(event) {
 
                                 const target = event.target;
+                                const canvas = document.getElementById("canvas");
 
                                 let width = event.rect.width;
                                 let height = event.rect.height;
@@ -564,7 +565,7 @@
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
 
-                                // 🔒 Si lock está activo → forzar proporción
+                                // 🔒 lock ratio
                                 if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
 
                                     const ratio = selectedWidget.data.aspectRatio;
@@ -576,7 +577,6 @@
                                     }
                                 }
 
-                                // Ajustar posición si redimensiona desde izquierda o arriba
                                 if (event.edges.left) {
                                     left = event.rect.right - width;
                                 }
@@ -584,6 +584,23 @@
                                 if (event.edges.top) {
                                     top = event.rect.bottom - height;
                                 }
+
+                                // límites reales sin romper interact
+                                if (left < 0) {
+                                    width += left;
+                                    left = 0;
+                                }
+
+                                if (top < 0) {
+                                    height += top;
+                                    top = 0;
+                                }
+
+                                const maxWidth = canvas.clientWidth - left;
+                                const maxHeight = canvas.clientHeight - top;
+
+                                if (width > maxWidth) width = maxWidth;
+                                if (height > maxHeight) height = maxHeight;
 
                                 target.style.width = width + "px";
                                 target.style.height = height + "px";
@@ -901,7 +918,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 widgets[index].data = selectedWidget.data;
             }
 
-            // ===== 2️⃣ Actualizar canvas =====
+            // ===== 2️⃣ Actualizar posición y tamaño =====
             if (updates.x !== undefined)
                 selectedElement.style.left = updates.x + "px";
 
@@ -914,30 +931,19 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             if (updates.height !== undefined)
                 selectedElement.style.height = updates.height + "px";
 
-            const img = selectedElement.querySelector("img");
+            // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
+            const widgetDef = window.WidgetRegistry[selectedWidget.type];
 
-            if (img) {
-
-                if (updates.objectFit !== undefined)
-                    img.style.objectFit = updates.objectFit;
-
-                if (updates.borderRadius !== undefined)
-                    img.style.borderRadius = updates.borderRadius + "px";
-
-                if (updates.opacity !== undefined)
-                    img.style.opacity = updates.opacity;
-
-                if (updates.shadow !== undefined)
-                    img.style.boxShadow = updates.shadow
-                        ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
-                        : "none";
+            if (widgetDef && widgetDef.renderCanvas) {
+                selectedElement.innerHTML = "";
+                const rendered = widgetDef.renderCanvas(selectedWidget);
+                selectedElement.appendChild(rendered);
             }
 
-            // ===== 3️⃣ Sincronizar panel =====
+            // ===== 4️⃣ Sincronizar panel =====
             const panel = document.getElementById("configContent");
             if (!panel) return;
 
-            // actualizar inputs
             panel.querySelectorAll("input[data-field]").forEach(input => {
                 const field = input.dataset.field;
                 if (selectedWidget.data[field] !== undefined) {
@@ -945,15 +951,13 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 }
             });
 
-            // actualizar labels de sliders
             panel.querySelectorAll("input[type='range']").forEach(range => {
                 const span = range.parentElement.querySelector("span");
-                if (span) {
+                if (span && range.dataset.field) {
                     span.innerText = selectedWidget.data[range.dataset.field];
                 }
             });
 
-            // actualizar botones fit
             panel.querySelectorAll("[data-fit]").forEach(btn => {
                 const active = btn.dataset.fit === selectedWidget.data.objectFit;
                 btn.className =
@@ -963,7 +967,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
             });
 
-            // actualizar botón lock
             const lockBtn = panel.querySelector("#lockRatio");
             if (lockBtn) {
                 lockBtn.className =
@@ -973,7 +976,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
             }
 
-            // ===== 4️⃣ marcar cambios =====
+            // ===== 5️⃣ Marcar cambios =====
             markAsChanged();
         }
 
