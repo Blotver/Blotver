@@ -501,7 +501,6 @@
                 el.style.fontSize = (widget.data.fontSize || 32) + "px";
                 el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
                 el.classList.add("draggable-resizable");
-                el.dataset.id = widget._id;
 
                 if (widget.data.width) {
                     el.style.width = widget.data.width + "px";
@@ -529,22 +528,20 @@
 
                                 const target = event.target;
 
-                                const left = (parseFloat(target.style.left) || 0) + event.dx;
-                                const top = (parseFloat(target.style.top) || 0) + event.dy;
+                                const left = parseFloat(target.style.left) || 0;
+                                const top = parseFloat(target.style.top) || 0;
 
-                                target.style.left = left + "px";
-                                target.style.top = top + "px";
+                                target.style.left = left + event.dx + "px";
+                                target.style.top = top + event.dy + "px";
                             },
-
                             end(event) {
 
                                 const target = event.target;
-                                const id = target.dataset.id;
 
                                 const left = parseFloat(target.style.left) || 0;
                                 const top = parseFloat(target.style.top) || 0;
 
-                                updateWidgetById(id, {
+                                updateSelectedWidget({
                                     x: left,
                                     y: top
                                 });
@@ -560,9 +557,6 @@
                             move(event) {
 
                                 const target = event.target;
-                                const id = target.dataset.id;
-                                const widget = widgets.find(w => w._id === id);
-                                if (!widget) return;
 
                                 let width = event.rect.width;
                                 let height = event.rect.height;
@@ -570,21 +564,26 @@
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
 
-                                const lock = widget.data.lockRatio;
-                                const ratio = widget.data.aspectRatio;
+                                // 🔒 Si lock está activo → forzar proporción
+                                if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
 
-                                if (lock && ratio) {
+                                    const ratio = selectedWidget.data.aspectRatio;
 
-                                    if (event.edges.left || event.edges.right) {
-                                        height = width / ratio;
-                                    } else if (event.edges.top || event.edges.bottom) {
+                                    if (width / height > ratio) {
                                         width = height * ratio;
+                                    } else {
+                                        height = width / ratio;
                                     }
-
                                 }
 
-                                left += event.deltaRect.left;
-                                top += event.deltaRect.top;
+                                // Ajustar posición si redimensiona desde izquierda o arriba
+                                if (event.edges.left) {
+                                    left = event.rect.right - width;
+                                }
+
+                                if (event.edges.top) {
+                                    top = event.rect.bottom - height;
+                                }
 
                                 target.style.width = width + "px";
                                 target.style.height = height + "px";
@@ -595,18 +594,12 @@
                             end(event) {
 
                                 const target = event.target;
-                                const id = target.dataset.id;
 
-                                const width = parseFloat(target.style.width);
-                                const height = parseFloat(target.style.height);
-                                const left = parseFloat(target.style.left);
-                                const top = parseFloat(target.style.top);
-
-                                updateWidgetById(id, {
-                                    width,
-                                    height,
-                                    x: left,
-                                    y: top
+                                updateSelectedWidget({
+                                    x: parseFloat(target.style.left) || 0,
+                                    y: parseFloat(target.style.top) || 0,
+                                    width: parseFloat(target.style.width),
+                                    height: parseFloat(target.style.height)
                                 });
                             }
                         }
@@ -804,7 +797,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
                 showSaveToast("Saved ✔");
                 resetChanges();
-
+                loadWidgets();
 
             } catch (error) {
                 console.error(error);
@@ -893,66 +886,95 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             }
         }
 
-        function updateWidgetById(id, updates) {
+        function updateSelectedWidget(updates) {
 
-            const widget = widgets.find(w => w._id === id);
-            if (!widget) return;
+            if (!selectedWidget || !selectedElement) return;
 
-            widget.data = {
-                ...widget.data,
+            // ===== 1️⃣ Actualizar memoria =====
+            selectedWidget.data = {
+                ...selectedWidget.data,
                 ...updates
             };
 
-            if (selectedWidget?._id === id) {
-                selectedWidget = widget;
+            const index = widgets.findIndex(w => w._id === selectedWidget._id);
+            if (index !== -1) {
+                widgets[index].data = selectedWidget.data;
             }
 
-            const element = document.querySelector(`[data-id="${id}"]`);
-            if (element) {
+            // ===== 2️⃣ Actualizar canvas =====
+            if (updates.x !== undefined)
+                selectedElement.style.left = updates.x + "px";
 
-                if (updates.x !== undefined)
-                    element.style.left = updates.x + "px";
+            if (updates.y !== undefined)
+                selectedElement.style.top = updates.y + "px";
 
-                if (updates.y !== undefined)
-                    element.style.top = updates.y + "px";
+            if (updates.width !== undefined)
+                selectedElement.style.width = updates.width + "px";
 
-                if (updates.width !== undefined)
-                    element.style.width = updates.width + "px";
+            if (updates.height !== undefined)
+                selectedElement.style.height = updates.height + "px";
 
-                if (updates.height !== undefined)
-                    element.style.height = updates.height + "px";
+            const img = selectedElement.querySelector("img");
 
-                const img = element.querySelector("img"); // ✅ DEFINIDO UNA VEZ
+            if (img) {
 
-                if (updates.opacity !== undefined) {
-                    element.style.opacity = updates.opacity;
-                    if (img) img.style.opacity = updates.opacity;
-                }
+                if (updates.objectFit !== undefined)
+                    img.style.objectFit = updates.objectFit;
 
-                if (img) {
-                    if (updates.objectFit !== undefined)
-                        img.style.objectFit = updates.objectFit;
+                if (updates.borderRadius !== undefined)
+                    img.style.borderRadius = updates.borderRadius + "px";
 
-                    if (updates.borderRadius !== undefined)
-                        img.style.borderRadius = updates.borderRadius + "px";
+                if (updates.opacity !== undefined)
+                    img.style.opacity = updates.opacity;
 
-                    if (updates.shadow !== undefined)
-                        img.style.boxShadow =
-                            updates.shadow
-                                ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
-                                : "none";
-                }
+                if (updates.shadow !== undefined)
+                    img.style.boxShadow = updates.shadow
+                        ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
+                        : "none";
             }
 
+            // ===== 3️⃣ Sincronizar panel =====
+            const panel = document.getElementById("configContent");
+            if (!panel) return;
+
+            // actualizar inputs
+            panel.querySelectorAll("input[data-field]").forEach(input => {
+                const field = input.dataset.field;
+                if (selectedWidget.data[field] !== undefined) {
+                    input.value = selectedWidget.data[field];
+                }
+            });
+
+            // actualizar labels de sliders
+            panel.querySelectorAll("input[type='range']").forEach(range => {
+                const span = range.parentElement.querySelector("span");
+                if (span) {
+                    span.innerText = selectedWidget.data[range.dataset.field];
+                }
+            });
+
+            // actualizar botones fit
+            panel.querySelectorAll("[data-fit]").forEach(btn => {
+                const active = btn.dataset.fit === selectedWidget.data.objectFit;
+                btn.className =
+                    "flex-1 py-2 rounded-md border text-xs capitalize " +
+                    (active
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+            });
+
+            // actualizar botón lock
+            const lockBtn = panel.querySelector("#lockRatio");
+            if (lockBtn) {
+                lockBtn.className =
+                    "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
+                    (selectedWidget.data.lockRatio
+                        ? "bg-gray-600 border-gray-500 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+            }
+
+            // ===== 4️⃣ marcar cambios =====
             markAsChanged();
-        }
-
-        function updateSelectedWidget(changes) {
-
-            if (!selectedWidget) return;
-
-
-            updateWidgetById(selectedWidget._id, changes);
         }
 
         function closeSettings() {
