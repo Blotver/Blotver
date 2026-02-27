@@ -412,8 +412,7 @@
                         });
 
                         // 🔥 actualizar solo el elemento visual actual
-                        selectedElement.querySelector("img").src = data.url;
-
+                                            
                         closeImageModal();
                     };
 
@@ -557,15 +556,21 @@
                             move(event) {
 
                                 const target = event.target;
-                                const canvas = document.getElementById("canvas");
 
-                                let width = event.rect.width;
-                                let height = event.rect.height;
-
+                                // Obtener valores actuales reales
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
+                                let width = parseFloat(target.style.width) || event.rect.width;
+                                let height = parseFloat(target.style.height) || event.rect.height;
 
-                                // 🔒 lock ratio
+                                // 🔥 usar deltaRect (CLAVE)
+                                left += event.deltaRect.left;
+                                top += event.deltaRect.top;
+
+                                width = event.rect.width;
+                                height = event.rect.height;
+
+                                // 🔒 Lock ratio real
                                 if (selectedWidget?.data?.lockRatio && selectedWidget?.data?.aspectRatio) {
 
                                     const ratio = selectedWidget.data.aspectRatio;
@@ -577,35 +582,10 @@
                                     }
                                 }
 
-                                if (event.edges.left) {
-                                    left = event.rect.right - width;
-                                }
-
-                                if (event.edges.top) {
-                                    top = event.rect.bottom - height;
-                                }
-
-                                // límites reales sin romper interact
-                                if (left < 0) {
-                                    width += left;
-                                    left = 0;
-                                }
-
-                                if (top < 0) {
-                                    height += top;
-                                    top = 0;
-                                }
-
-                                const maxWidth = canvas.clientWidth - left;
-                                const maxHeight = canvas.clientHeight - top;
-
-                                if (width > maxWidth) width = maxWidth;
-                                if (height > maxHeight) height = maxHeight;
-
-                                target.style.width = width + "px";
-                                target.style.height = height + "px";
                                 target.style.left = left + "px";
                                 target.style.top = top + "px";
+                                target.style.width = width + "px";
+                                target.style.height = height + "px";
                             },
 
                             end(event) {
