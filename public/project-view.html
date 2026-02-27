@@ -922,17 +922,14 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 if (updates.height !== undefined)
                     element.style.height = updates.height + "px";
 
+                const img = element.querySelector("img"); // ✅ DEFINIDO UNA VEZ
+
                 if (updates.opacity !== undefined) {
                     element.style.opacity = updates.opacity;
-
-                    const img = element.querySelector("img");
-                    if (img) {
-                        img.style.opacity = updates.opacity;
-                    }
+                    if (img) img.style.opacity = updates.opacity;
                 }
 
                 if (img) {
-
                     if (updates.objectFit !== undefined)
                         img.style.objectFit = updates.objectFit;
 
