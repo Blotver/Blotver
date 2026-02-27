@@ -918,9 +918,45 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 selectedWidget = widget;
             }
 
+            // 🔥 ACTUALIZAR DOM EN TIEMPO REAL
+            const element = document.querySelector(`[data-id="${id}"]`);
+            if (element) {
+
+                if (updates.x !== undefined)
+                    element.style.left = updates.x + "px";
+
+                if (updates.y !== undefined)
+                    element.style.top = updates.y + "px";
+
+                if (updates.width !== undefined)
+                    element.style.width = updates.width + "px";
+
+                if (updates.height !== undefined)
+                    element.style.height = updates.height + "px";
+
+                const img = element.querySelector("img");
+
+                if (img) {
+                    if (updates.objectFit !== undefined)
+                        img.style.objectFit = updates.objectFit;
+
+                    if (updates.borderRadius !== undefined)
+                        img.style.borderRadius = updates.borderRadius + "px";
+
+                    if (updates.opacity !== undefined)
+                        img.style.opacity = updates.opacity;
+
+                    if (updates.shadow !== undefined)
+                        img.style.boxShadow =
+                            updates.shadow
+                                ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
+                                : "none";
+                }
+            }
+
             markAsChanged();
         }
-        
+
         function updateSelectedWidget(updates) {
             if (!selectedWidget) return;
             updateWidgetById(selectedWidget._id, updates);
