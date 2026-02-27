@@ -192,9 +192,12 @@
             <div id="widgetSelector"
                 class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 border border-gray-700 rounded-xl shadow-xl p-4 flex flex-col gap-2 w-56 z-40">
                 <div onclick="createWidget('text')" class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
-                    Text</div>
+                    Text
+                </div>
                 <div onclick="createWidget('image')" class="p-2 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer">
-                    Image</div>
+                    Image
+                </div>
+            </div>
         </main>
     </div>
 
@@ -568,38 +571,23 @@
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
 
+                                const oldWidth = parseFloat(target.style.width) || 0;
+                                const oldHeight = parseFloat(target.style.height) || 0;
+
                                 let width = event.rect.width;
                                 let height = event.rect.height;
 
-                                const isLocked =
-                                    selectedWidget?.data?.lockRatio &&
-                                    selectedWidget?.data?.aspectRatio;
+                                const resizingFromLeft = event.edges.left;
+                                const resizingFromTop = event.edges.top;
 
-                                if (!isLocked) {
+                                // 🔥 Ajustar left correctamente si viene desde izquierda
+                                if (resizingFromLeft) {
+                                    left += oldWidth - width;
+                                }
 
-                                    left += event.deltaRect.left;
-                                    top += event.deltaRect.top;
-
-                                } else {
-
-                                    const ratio = selectedWidget.data.aspectRatio;
-
-                                    const resizingFromLeft = event.deltaRect.left !== 0;
-                                    const resizingFromTop = event.deltaRect.top !== 0;
-
-                                    if (width / height > ratio) {
-                                        width = height * ratio;
-                                    } else {
-                                        height = width / ratio;
-                                    }
-
-                                    if (resizingFromLeft) {
-                                        left += event.deltaRect.left;
-                                    }
-
-                                    if (resizingFromTop) {
-                                        top += event.deltaRect.top;
-                                    }
+                                // 🔥 Ajustar top correctamente si viene desde arriba
+                                if (resizingFromTop) {
+                                    top += oldHeight - height;
                                 }
 
                                 target.style.left = left + "px";
