@@ -927,18 +927,23 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
                 if (updates.opacity !== undefined) {
                     element.style.opacity = updates.opacity;
+                }
 
-                    if (updates.objectFit !== undefined)
+                if (img) {
+                    if (updates.objectFit !== undefined) {
                         img.style.objectFit = updates.objectFit;
+                    }
 
-                    if (updates.borderRadius !== undefined)
+                    if (updates.borderRadius !== undefined) {
                         img.style.borderRadius = updates.borderRadius + "px";
+                    }
 
-                    if (updates.shadow !== undefined)
+                    if (updates.shadow !== undefined) {
                         img.style.boxShadow =
                             updates.shadow
                                 ? `0 10px 30px rgba(0,0,0,${updates.shadow / 100})`
                                 : "none";
+                    }
                 }
             }
             console.log("UPDATE:", id, updates);
