@@ -946,9 +946,11 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             markAsChanged();
         }
 
-        function updateSelectedWidget(updates) {
+        function updateSelectedWidget(changes) {
+
             if (!selectedWidget) return;
-            updateWidgetById(selectedWidget._id, updates);
+
+            updateWidgetById(selectedWidget._id, changes);
         }
 
         function closeSettings() {
