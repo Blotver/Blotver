@@ -7,6 +7,74 @@
     <link href="/styles.css" rel="stylesheet">
 
     <style>
+        /* ===== RESIZE HANDLES ===== */
+
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border: 2px solid #3b82f6;
+            border-radius: 2px;
+            z-index: 20;
+        }
+
+        .resize-handle.corner {
+            border-radius: 3px;
+        }
+
+        .resize-handle.top {
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: ns-resize;
+        }
+
+        .resize-handle.bottom {
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: ns-resize;
+        }
+
+        .resize-handle.left {
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: ew-resize;
+        }
+
+        .resize-handle.right {
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: ew-resize;
+        }
+
+        .resize-handle.tl {
+            top: -6px;
+            left: -6px;
+            cursor: nwse-resize;
+        }
+
+        .resize-handle.tr {
+            top: -6px;
+            right: -6px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.bl {
+            bottom: -6px;
+            left: -6px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.br {
+            bottom: -6px;
+            right: -6px;
+            cursor: nwse-resize;
+        }
+
         .selected-widget {
             outline: 2px solid #6366f1;
             outline-offset: 2px;
@@ -560,8 +628,12 @@
                     })
 
                     .resizable({
-                        edges: { left: true, right: true, bottom: true, top: true },
-
+                        edges: {
+                            top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
+                            bottom: ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
+                            left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
+                            right: ".resize-handle.right, .resize-handle.tr, .resize-handle.br"
+                        },
                         listeners: {
 
                             move(event) {
@@ -883,15 +955,35 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         function selectWidget(widget, element) {
 
             if (selectedElement) selectedElement.style.outline = "none";
+            if (selectedElement) {
+                selectedElement.querySelectorAll(".resize-handle").forEach(h => h.remove());
+            }
 
             selectedWidget = widget;
             selectedElement = element;
 
-            element.style.outline = "2px solid #3b82f6";
-            element.style.outlineOffset = "2px";
+            element.style.border = "2px solid #3b82f6";
+            element.style.boxSizing = "border-box";
 
             openConfig(widget);
+            addResizeHandles(element);
 
+        }
+
+        function addResizeHandles(el) {
+
+            el.querySelectorAll(".resize-handle").forEach(h => h.remove());
+
+            const positions = [
+                "top", "bottom", "left", "right",
+                "tl", "tr", "bl", "br"
+            ];
+
+            positions.forEach(pos => {
+                const handle = document.createElement("div");
+                handle.className = "resize-handle " + pos;
+                el.appendChild(handle);
+            });
         }
 
         function showLayers() {
@@ -999,6 +1091,9 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             // ===== 5️⃣ Marcar cambios =====
             markAsChanged();
+            if (selectedElement) {
+                addResizeHandles(selectedElement);
+            }
         }
 
         function closeSettings() {
