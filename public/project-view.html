@@ -567,6 +567,9 @@
                             move(event) {
 
                                 const target = event.target;
+                                const widgetId = target.dataset.widgetId;
+                                const widget = widgets.find(w => w._id === widgetId);
+                                if (!widget) return;
 
                                 let left = parseFloat(target.style.left) || 0;
                                 let top = parseFloat(target.style.top) || 0;
@@ -580,12 +583,25 @@
                                 const resizingFromLeft = event.edges.left;
                                 const resizingFromTop = event.edges.top;
 
-                                // 🔥 Ajustar left correctamente si viene desde izquierda
+                                // ===== 🔒 LOCK RATIO =====
+                                const lock = widget.data.lockRatio;
+                                const ratio = widget.data.aspectRatio;
+
+                                if (lock && ratio) {
+
+                                    if (event.edges.left || event.edges.right) {
+                                        height = width / ratio;
+                                    }
+                                    else if (event.edges.top || event.edges.bottom) {
+                                        width = height * ratio;
+                                    }
+                                }
+
+                                // ===== Ajuste posición correcto =====
                                 if (resizingFromLeft) {
                                     left += oldWidth - width;
                                 }
 
-                                // 🔥 Ajustar top correctamente si viene desde arriba
                                 if (resizingFromTop) {
                                     top += oldHeight - height;
                                 }
@@ -971,7 +987,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                         : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
             });
 
-            
+
             const lockBtn = panel.querySelector("#lockRatio");
             if (lockBtn) {
                 lockBtn.className =
