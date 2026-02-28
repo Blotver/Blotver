@@ -955,15 +955,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         function selectWidget(widget, element) {
 
             if (selectedElement) selectedElement.style.outline = "none";
-            if (selectedElement) {
-                selectedElement.querySelectorAll(".resize-handle").forEach(h => h.remove());
-            }
 
             selectedWidget = widget;
             selectedElement = element;
 
-            element.style.border = "2px solid #3b82f6";
-            element.style.boxSizing = "border-box";
+            element.style.outline = "2px solid #3b82f6";
+            element.style.outlineOffset = "2px";
 
             openConfig(widget);
             addResizeHandles(element);
@@ -985,7 +982,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 el.appendChild(handle);
             });
         }
-
+        
         function showLayers() {
             document.getElementById("sidebarTitle").innerText = "Layers";
 
@@ -1091,9 +1088,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             // ===== 5️⃣ Marcar cambios =====
             markAsChanged();
-            if (selectedElement) {
-                addResizeHandles(selectedElement);
-            }
         }
 
         function closeSettings() {
