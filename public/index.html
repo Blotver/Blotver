@@ -5,40 +5,97 @@
     <meta charset="UTF-8">
     <title>Blotver — Widgets para Streamers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="./logo/BlotverLina.png">
+    <link rel="icon" type="image/png" href="./logo/BlotverFavicon.png">
     <link href="/styles.css" rel="stylesheet">
 
     <style>
+        .bot-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        /* ============================= */
+        /* 🚀 FLOAT ULTRA FLUIDO */
+        /* ============================= */
+
         @keyframes floatBot {
-
-            0%,
-            100% {
-                transform: translateY(0px);
+            0% {
+                transform: translate3d(0, 0px, 0);
             }
 
             50% {
-                transform: translateY(-8px);
+                transform: translate3d(0, -16px, 0);
+            }
+
+            100% {
+                transform: translate3d(0, 0px, 0);
             }
         }
 
-        .bot-float {
-            animation: floatBot 4s ease-in-out infinite;
+        .bot-float-layer {
+            animation: floatBot 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
-        @keyframes glowPulse {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.35)) drop-shadow(0 0 80px rgba(168, 85, 247, 0.15));
+        @keyframes shadowReal {
+            0% {
+                transform: translateX(-50%) scaleX(1.35) scaleY(1);
+                opacity: 0.75;
+                filter: blur(8px);
             }
 
             50% {
-                filter: drop-shadow(0 0 70px rgba(168, 85, 247, 0.6)) drop-shadow(0 0 120px rgba(168, 85, 247, 0.35));
+                transform: translateX(-50%) scaleX(0.6) scaleY(0.75);
+                opacity: 0.14;
+                filter: blur(22px);
+            }
+
+            100% {
+                transform: translateX(-50%) scaleX(1.35) scaleY(1);
+                opacity: 0.75;
+                filter: blur(8px);
             }
         }
+
+        .bot-shadow {
+            position: absolute;
+            bottom: -48px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 125%;
+            height: 50px;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 0;
+
+            background:
+                radial-gradient(ellipse at center,
+                    rgba(0, 0, 0, 1) 0%,
+                    rgba(0, 0, 0, 0.9) 18%,
+                    rgba(0, 0, 0, 0.65) 35%,
+                    rgba(0, 0, 0, 0.25) 55%,
+                    transparent 78%),
+                radial-gradient(ellipse at center,
+                    rgba(168, 85, 247, 0.45) 0%,
+                    rgba(168, 85, 247, 0.2) 40%,
+                    transparent 75%);
+
+            animation: shadowReal 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* ============================= */
+        /* ✨ GLOW ESTÁTICO (NO ANIMADO) */
+        /* ============================= */
 
         .bot-glow {
-            animation: glowPulse 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 45px rgba(168, 85, 247, 0.4));
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
     </style>
 </head>
@@ -71,11 +128,15 @@ bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.15),transparent_40%)]">
 
         <div class="max-w-4xl relative z-10">
 
-            <img src="./logo/BlotverLina.png" alt="Blotver Bot" class="w-32 md:w-40 mx-auto mb-8 bot-float bot-glow">
+            <div class="bot-wrapper mx-auto mb-12">
+                <div class="bot-shadow"></div>
 
-            <h2 class="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+                <div class="bot-float-layer">
+                    <img src="./logo/BlotverFly.png" alt="Blotver Bot" class="bot-glow w-32 md:w-40">
+                </div>
+            </div>
+            <h2 class="mt-12 md:mt-20 text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight mb-6">
                 Build Stream Widgets
-                <span class="text-purple-500">Without Limits</span>
             </h2>
 
             <p class="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
