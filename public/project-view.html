@@ -255,24 +255,47 @@
 
                 <!-- ===== WIDGET SELECT MENU ===== -->
                 <div id="widgetMenu" class="absolute bottom-20 right-0
-            bg-gray-900 border border-gray-700
-            rounded-xl shadow-2xl
+            w-44
+            bg-gray-900/95 backdrop-blur-xl
+            border border-gray-700
+            rounded-2xl shadow-2xl
             p-2 space-y-1
-            opacity-0 scale-95 pointer-events-none
-            transition-all duration-200">
+            opacity-0 scale-90 translate-y-2
+            pointer-events-none
+            transition-all duration-200 ease-out">
 
-                    <button data-type="text" class="w-36 text-left px-4 py-2 rounded-lg
-               hover:bg-purple-600/20 text-sm transition">
+                    <!-- TEXT -->
+                    <button data-type="text" class="flex items-center gap-3 w-full
+               px-4 py-2.5 rounded-xl
+               text-sm text-gray-300
+               hover:bg-purple-600/20 hover:text-white
+               transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h16" />
+                        </svg>
+
                         Text
                     </button>
 
-                    <button data-type="image" class="w-36 text-left px-4 py-2 rounded-lg
-               hover:bg-purple-600/20 text-sm transition">
+                    <!-- IMAGE -->
+                    <button data-type="image" class="flex items-center gap-3 w-full
+               px-4 py-2.5 rounded-xl
+               text-sm text-gray-300
+               hover:bg-purple-600/20 hover:text-white
+               transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 5h18M3 19h18M5 7v10M19 7v10M9 11l3 3 4-5" />
+                        </svg>
+
                         Image
                     </button>
 
                 </div>
-
                 <!-- ACTION BUTTONS -->
                 <div id="fabActions" class="flex items-center gap-3 mr-3
                 opacity-0 translate-x-6 pointer-events-none
@@ -1223,7 +1246,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
 
         loadWidgets();
-        
+
         const fabMain = document.getElementById("fabMain");
         const fabActions = document.getElementById("fabActions");
         const fabAdd = document.getElementById("fabAdd");
@@ -1267,11 +1290,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             }
         });
 
-        // ===== FAB ACTIONS =====
-
-        fabAdd.addEventListener("click", () => {
-            createWidget("text"); // después podemos hacer selector dinámico
-        });
+        // ===== FAB ACTIONS ====
 
         fabTest.addEventListener("click", () => {
 
@@ -1302,26 +1321,30 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         function openWidgetMenu() {
             widgetMenu.classList.remove(
                 "opacity-0",
-                "scale-95",
+                "scale-90",
+                "translate-y-2",
                 "pointer-events-none"
             );
 
             widgetMenu.classList.add(
                 "opacity-100",
-                "scale-100"
+                "scale-100",
+                "translate-y-0"
             );
         }
 
         function closeWidgetMenu() {
             widgetMenu.classList.add(
                 "opacity-0",
-                "scale-95",
+                "scale-90",
+                "translate-y-2",
                 "pointer-events-none"
             );
 
             widgetMenu.classList.remove(
                 "opacity-100",
-                "scale-100"
+                "scale-100",
+                "translate-y-0"
             );
         }
 
