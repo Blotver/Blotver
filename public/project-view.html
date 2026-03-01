@@ -276,39 +276,38 @@
                 class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-64"
                 placeholder="Untitled Overlay">
 
-            <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2">
 
-                    <!-- HELP -->
-                    <button id="helpOverlayBtn" data-label="How to use overlay" class="w-9 h-9 flex items-center justify-center
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- HELP -->
+            <button id="helpOverlayBtn" data-label="How to use overlay" class="w-9 h-9 flex items-center justify-center
         rounded-lg bg-gray-800 border border-gray-700
         hover:bg-gray-700 hover:border-gray-600
         transition group">
 
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4 text-gray-400 group-hover:text-white transition" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8 10a4 4 0 118 0c0 3-4 3-4 6m0 4h.01" />
-                        </svg>
-                    </button>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="icon-tooltip  w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path
+                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm1.07-7.75l-.9.92A1.49 1.49 0 0012 12h-1v-1h1a.5.5 0 00.35-.85l-.9-.92A3 3 0 1114.07 9.25z" />
+                </svg>
+            </button>
 
-                    <!-- COPY -->
-                    <button id="copyOverlayBtn" data-label="Copy overlay URL" class="w-9 h-9 flex items-center justify-center
+            <!-- COPY -->
+            <button id="copyOverlayBtn" data-label="Copy overlay URL" class="icon-tooltip w-9 h-9 flex items-center justify-center
         rounded-lg bg-gray-800 border border-gray-700
         hover:bg-gray-700 hover:border-gray-600
         transition group">
 
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4 text-gray-400 group-hover:text-white transition" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                            <rect x="9" y="9" width="13" height="13" rx="2" />
-                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                        </svg>
-                    </button>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1z" />
+                    <path d="M20 5H8a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                </svg>
+            </button>
 
-                </div>
-            </div>
         </div>
 
         <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
@@ -552,8 +551,6 @@
 
         const overlayURL =
             window.location.origin + "/overlay/" + projectId;
-
-        document.getElementById("overlayLink").innerText = overlayURL;
 
         document.getElementById("copyOverlayBtn")
             .addEventListener("click", async () => {
@@ -1466,7 +1463,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 const reversedIndex = items.length - 1 - index;
 
                 if (isOpen) {
-                    item.style.transitionDelay = `${index * 70}ms`;
+                    item.style.transitionDelay = `${index * 55}ms`;
                     item.classList.remove("opacity-0", "translate-y-6", "scale-90");
                 } else {
                     item.style.transitionDelay = "0ms";
