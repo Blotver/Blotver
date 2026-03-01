@@ -288,8 +288,7 @@
         </main>
     </div>
 
-    <div id="fabWrapper" class="fixed bottom-8 right-8 z-50 flex items-center">
-
+    <div id="fabWrapper" class="fixed bottom-8 right-8 z-[999] flex items-center">
         <!-- ===== WIDGET SELECT MENU ===== -->
         <div id="widgetMenu" class="absolute bottom-24 right-0
            w-64
@@ -339,10 +338,6 @@
                 </div>
             </button>
 
-        </div>
-
-        <div id="menuBackdrop"
-            class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition duration-300 z-[998]">
         </div>
 
         <!-- ACTION BUTTONS -->
@@ -464,6 +459,9 @@
         Saved
     </div>
 
+    <div id="menuBackdrop"
+        class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition duration-300 z-[998]">
+    </div>
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
     <script src="/widgets/image.js"></script>
