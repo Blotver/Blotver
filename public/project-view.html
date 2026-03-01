@@ -189,6 +189,12 @@
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
         }
 
+        #fabMain.glow {
+            box-shadow:
+                0 0 0 1px rgba(139, 92, 246, 0.4),
+                0 10px 40px rgba(139, 92, 246, 0.25);
+        }
+
         .fab-item {
             position: relative;
         }
@@ -196,23 +202,29 @@
         .fab-item::after {
             content: attr(data-label);
             position: absolute;
-            right: 60px;
-            background: #111827;
+            right: 70px;
+            /* más separado */
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+
+            background: #0f172a;
             border: 1px solid #1f2937;
             color: white;
             font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 10px;
+
             opacity: 0;
-            transform: translateX(6px);
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
             pointer-events: none;
             white-space: nowrap;
+
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
         .fab-item:hover::after {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(-50%) translateX(0);
         }
     </style>
 </head>
@@ -315,6 +327,10 @@
         </main>
     </div>
 
+    <div id="fabBackdrop" class="fixed inset-0 backdrop-blur-sm bg-black/10 opacity-0 pointer-events-none
+transition-all duration-300 z-[998]">
+    </div>
+
     <div id="fabWrapper" class="fixed bottom-8 right-8 z-[999] flex flex-col items-center">
 
         <!-- STACK -->
@@ -325,7 +341,7 @@
                 class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 data-label="Image">
                 <button class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800
-                hover:bg-gray-800 hover:scale-110
+                hover:bg-gray-800 hover:scale-105
                 transition-all duration-200
                 flex items-center justify-center shadow-lg">
 
@@ -344,7 +360,7 @@
                 class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 data-label="Text">
                 <button class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800
-                hover:bg-gray-800 hover:scale-110
+                hover:bg-gray-800 hover:scale-105
                 transition-all duration-200
                 flex items-center justify-center shadow-lg">
 
@@ -359,7 +375,7 @@
             <div class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 data-label="Test">
                 <button id="fabTest" class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800
-                hover:bg-gray-800 hover:scale-110
+                hover:bg-gray-800 hover:scale-105
                 transition-all duration-200
                 flex items-center justify-center shadow-lg">
 
@@ -374,7 +390,7 @@
         </div>
 
         <!-- MAIN FAB -->
-        <button id="fabMain" class="w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800
+        <button id="fabMain" class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800
         shadow-[0_10px_40px_rgba(0,0,0,0.6)]
         hover:bg-gray-800
         transition-all duration-300
@@ -1298,18 +1314,35 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         const fabStack = document.getElementById("fabStack");
 
-        fabMain.addEventListener("click", () => {
+        fabMain.addEventListener("click", (e) => {
+            e.stopPropagation();
+
             isOpen = !isOpen;
+
+            const backdrop = document.getElementById("fabBackdrop");
 
             if (isOpen) {
                 fabStack.classList.remove("pointer-events-none");
+
+                fabMain.classList.add("rotate-45");
+                fabMain.classList.add("glow");
+
+                backdrop.classList.remove("opacity-0", "pointer-events-none");
+                backdrop.classList.add("opacity-100");
             } else {
                 fabStack.classList.add("pointer-events-none");
+
+                fabMain.classList.remove("rotate-45");
+                fabMain.classList.remove("glow");
+
+                backdrop.classList.add("opacity-0", "pointer-events-none");
             }
 
             items.forEach((item, index) => {
+                const reversedIndex = items.length - 1 - index;
+
                 if (isOpen) {
-                    item.style.transitionDelay = `${index * 70}ms`;
+                    item.style.transitionDelay = `${reversedIndex * 70}ms`;
                     item.classList.remove("opacity-0", "translate-y-6", "scale-90");
                 } else {
                     item.style.transitionDelay = `0ms`;
@@ -1320,10 +1353,17 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         document.addEventListener("click", (e) => {
             if (!fabWrapper.contains(e.target) && isOpen) {
+
                 isOpen = false;
+
+                const backdrop = document.getElementById("fabBackdrop");
+
                 fabStack.classList.add("pointer-events-none");
 
-                fabMain.classList.remove("rotate-45"); // 👈 FALTABA ESTO
+                fabMain.classList.remove("rotate-45");
+                fabMain.classList.remove("glow");
+
+                backdrop.classList.add("opacity-0", "pointer-events-none");
 
                 items.forEach(item => {
                     item.style.transitionDelay = "0ms";
@@ -1332,7 +1372,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             }
         });
 
-        
+
 
         document.getElementById("fabImage")
             .addEventListener("click", () => createWidget("image"));
