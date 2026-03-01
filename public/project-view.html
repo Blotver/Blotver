@@ -227,6 +227,32 @@
             opacity: 1;
             transform: translateY(-50%) translateX(0);
         }
+
+        .icon-tooltip {
+            position: relative;
+        }
+
+        .icon-tooltip::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+
+            background: #0f172a;
+            border: 1px solid #1f2937;
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .icon-tooltip:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 
@@ -251,28 +277,36 @@
                 placeholder="Untitled Overlay">
 
             <div class="flex flex-col gap-1">
-                <span class="text-[11px] tracking-wide text-gray-500 uppercase">
-                    Overlay URL
-                </span>
+                <div class="flex items-center gap-2">
 
-                <div class="flex items-center gap-2 bg-gray-800/60 border border-gray-700
-        rounded-lg px-3 py-2 w-[380px] group">
+                    <!-- HELP -->
+                    <button id="helpOverlayBtn" data-label="How to use overlay" class="w-9 h-9 flex items-center justify-center
+        rounded-lg bg-gray-800 border border-gray-700
+        hover:bg-gray-700 hover:border-gray-600
+        transition group">
 
-                    <span id="overlayLink" class="text-xs text-gray-300 truncate flex-1">
-                    </span>
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4 text-gray-400 group-hover:text-white transition" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 10a4 4 0 118 0c0 3-4 3-4 6m0 4h.01" />
+                        </svg>
+                    </button>
 
-                    <button id="copyOverlayBtn" class="w-7 h-7 flex items-center justify-center
-            rounded-md hover:bg-gray-700 transition">
+                    <!-- COPY -->
+                    <button id="copyOverlayBtn" data-label="Copy overlay URL" class="w-9 h-9 flex items-center justify-center
+        rounded-lg bg-gray-800 border border-gray-700
+        hover:bg-gray-700 hover:border-gray-600
+        transition group">
 
-                        <!-- COPY SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-4 h-4 text-gray-400 group-hover:text-white transition" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <rect x="9" y="9" width="13" height="13" rx="2" />
                             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                         </svg>
-
                     </button>
+
                 </div>
             </div>
         </div>
@@ -499,8 +533,14 @@
     opacity-0 pointer-events-none
     transition-all duration-300
     translate-y-2 scale-95
-    z-[2000]">
-        Link copied ✔
+    z-[2000] flex items-center gap-2">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+
+        Overlay link copied
     </div>
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>

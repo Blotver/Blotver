@@ -869,6 +869,10 @@ video {
   height: 100vh;
 }
 
+.h-9 {
+  height: 2.25rem;
+}
+
 .max-h-40 {
   max-height: 10rem;
 }
@@ -959,6 +963,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.w-9 {
+  width: 2.25rem;
 }
 
 .max-w-2xl {
