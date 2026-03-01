@@ -153,6 +153,36 @@
         .show-settings .sidebar-header svg {
             transform: rotate(180deg);
         }
+
+        .widget-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            transition: all 0.25s ease;
+        }
+
+        .widget-option:hover {
+            background: rgba(168, 85, 247, 0.08);
+            transform: translateX(4px);
+        }
+
+        .icon-wrap {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 18px;
+            transition: all 0.25s ease;
+        }
+
+        .widget-option:hover .icon-wrap {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -254,45 +284,42 @@
             <div id="fabWrapper" class="fixed bottom-8 right-8 z-50 flex items-center">
 
                 <!-- ===== WIDGET SELECT MENU ===== -->
-                <div id="widgetMenu" class="absolute bottom-20 right-0
-            w-44
-            bg-gray-900/95 backdrop-blur-xl
-            border border-gray-700
-            rounded-2xl shadow-2xl
-            p-2 space-y-1
-            opacity-0 scale-90 translate-y-2
-            pointer-events-none
-            transition-all duration-200 ease-out">
-
-                    <!-- TEXT -->
-                    <button data-type="text" class="flex items-center gap-3 w-full
-               px-4 py-2.5 rounded-xl
-               text-sm text-gray-300
-               hover:bg-purple-600/20 hover:text-white
-               transition">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h16" />
-                        </svg>
-
-                        Text
-                    </button>
+                <div id="widgetMenu" class="absolute bottom-24 right-0
+           w-56
+           bg-gradient-to-br from-gray-900/95 to-gray-800/95
+           backdrop-blur-xl
+           border border-gray-700/60
+           rounded-2xl
+           shadow-[0_20px_60px_rgba(0,0,0,0.6)]
+           p-3
+           opacity-0 scale-95 translate-y-3
+           pointer-events-none
+           transition-all duration-300 ease-out">
 
                     <!-- IMAGE -->
-                    <button data-type="image" class="flex items-center gap-3 w-full
-               px-4 py-2.5 rounded-xl
-               text-sm text-gray-300
-               hover:bg-purple-600/20 hover:text-white
-               transition">
+                    <button data-type="image" class="widget-option group opacity-0 translate-y-4">
 
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M3 5h18M3 19h18M5 7v10M19 7v10M9 11l3 3 4-5" />
-                        </svg>
+                        <div class="icon-wrap bg-blue-500/10 text-blue-400">
+                            🖼
+                        </div>
 
-                        Image
+                        <div>
+                            <div class="text-sm font-medium text-gray-200">Image</div>
+                            <div class="text-xs text-gray-500">Upload visual media</div>
+                        </div>
+                    </button>
+
+                    <!-- TEXT -->
+                    <button data-type="text" class="widget-option group opacity-0 translate-y-4">
+
+                        <div class="icon-wrap bg-purple-500/10 text-purple-400">
+                            ✏
+                        </div>
+
+                        <div>
+                            <div class="text-sm font-medium text-gray-200">Text</div>
+                            <div class="text-xs text-gray-500">Static or animated text</div>
+                        </div>
                     </button>
 
                 </div>
@@ -303,9 +330,11 @@
 
                     <!-- ADD WIDGET -->
                     <button id="fabAdd" class="w-12 h-12 rounded-full
-                   bg-purple-600 hover:bg-purple-700
-                   shadow-xl flex items-center justify-center
-                   transition">
+       bg-gray-800 border border-gray-700
+       hover:border-purple-500
+       hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]
+       transition-all duration-300
+       flex items-center justify-center">
 
                         <!-- PLUS SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none"
@@ -317,9 +346,11 @@
 
                     <!-- TEST BUTTON -->
                     <button id="fabTest" class="w-12 h-12 rounded-full
-                   bg-blue-600 hover:bg-blue-700
-                   shadow-xl flex items-center justify-center
-                   transition">
+       bg-gray-800 border border-gray-700
+       hover:border-purple-500
+       hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]
+       transition-all duration-300
+       flex items-center justify-center">
 
                         <!-- BEAKER SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none"
@@ -1319,10 +1350,11 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         });
 
         function openWidgetMenu() {
+
             widgetMenu.classList.remove(
                 "opacity-0",
-                "scale-90",
-                "translate-y-2",
+                "scale-95",
+                "translate-y-3",
                 "pointer-events-none"
             );
 
@@ -1331,21 +1363,42 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 "scale-100",
                 "translate-y-0"
             );
+
+            const options = widgetMenu.querySelectorAll(".widget-option");
+
+            options.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.remove("opacity-0", "translate-y-4");
+                    btn.classList.add("opacity-100", "translate-y-0");
+                }, 100 * (index + 1));
+            });
         }
 
         function closeWidgetMenu() {
-            widgetMenu.classList.add(
-                "opacity-0",
-                "scale-90",
-                "translate-y-2",
-                "pointer-events-none"
-            );
 
-            widgetMenu.classList.remove(
-                "opacity-100",
-                "scale-100",
-                "translate-y-0"
-            );
+            const options = widgetMenu.querySelectorAll(".widget-option");
+
+            options.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.add("opacity-0", "translate-y-4");
+                    btn.classList.remove("opacity-100", "translate-y-0");
+                }, 70 * index);
+            });
+
+            setTimeout(() => {
+                widgetMenu.classList.add(
+                    "opacity-0",
+                    "scale-95",
+                    "translate-y-3",
+                    "pointer-events-none"
+                );
+
+                widgetMenu.classList.remove(
+                    "opacity-100",
+                    "scale-100",
+                    "translate-y-0"
+                );
+            }, 200);
         }
 
         // Crear widget al elegir opción
