@@ -161,12 +161,13 @@
             width: 100%;
             padding: 14px;
             border-radius: 14px;
+            border: 1px solid transparent;
             transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
         }
 
         .widget-option:hover {
-            background: rgba(139, 92, 246, 0.08);
-            transform: translateX(6px);
+            background: rgba(139, 92, 246, 0.06);
+            transform: translateX(4px);
         }
 
         .widget-option:active {
@@ -294,10 +295,10 @@
         <div id="widgetMenu" class="absolute bottom-24 right-0
            w-64
            bg-gray-900/95
-           backdrop-blur-2xl
            border border-gray-800
            rounded-2xl
-           shadow-[0_25px_80px_rgba(0,0,0,0.65)]
+           shadow-[0_30px_100px_rgba(0,0,0,0.7)]
+           origin-bottom-right
            p-2
            opacity-0 scale-95 translate-y-4
            pointer-events-none
@@ -342,18 +343,23 @@
         </div>
 
         <!-- ACTION BUTTONS -->
-        <div id="fabActions" class="flex items-center gap-2 
-       bg-white shadow-lg rounded-xl px-4 py-2
-       transform scale-90 opacity-0
-       transition-all duration-200 ease-out">
+        <div id="fabActions" class="flex items-center gap-2
+    bg-gray-900/95 border border-gray-800
+    rounded-2xl px-3 py-2
+    shadow-[0_20px_60px_rgba(0,0,0,0.6)]
+    backdrop-blur-sm
+    transform scale-90 opacity-0 translate-x-6 pointer-events-none
+    transition-all duration-200 ease-out">
 
             <!-- ADD WIDGET -->
-            <button id="fabAdd" class="w-12 h-12 rounded-full
-       bg-gray-800 border border-gray-700
-       hover:border-purple-500
-       hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]
-       transition-all duration-300
-       flex items-center justify-center">
+            <button id="fabAdd" class="w-11 h-11 rounded-xl
+bg-gray-800/80 border border-gray-700
+hover:border-purple-500
+hover:bg-gray-800
+hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]
+active:scale-95
+transition-all duration-200
+flex items-center justify-center">
 
                 <!-- PLUS SVG -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
@@ -364,12 +370,14 @@
             </button>
 
             <!-- TEST BUTTON -->
-            <button id="fabTest" class="w-12 h-12 rounded-full
-       bg-gray-800 border border-gray-700
-       hover:border-purple-500
-       hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]
-       transition-all duration-300
-       flex items-center justify-center">
+            <button id="fabTest" class="w-11 h-11 rounded-xl
+bg-gray-800/80 border border-gray-700
+hover:border-purple-500
+hover:bg-gray-800
+hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]
+active:scale-95
+transition-all duration-200
+flex items-center justify-center">
 
                 <!-- BEAKER SVG -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
@@ -384,13 +392,14 @@
 
         <!-- MAIN FAB -->
         <button id="fabMain" class="w-16 h-16 rounded-full
-           bg-gradient-to-br from-purple-600 to-violet-700
-           shadow-[0_15px_50px_rgba(139,92,246,0.5)]
-           hover:shadow-[0_20px_70px_rgba(139,92,246,0.7)]
-           hover:scale-105
-           active:scale-95
-           transition-all duration-300
-           flex items-center justify-center">
+        bg-gradient-to-br from-purple-600 to-violet-700
+        shadow-[0_15px_50px_rgba(139,92,246,0.45)]
+        hover:shadow-[0_20px_80px_rgba(139,92,246,0.65)]
+        hover:scale-105
+        active:scale-95
+        transition-all duration-200 ease-out
+        flex items-center justify-center
+        relative overflow-hidden">
 
             <img src="/logo/BlotverFavicon.png" class="w-8 h-8 drop-shadow-md" />
         </button>
@@ -1399,13 +1408,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 "translate-y-0"
             );
 
-            widgetMenu.querySelectorAll(".widget-option").forEach((item, i) => {
-                setTimeout(() => {
-                    item.classList.remove("scale-90", "opacity-0");
-                    item.classList.add("scale-100", "opacity-100");
-                }, i * 40);
-            });
-
             const options = widgetMenu.querySelectorAll(".widget-option");
 
             options.forEach((btn, index) => {
@@ -1415,14 +1417,14 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 }, 100 * (index + 1));
             });
             fabAdd.classList.add("ring-2", "ring-purple-500/40");
-            fabMain.classList.add("rotate-45");
+            fabMain.classList.add("rotate-45", "scale-105");
         }
 
         function closeWidgetMenu() {
 
             const options = widgetMenu.querySelectorAll(".widget-option");
             fabAdd.classList.remove("ring-2", "ring-purple-500/40");
-            fabMain.classList.remove("rotate-45");
+            fabMain.classList.remove("rotate-45", "scale-105");
 
             widgetMenu.querySelectorAll(".widget-option").forEach((item) => {
                 item.classList.add("scale-90", "opacity-0");
