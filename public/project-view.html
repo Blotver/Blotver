@@ -289,8 +289,7 @@
         </main>
     </div>
 
-    <div id="fabWrapper"
-        class="fixed bottom-8 right-8 z-[999] flex items-center transition-transform duration-200 ease-out active:scale-90">
+    <div id="fabWrapper" class="fixed bottom-8 right-8 z-[999] flex items-center">
         <!-- ===== WIDGET SELECT MENU ===== -->
         <div id="widgetMenu" class="absolute bottom-24 right-0
            w-64
@@ -344,19 +343,17 @@
 
         <!-- ACTION BUTTONS -->
         <div id="fabActions" class="flex items-center gap-2
-    bg-gray-900/95 border border-gray-800
-    rounded-2xl px-3 py-2
-    shadow-[0_20px_60px_rgba(0,0,0,0.6)]
-    backdrop-blur-sm
-    transform scale-90 opacity-0 translate-x-6 pointer-events-none
-    transition-all duration-200 ease-out">
+bg-gray-950 border border-gray-800
+rounded-2xl px-2 py-2
+shadow-[0_15px_50px_rgba(0,0,0,0.6)]
+transform scale-95 opacity-0 translate-x-4 pointer-events-none
+transition-all duration-200 ease-out">
 
             <!-- ADD WIDGET -->
             <button id="fabAdd" class="w-11 h-11 rounded-xl
-bg-gray-800/80 border border-gray-700
-hover:border-purple-500
+bg-gray-900 border border-gray-800
 hover:bg-gray-800
-hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]
+hover:border-gray-700
 active:scale-95
 transition-all duration-200
 flex items-center justify-center">
@@ -371,10 +368,9 @@ flex items-center justify-center">
 
             <!-- TEST BUTTON -->
             <button id="fabTest" class="w-11 h-11 rounded-xl
-bg-gray-800/80 border border-gray-700
-hover:border-purple-500
+bg-gray-900 border border-gray-800
 hover:bg-gray-800
-hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]
+hover:border-gray-700
 active:scale-95
 transition-all duration-200
 flex items-center justify-center">
@@ -391,15 +387,13 @@ flex items-center justify-center">
         </div>
 
         <!-- MAIN FAB -->
-        <button id="fabMain" class="w-16 h-16 rounded-full
-        bg-gradient-to-br from-purple-600 to-violet-700
-        shadow-[0_15px_50px_rgba(139,92,246,0.45)]
-        hover:shadow-[0_20px_80px_rgba(139,92,246,0.65)]
-        hover:scale-105
-        active:scale-95
-        transition-all duration-200 ease-out
-        flex items-center justify-center
-        relative overflow-hidden">
+        <button id="fabMain" class="w-16 h-16 rounded-2xl
+bg-gray-900 border border-gray-800
+shadow-[0_10px_40px_rgba(0,0,0,0.6)]
+hover:bg-gray-800
+hover:border-gray-700
+transition-all duration-200 ease-out
+flex items-center justify-center">
 
             <img src="/logo/BlotverFavicon.png" class="w-8 h-8 drop-shadow-md" />
         </button>
@@ -1338,7 +1332,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     "translate-x-0"
                 );
 
-                fabMain.classList.add("-translate-x-2");
 
             } else {
 
@@ -1353,7 +1346,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     "translate-x-0"
                 );
 
-                fabMain.classList.remove("-translate-x-2");
             }
         });
 
@@ -1416,14 +1408,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     btn.classList.add("opacity-100", "translate-y-0");
                 }, 100 * (index + 1));
             });
-            fabAdd.classList.add("ring-2", "ring-purple-500/40");
             fabMain.classList.add("rotate-45", "scale-105");
         }
 
         function closeWidgetMenu() {
 
             const options = widgetMenu.querySelectorAll(".widget-option");
-            fabAdd.classList.remove("ring-2", "ring-purple-500/40");
             fabMain.classList.remove("rotate-45", "scale-105");
 
             widgetMenu.querySelectorAll(".widget-option").forEach((item) => {
