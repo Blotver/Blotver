@@ -288,7 +288,8 @@
         </main>
     </div>
 
-    <div id="fabWrapper" class="fixed bottom-8 right-8 z-[999] flex items-center">
+    <div id="fabWrapper"
+        class="fixed bottom-8 right-8 z-[999] flex items-center transition-transform duration-200 ease-out active:scale-90">
         <!-- ===== WIDGET SELECT MENU ===== -->
         <div id="widgetMenu" class="absolute bottom-24 right-0
            w-64
@@ -300,7 +301,7 @@
            p-2
            opacity-0 scale-95 translate-y-4
            pointer-events-none
-           transition-all duration-300 ease-out">
+           transition-all duration-200 ease-out">
 
             <!-- IMAGE -->
             <button data-type="image" class="widget-option group opacity-0 translate-y-4">
@@ -341,9 +342,10 @@
         </div>
 
         <!-- ACTION BUTTONS -->
-        <div id="fabActions" class="flex items-center gap-3 mr-3
-                opacity-0 translate-x-6 pointer-events-none
-                transition-all duration-300 ease-out">
+        <div id="fabActions" class="flex items-center gap-2 
+       bg-white shadow-lg rounded-xl px-4 py-2
+       transform scale-90 opacity-0
+       transition-all duration-200 ease-out">
 
             <!-- ADD WIDGET -->
             <button id="fabAdd" class="w-12 h-12 rounded-full
@@ -459,9 +461,6 @@
         Saved
     </div>
 
-    <div id="menuBackdrop"
-        class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition duration-300 z-[998]">
-    </div>
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
     <script src="/widgets/image.js"></script>
@@ -1387,16 +1386,10 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function openWidgetMenu() {
 
-            document.getElementById("menuBackdrop")
-                .classList.remove("opacity-0", "pointer-events-none");
-
-            document.getElementById("menuBackdrop")
-                .classList.add("opacity-100");
-
             widgetMenu.classList.remove(
                 "opacity-0",
                 "scale-95",
-                "translate-y-3",
+                "translate-y-4",
                 "pointer-events-none"
             );
 
@@ -1405,6 +1398,13 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 "scale-100",
                 "translate-y-0"
             );
+
+            widgetMenu.querySelectorAll(".widget-option").forEach((item, i) => {
+                setTimeout(() => {
+                    item.classList.remove("scale-90", "opacity-0");
+                    item.classList.add("scale-100", "opacity-100");
+                }, i * 40);
+            });
 
             const options = widgetMenu.querySelectorAll(".widget-option");
 
@@ -1415,18 +1415,19 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 }, 100 * (index + 1));
             });
             fabAdd.classList.add("ring-2", "ring-purple-500/40");
+            fabMain.classList.add("rotate-45");
         }
 
         function closeWidgetMenu() {
 
-            document.getElementById("menuBackdrop")
-                .classList.add("opacity-0", "pointer-events-none");
-
-            document.getElementById("menuBackdrop")
-                .classList.remove("opacity-100");
-
             const options = widgetMenu.querySelectorAll(".widget-option");
             fabAdd.classList.remove("ring-2", "ring-purple-500/40");
+            fabMain.classList.remove("rotate-45");
+
+            widgetMenu.querySelectorAll(".widget-option").forEach((item) => {
+                item.classList.add("scale-90", "opacity-0");
+                item.classList.remove("scale-100", "opacity-100");
+            });
 
             options.forEach((btn, index) => {
                 setTimeout(() => {
@@ -1439,7 +1440,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 widgetMenu.classList.add(
                     "opacity-0",
                     "scale-95",
-                    "translate-y-3",
+                    "translate-y-4",
                     "pointer-events-none"
                 );
 
