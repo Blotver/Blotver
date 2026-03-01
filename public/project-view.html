@@ -337,6 +337,9 @@
                     </button>
 
                 </div>
+                <div id="menuBackdrop"
+                    class="fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 pointer-events-none transition duration-300">
+                </div>
                 <!-- ACTION BUTTONS -->
                 <div id="fabActions" class="flex items-center gap-3 mr-3
                 opacity-0 translate-x-6 pointer-events-none
@@ -1079,7 +1082,11 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function selectWidget(widget, element) {
 
-            if (selectedElement) selectedElement.style.outline = "none";
+            if (selectedElement) {
+                selectedElement.style.border = "none";
+                selectedElement.querySelectorAll(".resize-handle")
+                    .forEach(h => h.remove());
+            }
 
             selectedWidget = widget;
             selectedElement = element;
@@ -1111,7 +1118,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         function showLayers() {
             document.getElementById("sidebarTitle").innerText = "Layers";
 
-            if (selectedElement) selectedElement.style.outline = "none";
+            if (selectedElement) {
+                selectedElement.style.border = "none";
+                selectedElement.querySelectorAll(".resize-handle")
+                    .forEach(h => h.remove());
+            }
+            
             selectedWidget = null;
             selectedElement = null;
         }
@@ -1346,7 +1358,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             if (widgetDef && widgetDef.test) {
                 widgetDef.test(selectedWidget, selectedElement);
             }
+
+            fabTest.classList.add("scale-95");
+
+            setTimeout(() => {
+                fabTest.classList.remove("scale-95");
+            }, 150);
+
         });
+
         const widgetMenu = document.getElementById("widgetMenu");
 
         // Abrir menú al apretar +
@@ -1364,6 +1384,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         });
 
         function openWidgetMenu() {
+
+            document.getElementById("menuBackdrop")
+                .classList.remove("opacity-0", "pointer-events-none");
+
+            document.getElementById("menuBackdrop")
+                .classList.add("opacity-100");
 
             widgetMenu.classList.remove(
                 "opacity-0",
@@ -1391,9 +1417,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function closeWidgetMenu() {
 
+            document.getElementById("menuBackdrop")
+                .classList.add("opacity-0", "pointer-events-none");
+
+            document.getElementById("menuBackdrop")
+                .classList.remove("opacity-100");
+
             const options = widgetMenu.querySelectorAll(".widget-option");
             fabAdd.classList.remove("ring-2", "ring-purple-500/40");
-            
+
             options.forEach((btn, index) => {
                 setTimeout(() => {
                     btn.classList.add("opacity-0", "translate-y-4");
