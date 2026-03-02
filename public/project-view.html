@@ -275,16 +275,30 @@
                 align-items: center;
                 z-index: 1200;
                 box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+                overflow: visible;
+            }
 
-                clip-path: path("M0 0 Q 30% 0 42% 0 Q 50% 0 50% -70 Q 50% 0 58% 0 Q 70% 0 100% 0 L100% 100% L0 100% Z");
+            /* 🔥 HUECO REAL */
+            #mobileNav::before {
+                content: "";
+                position: absolute;
+                top: -32px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90px;
+                height: 90px;
+                background: #0f172a;
+                border-radius: 50%;
+                box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.4) inset;
+                z-index: -1;
             }
 
             #fabWrapper {
                 position: fixed;
-                bottom: 28px;
+                bottom: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                z-index: 50;
+                z-index: 1300;
             }
         }
     </style>
