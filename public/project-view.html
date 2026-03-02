@@ -257,13 +257,16 @@
     </style>
 </head>
 
-<body class="bg-gray-950 text-white overflow-hidden">
+<body class="bg-gray-950 text-white overflow-x-hidden">
 
     <!-- ================= HEADER ================= -->
-    <header
-        class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
+    <header class="fixed top-0 left-0 w-full min-h-16
+bg-gray-900 border-b border-gray-800
+flex flex-wrap items-center justify-between
+px-4 md:px-6 gap-3
+z-50">
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
 
             <button onclick="goBack()"
                 class="text-gray-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-800 transition">
@@ -273,9 +276,9 @@
                 </svg>
             </button>
 
-            <input id="projectNameInput"
-                class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-64"
-                placeholder="Untitled Overlay">
+            <input id="projectNameInput" class="bg-transparent border-b border-gray-600 
+focus:border-purple-500 outline-none text-lg
+w-32 sm:w-48 md:w-64 max-w-[40vw]" placeholder="Untitled Overlay">
         </div>
 
         <div class="flex items-center gap-3">
@@ -308,14 +311,15 @@
             </button>
 
 
-            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded">
+            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700
+px-4 sm:px-6 py-2 rounded text-sm sm:text-base">
                 Save
             </button>
         </div>
     </header>
 
     <!-- ================= MAIN ================= -->
-    <div class="pt-16 h-[calc(100vh-4rem)] flex relative">
+    <div class="pt-16 min-h-[calc(100vh-4rem)] flex relative">
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="
