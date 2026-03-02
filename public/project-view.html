@@ -343,11 +343,11 @@
     </header>
 
     <!-- ================= MAIN ================= -->
-    <div class="pt-16 h-[calc(100vh-4rem)] flex">
+    <div class="pt-16 h-[calc(100vh-4rem)] flex flex-col md:flex-row">
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed md:relative
-w-72
+w-full md:w-72
 h-full
 bg-gradient-to-b from-gray-950 to-gray-900
 border-r border-gray-800
@@ -410,7 +410,8 @@ transition-transform duration-300
         <main class="flex-1 relative bg-white overflow-hidden"
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
 
-            <div id="canvas" class="w-full h-full relative"></div>
+            <div id="canvas" class="flex-1 relative bg-black overflow-hidden">
+            </div>
 
             <!-- ===== FLOATING SPEED DIAL ===== -->
         </main>
@@ -587,6 +588,7 @@ z-[999] flex flex-col items-center">
 
         openSidebar.addEventListener("click", () => {
             sidebar.classList.toggle("-translate-x-full");
+            document.body.classList.toggle("overflow-hidden");
         });
 
         document.addEventListener("click", (e) => {
