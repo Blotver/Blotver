@@ -262,7 +262,9 @@
         }
 
         #mobileSidebarHandle {
-            transition: left 0.3s cubic-bezier(.4, 0, .2, 1);
+            transition:
+                left 0.3s cubic-bezier(.4, 0, .2, 1),
+                opacity 0.25s ease;
         }
     </style>
 </head>
@@ -409,33 +411,35 @@ transition-transform duration-300
 
 
         <div id="mobileSidebarHandle" class="md:hidden fixed top-1/2 -translate-y-1/2 left-0
+h-[calc(100dvh-4rem)]
 z-[1100] flex items-center">
 
-            <!-- FRANJA -->
-            <div class="w-2 h-28 bg-gray-900/95
+            <!-- FRANJA VERTICAL -->
+            <div class="relative w-3 h-full
+        bg-gray-900
         border-r border-gray-800
-        backdrop-blur-md
-        rounded-r-full
-        shadow-lg shadow-black/50">
+        shadow-[4px_0_20px_rgba(0,0,0,0.6)]">
+
+                <!-- BOTÓN INCRUSTADO -->
+                <button id="sidebarBubble" class="md:hidden fixed top-[48%] -translate-y-1/2 left-0
+w-8 h-8
+rounded-full
+bg-gray-900
+border border-gray-800
+flex items-center justify-center
+shadow-lg
+transition-all duration-300
+active:scale-95">
+
+                    <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg"
+                        class="w-3.5 h-3.5 text-gray-300 transition-transform duration-300" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+
+                    </svg>
+                </button>
             </div>
-
-            <!-- BOTÓN REDONDO -->
-            <button id="sidebarBubble" class="-ml-3 w-9 h-9 rounded-full
-        bg-gray-900/95
-        border border-gray-800
-        backdrop-blur-md
-        flex items-center justify-center
-        shadow-lg shadow-black/60
-        transition-all duration-300
-        hover:scale-105 active:scale-95">
-
-                <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-gray-300 transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-
-            </button>
         </div>
 
         <!-- CANVAS -->
@@ -1586,19 +1590,26 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             sidebarOpen = !sidebarOpen;
 
             if (sidebarOpen) {
+                // Abrir sidebar
                 sidebar.classList.remove("-translate-x-full");
                 overlay.classList.remove("hidden");
                 arrow.style.transform = "rotate(180deg)";
                 document.body.classList.add("overflow-hidden");
 
-                handle.style.left = "85vw";
+                // 🔥 DESAPARECER FRANJA
+                handle.style.opacity = "0";
+                handle.style.pointerEvents = "none";
+
             } else {
+                // Cerrar sidebar
                 sidebar.classList.add("-translate-x-full");
                 overlay.classList.add("hidden");
                 arrow.style.transform = "rotate(0deg)";
                 document.body.classList.remove("overflow-hidden");
 
-                handle.style.left = "0";
+                // 🔥 REAPARECER FRANJA
+                handle.style.opacity = "1";
+                handle.style.pointerEvents = "auto";
             }
         }
 
