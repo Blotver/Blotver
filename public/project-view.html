@@ -291,11 +291,17 @@
 
             #fabWrapper {
                 position: fixed;
-                bottom: 30px;
+                bottom: 18px;
                 /* lo bajamos más */
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
+            }
+
+            #fabWrapper>button {
+                box-shadow:
+                    0 0 0 6px #0f172a,
+                    0 12px 35px rgba(0, 0, 0, 0.6);
             }
         }
     </style>
@@ -567,8 +573,16 @@
     <div id="mobileNav" class="md:hidden">
 
         <!-- 🔥 SVG BAR SHAPE -->
-        <svg viewBox="0 0 100 25" preserveAspectRatio="none">
-            <path d=" M0 0 H35 C42 0 45 0 50 14 C55 0 58 0 65 0 H100 V25 H0 Z" fill="#0f172a" />
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+            <path d="
+    M0 0
+    H38
+    C43 0 46 0 50 18
+    C54 0 57 0 62 0
+    H100
+    V30
+    H0
+    Z" fill="#0f172a" />
         </svg>
         <div class="navContent absolute inset-0 flex items-center justify-around text-gray-400">
             <!-- LAYERS -->
