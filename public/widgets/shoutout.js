@@ -23,53 +23,130 @@ window.ShoutoutWidget = {
     renderConfig(widget, content, update) {
 
         content.innerHTML = `
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Command</label>
-                <input id="cfgCommand"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded"
-                    value="${widget.data.command || ""}">
+        
+        <div class="space-y-6">
+
+            <!-- BASIC SETTINGS -->
+            <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+
+                <h3 class="text-xs uppercase tracking-wider text-gray-500">
+                    Basic
+                </h3>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Command
+                    </label>
+                    <input id="cfgCommand"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        placeholder-gray-500
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition"
+                        value="${widget.data.command || ""}">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Text Template
+                    </label>
+                    <input id="cfgTemplate"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition"
+                        value="${widget.data.textTemplate || ""}">
+                </div>
+
             </div>
 
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Text Template</label>
-                <input id="cfgTemplate"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded"
-                    value="${widget.data.textTemplate || ""}">
+            <!-- DISPLAY SETTINGS -->
+            <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+
+                <h3 class="text-xs uppercase tracking-wider text-gray-500">
+                    Display
+                </h3>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Duration (ms)
+                    </label>
+                    <input type="number" id="cfgDuration"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition"
+                        value="${widget.data.duration || 10000}">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Overlay Text
+                    </label>
+                    <input id="cfgOverlay"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition"
+                        value="${widget.data.overlayText || ""}">
+                </div>
+
             </div>
 
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Duration (ms)</label>
-                <input type="number" id="cfgDuration"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded"
-                    value="${widget.data.duration || 10000}">
+            <!-- ANIMATIONS -->
+            <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+
+                <h3 class="text-xs uppercase tracking-wider text-gray-500">
+                    Animations
+                </h3>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Animation In
+                    </label>
+                    <select id="cfgAnimIn"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition">
+                        <option value="fade">Fade</option>
+                        <option value="slide">Slide</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">
+                        Animation Out
+                    </label>
+                    <select id="cfgAnimOut"
+                        class="w-full bg-gray-900 border border-gray-700
+                        rounded-lg px-3 py-2.5 text-sm text-gray-200
+                        focus:outline-none focus:ring-2
+                        focus:ring-purple-500/50 focus:border-purple-500
+                        transition">
+                        <option value="fade">Fade</option>
+                        <option value="slide">Slide</option>
+                    </select>
+                </div>
+
             </div>
 
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Overlay Text</label>
-                <input id="cfgOverlay"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded"
-                    value="${widget.data.overlayText || ""}">
-            </div>
+        </div>
+    `;
 
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Animation In</label>
-                <select id="cfgAnimIn"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded">
-                    <option value="fade">Fade</option>
-                    <option value="slide">Slide</option>
-                </select>
-            </div>
+        // Set current selected values
+        document.getElementById("cfgAnimIn").value =
+            widget.data.animationIn || "fade";
 
-            <div>
-                <label class="block mb-1 text-sm text-gray-400">Animation Out</label>
-                <select id="cfgAnimOut"
-                    class="w-full mb-4 p-2 bg-gray-800 rounded">
-                    <option value="fade">Fade</option>
-                    <option value="slide">Slide</option>
-                </select>
-            </div>
-        `;
+        document.getElementById("cfgAnimOut").value =
+            widget.data.animationOut || "fade";
 
+        // Listeners
         document.getElementById("cfgCommand")
             .addEventListener("input", e =>
                 update({ command: e.target.value })
