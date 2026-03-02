@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Editor</title>
     <link rel="icon" type="image/png" href="./logo/BlotverFavicon.png">
     <link href="/styles.css" rel="stylesheet">
@@ -343,7 +344,7 @@
     </header>
 
     <!-- ================= MAIN ================= -->
-    <div class="pt-16 h-[calc(100vh-4rem)] flex flex-col md:flex-row">
+    <div class="pt-16 min-h-[calc(100vh-4rem)] flex flex-col md:flex-row">
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed md:relative
@@ -407,7 +408,7 @@ transition-transform duration-300
         </aside>
 
         <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-hidden"
+        <main class="flex-1 relative bg-white overflow-hidden md:h-full">
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
 
             <div id="canvas" class="flex-1 relative bg-black overflow-hidden">
