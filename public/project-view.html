@@ -261,12 +261,38 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        #sidebarBubble {
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        #sidebarBubble:hover {
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        #sidebarBubble:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
         #mobileSidebarHandle {
-            box-shadow:
-                -4px 0 0 #111827;
             transition:
                 left 0.3s cubic-bezier(.4, 0, .2, 1),
-                opacity 0.25s ease;
+                opacity 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        #mobileSidebarHandle::after {
+            content: "";
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 80px;
+            background: radial-gradient(circle at left center,
+                    rgba(17, 24, 39, 0.9) 0%,
+                    rgba(17, 24, 39, 0.7) 40%,
+                    transparent 70%);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -417,23 +443,24 @@ h-[calc(100dvh-4rem)]
 z-[1100]">
 
             <!-- FRANJA -->
-            <div class="relative w-3 h-full
-    bg-gray-900
-    border-r border-gray-800
-    shadow-[6px_0_30px_rgba(0,0,0,0.65)]">
+            <div class="relative w-[6px] h-full
+bg-gradient-to-b from-gray-900 to-gray-950
+border-r border-gray-800/60
+shadow-[8px_0_40px_rgba(0,0,0,0.75)]">
 
                 <!-- BOTÓN -->
-                <button id="sidebarBubble" class="absolute top-1/2 -translate-y-1/2 -right-4
-    w-8 h-8
-    rounded-r-full
-    bg-gray-900
-    flex items-center justify-center
-    transition-all duration-300
-    active:scale-95">
+                <button id="sidebarBubble" class="absolute top-1/2 -translate-y-1/2 -right-[18px]
+w-9 h-9
+rounded-full
+bg-gradient-to-br from-gray-900 to-gray-950
+flex items-center justify-center
+transition-all duration-300
+active:scale-95
+shadow-[0_8px_25px_rgba(0,0,0,0.7)]">
 
                     <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg"
-                        class="w-3.5 h-3.5 text-gray-300 transition-transform duration-300" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        class="w-4 h-4 text-gray-300 transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
 
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
 
@@ -457,7 +484,7 @@ hidden md:hidden">
         </div>
     </div>
 
-    <div id="fabWrapper" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-center">
+    <div id="fabWrapper" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[1500] flex flex-col items-center">
 
         <!-- STACK -->
         <div id="fabStack" class="flex flex-col items-center gap-4 mb-4 pointer-events-none">
@@ -1596,6 +1623,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 overlay.classList.remove("hidden");
                 arrow.style.transform = "rotate(180deg)";
                 document.body.classList.add("overflow-hidden");
+                handle.style.transform = "translateX(-6px)";
 
                 // 🔥 DESAPARECER FRANJA
                 handle.style.opacity = "0";
@@ -1607,6 +1635,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 overlay.classList.add("hidden");
                 arrow.style.transform = "rotate(0deg)";
                 document.body.classList.remove("overflow-hidden");
+                handle.style.transform = "translateX(0)";
 
                 // 🔥 REAPARECER FRANJA
                 handle.style.opacity = "1";
