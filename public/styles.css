@@ -1827,6 +1827,10 @@ video {
   color: rgb(255 255 255 / 0.7);
 }
 
+.text-white\/90 {
+  color: rgb(255 255 255 / 0.9);
+}
+
 .opacity-0 {
   opacity: 0;
 }
