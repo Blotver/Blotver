@@ -266,10 +266,10 @@
 <body class="bg-gray-950 text-white overflow-x-hidden min-h-screen flex flex-col">
 
     <!-- ================= HEADER ================= -->
-    <header class="fixed top-0 left-0 w-full min-h-16
+    <header class="fixed top-0 left-0 w-full h-16
 bg-gray-900 border-b border-gray-800
-flex flex-wrap items-center justify-between
-px-4 md:px-6 gap-3
+flex items-center justify-between
+px-4 md:px-6
 z-50">
 
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -283,8 +283,8 @@ z-50">
             </button>
 
             <input id="projectNameInput" class="bg-transparent border-b border-gray-600 
-focus:border-purple-500 outline-none text-lg
-w-32 sm:w-48 md:w-64 max-w-[40vw]" placeholder="Untitled Overlay">
+focus:border-purple-500 outline-none text-lg w-24 sm:w-40 md:w-64 max-w-[35vw]
+text-base md:text-lg" placeholder="Untitled Overlay">
         </div>
 
         <div class="flex items-center gap-3">
@@ -318,8 +318,18 @@ w-32 sm:w-48 md:w-64 max-w-[40vw]" placeholder="Untitled Overlay">
 
 
             <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700
-px-4 sm:px-6 py-2 rounded text-sm sm:text-base">
+px-4 py-2 rounded hidden md:inline-block">
                 Save
+            </button>
+
+            <button id="saveIconBtn" class="md:hidden w-9 h-9 flex items-center justify-center
+rounded-lg bg-purple-600 hover:bg-purple-700">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+
             </button>
         </div>
     </header>
@@ -392,6 +402,23 @@ transition-transform duration-300
             </div>
 
         </aside>
+
+
+        <div id="mobileSidebarHandle" class="md:hidden fixed top-16 left-0
+w-8 h-[calc(100dvh-4rem)]
+bg-gradient-to-b from-purple-600 to-purple-700
+flex items-center justify-center
+z-[1100]
+shadow-lg
+transition-all duration-300">
+
+            <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 text-white transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+
 
         <!-- CANVAS -->
         <main class="flex-1 relative bg-white overflow-hidden touch-none"
@@ -567,20 +594,6 @@ hidden md:hidden">
         Overlay link copied
     </div>
 
-    <button id="mobileSidebarBtn" class="md:hidden fixed left-4 bottom-24 -translate-y-1/2
-w-10 h-10
-rounded-full
-bg-gray-900 border border-gray-700
-flex items-center justify-center
-z-[1100]
-shadow-lg">
-
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-
-    </button>
 
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
@@ -1539,24 +1552,55 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 console.log("Test action");
             });
 
+
+        document.getElementById("saveIconBtn")
+            .addEventListener("click", saveConfig);
+
         const sidebar = document.getElementById("sidebar");
         const overlay = document.getElementById("sidebarOverlay");
-        const mobileBtn = document.getElementById("mobileSidebarBtn");
+        const handle = document.getElementById("mobileSidebarHandle");
+        const arrow = document.getElementById("sidebarArrow");
 
-        function openSidebarMobile() {
-            sidebar.classList.remove("-translate-x-full");
-            overlay.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
+        let sidebarOpen = false;
+
+        function toggleSidebarMobile() {
+            sidebarOpen = !sidebarOpen;
+
+            if (sidebarOpen) {
+                sidebar.classList.remove("-translate-x-full");
+                overlay.classList.remove("hidden");
+                arrow.style.transform = "rotate(180deg)";
+                document.body.classList.add("overflow-hidden");
+            } else {
+                sidebar.classList.add("-translate-x-full");
+                overlay.classList.add("hidden");
+                arrow.style.transform = "rotate(0deg)";
+                document.body.classList.remove("overflow-hidden");
+            }
         }
 
-        function closeSidebarMobile() {
-            sidebar.classList.add("-translate-x-full");
-            overlay.classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
+        handle.addEventListener("click", toggleSidebarMobile);
+        overlay.addEventListener("click", toggleSidebarMobile);
+
+        // ===== MOBILE CANVAS SCALE =====
+        function applyMobileScale() {
+            const canvas = document.getElementById("canvas");
+            if (!canvas) return;
+
+            const baseWidth = 1280;
+            const screenWidth = window.innerWidth;
+
+            if (screenWidth < 768) {
+                const scale = screenWidth / baseWidth;
+                canvas.style.transform = `scale(${scale})`;
+                canvas.style.transformOrigin = "top left";
+            } else {
+                canvas.style.transform = "scale(1)";
+            }
         }
 
-        mobileBtn.addEventListener("click", openSidebarMobile);
-        overlay.addEventListener("click", closeSidebarMobile);
+        window.addEventListener("resize", applyMobileScale);
+        window.addEventListener("load", applyMobileScale);
     </script>
 </body>
 
