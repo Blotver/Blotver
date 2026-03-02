@@ -393,7 +393,7 @@ transition-transform duration-300
         </aside>
 
         <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-hidden"
+        <main class="flex-1 relative bg-white overflow-auto md:overflow-hidden"
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
 
             <div id="canvas" class="w-full h-full relative"></div>
@@ -620,6 +620,22 @@ shadow-lg">
 
             window.location.href = "/dashboard/project";
         }
+
+        const BASE_WIDTH = 1200;
+
+        function scaleCanvas() {
+            const canvas = document.getElementById("canvas");
+            const container = canvas.parentElement;
+
+            const containerWidth = container.clientWidth;
+
+            const scale = containerWidth / BASE_WIDTH;
+
+            canvas.style.transformOrigin = "top left";
+            canvas.style.transform = `scale(${scale})`;
+            canvas.style.width = BASE_WIDTH + "px";
+        }
+
 
         let widgets = [];
         let selectedWidget = null;
@@ -1479,6 +1495,9 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
 
         loadWidgets();
+
+        window.addEventListener("load", scaleCanvas);
+        window.addEventListener("resize", scaleCanvas);
 
         const fabMain = document.getElementById("fabMain");
         const items = document.querySelectorAll(".fab-item");

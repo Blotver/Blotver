@@ -1083,6 +1083,10 @@ video {
           user-select: none;
 }
 
+.resize {
+  resize: both;
+}
+
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -1149,6 +1153,10 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.overflow-auto {
+  overflow: auto;
 }
 
 .overflow-hidden {
@@ -2160,6 +2168,10 @@ video {
 
   .md\:flex-row {
     flex-direction: row;
+  }
+
+  .md\:overflow-hidden {
+    overflow: hidden;
   }
 
   .md\:p-10 {
