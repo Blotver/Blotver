@@ -268,7 +268,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                height: 80px;
+                height: 85px;
                 z-index: 1200;
                 background: transparent;
             }
@@ -279,11 +279,20 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
+                z-index: 0;
+                /* 🔥 importante */
+            }
+
+            #mobileNav .navContent {
+                position: relative;
+                z-index: 2;
+                /* 🔥 botones encima */
             }
 
             #fabWrapper {
                 position: fixed;
-                bottom: 18px;
+                bottom: 30px;
+                /* lo bajamos más */
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -434,9 +443,8 @@
             <div id="fabImage"
                 class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                 data-label="Image">
-                <button
-                    class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:scale-[1.04] transition-all duration-200 flex items-center justify-center shadow-lg">
-
+                <button id="fabMain"
+                    class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center">
                     <!-- SVG IMAGE -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="1.8">
@@ -559,18 +567,10 @@
     <div id="mobileNav" class="md:hidden">
 
         <!-- 🔥 SVG BAR SHAPE -->
-        <svg viewBox="0 0 100 20" preserveAspectRatio="none">
-            <path d="
-            M0 0 
-            H35
-            C40 0 45 0 50 10
-            C55 0 60 0 65 0
-            H100
-            V20
-            H0
-            Z" fill="#0f172a" />
+        <svg viewBox="0 0 100 25" preserveAspectRatio="none">
+            <path d=" M0 0 H35 C42 0 45 0 50 14 C55 0 58 0 65 0 H100 V25 H0 Z" fill="#0f172a" />
         </svg>
-        <div class="absolute inset-0 flex items-center justify-around text-gray-400">
+        <div class="navContent absolute inset-0 flex items-center justify-around text-gray-400">
             <!-- LAYERS -->
             <button id="openLayersBtn"
                 class="flex flex-col items-center justify-center hover:text-purple-400 transition">
