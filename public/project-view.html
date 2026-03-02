@@ -268,7 +268,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                height: 85px;
+                height: 90px;
                 background: #0f172a;
                 z-index: 1200;
 
@@ -276,19 +276,16 @@
                 justify-content: space-around;
                 align-items: center;
 
-                /* CORTE MÁS PROFUNDO */
-                -webkit-mask:
-                    radial-gradient(circle 42px at 50% -18px, transparent 42px, black 43px);
-                mask:
-                    radial-gradient(circle 42px at 50% -18px, transparent 42px, black 43px);
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
 
-                box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+                /* Usamos máscara SVG */
+                -webkit-mask: url(#navMask);
+                mask: url(#navMask);
             }
 
             #fabWrapper {
                 position: fixed;
-                bottom: 35px;
-                /* 🔥 MÁS ARRIBA */
+                bottom: 42px;
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -604,6 +601,16 @@
         </div>
 
     </div>
+
+    <svg width="0" height="0">
+        <defs>
+            <mask id="navMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+                <rect width="1" height="1" fill="white" />
+                <!-- Corte central EXACTO -->
+                <circle cx="0.5" cy="-0.05" r="0.22" fill="black" />
+            </mask>
+        </defs>
+    </svg>
 
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
