@@ -692,6 +692,10 @@ video {
   right: -18px;
 }
 
+.left-\[8px\] {
+  left: 8px;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -913,6 +917,10 @@ video {
   height: 7rem;
 }
 
+.h-\[80px\] {
+  height: 80px;
+}
+
 .max-h-40 {
   max-height: 10rem;
 }
@@ -1027,6 +1035,10 @@ video {
 
 .w-\[6px\] {
   width: 6px;
+}
+
+.w-\[34px\] {
+  width: 34px;
 }
 
 .min-w-0 {
@@ -1523,6 +1535,12 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-gray-800 {
+  --tw-gradient-from: #1f2937 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(31 41 55 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .via-cyan-600 {
   --tw-gradient-to: rgb(8 145 178 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #0891b2 var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -1886,6 +1904,12 @@ video {
 .shadow-\[0_8px_25px_rgba\(0\2c 0\2c 0\2c 0\.7\)\] {
   --tw-shadow: 0 8px 25px rgba(0,0,0,0.7);
   --tw-shadow-colored: 0 8px 25px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-\[6px_0_35px_rgba\(0\2c 0\2c 0\2c 0\.6\)\] {
+  --tw-shadow: 6px 0 35px rgba(0,0,0,0.6);
+  --tw-shadow-colored: 6px 0 35px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
