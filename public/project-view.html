@@ -335,7 +335,8 @@ left-0
 w-72
 bg-gradient-to-b from-gray-950 to-gray-900
 border-r border-gray-800
-h-full flex flex-col min-h-0
+h-[calc(100vh-4rem)]
+flex flex-col
 z-[1000]
 transform -translate-x-full md:translate-x-0
 transition-transform duration-300
@@ -351,7 +352,8 @@ transition-transform duration-300
             <div id="layersPanel" class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2"></div>
 
             <!-- SETTINGS OVERLAY -->
-            <div id="settingsOverlay" class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0">
+            <div id="settingsOverlay"
+                class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0">
 
                 <!-- SETTINGS HEADER -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">

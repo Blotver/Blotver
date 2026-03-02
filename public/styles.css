@@ -885,6 +885,10 @@ video {
   height: 100%;
 }
 
+.h-\[calc\(100vh-4rem\)\] {
+  height: calc(100vh - 4rem);
+}
+
 .max-h-40 {
   max-height: 10rem;
 }
@@ -2151,6 +2155,10 @@ video {
 
   .md\:h-auto {
     height: auto;
+  }
+
+  .md\:h-\[calc\(100vh-4rem\)\] {
+    height: calc(100vh - 4rem);
   }
 
   .md\:w-40 {
