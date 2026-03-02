@@ -261,16 +261,7 @@
     <!-- ================= HEADER ================= -->
     <header
         class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
-        <button id="openSidebar" class="md:hidden relative z-50
-       group relative
-       w-10 h-10
-       rounded-2xl
-       bg-white/5 backdrop-blur-xl
-       border border-white/10
-       flex items-center justify-center
-       transition-all duration-300
-       hover:bg-white/10">
-
+        <button id="openSidebarHeader" class="hidden">
             <!-- Glow sutil -->
             <span class="absolute inset-0 rounded-2xl
                  bg-purple-500/10 opacity-0
@@ -347,15 +338,14 @@
     <div class="pt-16 min-h-[calc(100vh-4rem)] flex flex-col md:flex-row">
 
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed md:relative
-w-full md:w-72
-h-full
+        <aside id="sidebar" class="fixed inset-y-0 left-0
+w-72
 bg-gradient-to-b from-gray-950 to-gray-900
 border-r border-gray-800
 flex flex-col
-z-40
-transition-transform duration-300
--translate-x-full md:translate-x-0">
+z-[1100]
+transform -translate-x-full
+transition-transform duration-300 ease-in-out">
             <!-- HEADER -->
             <div class="h-14 flex items-center px-4 border-b border-gray-800">
                 <h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
@@ -536,6 +526,26 @@ z-[999] flex flex-col items-center">
 
         </div>
     </div>
+    <!-- MOBILE SIDEBAR TOGGLE -->
+    <button id="openSidebar" class="md:hidden fixed left-3 top-1/2 -translate-y-1/2
+w-10 h-10
+rounded-full
+bg-gray-900 border border-gray-700
+flex items-center justify-center
+z-[1000]
+shadow-lg">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+    </button>
+
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm
+z-[1050]
+hidden">
+    </div>
 
     <div id="saveToast" class="fixed bottom-6 right-6
     z-[3000]
@@ -577,6 +587,7 @@ z-[999] flex flex-col items-center">
 
         Overlay link copied
     </div>
+
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
     <script src="/widgets/image.js"></script>
@@ -585,13 +596,24 @@ z-[999] flex flex-col items-center">
     <script>
 
         const sidebar = document.getElementById("sidebar");
-        const openSidebar = document.getElementById("openSidebar");
+        const openSidebarBtn = document.getElementById("openSidebar");
+        const overlay = document.getElementById("sidebarOverlay");
 
-        openSidebar.addEventListener("click", () => {
-            sidebar.classList.toggle("-translate-x-full");
-            document.body.classList.toggle("overflow-hidden");
-        });
+        function openSidebar() {
+            sidebar.classList.remove("-translate-x-full");
+            overlay.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
 
+        function closeSidebar() {
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        openSidebarBtn.addEventListener("click", openSidebar);
+        overlay.addEventListener("click", closeSidebar);
+        
         document.addEventListener("click", (e) => {
             if (
                 window.innerWidth < 768 &&
