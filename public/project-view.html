@@ -279,7 +279,6 @@
                 opacity 0.25s ease,
                 transform 0.25s ease;
         }
-
     </style>
 </head>
 
@@ -359,7 +358,7 @@ rounded-lg bg-purple-600 hover:bg-purple-700">
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="
-fixed md:relative
+hidden md:flex
 top-16 md:top-0
 left-0
 w-[85vw] max-w-xs md:w-72
@@ -423,39 +422,6 @@ transition-transform duration-300
 
         </aside>
 
-
-        <div id="mobileSidebarHandle" class="md:hidden fixed top-16 left-0
-h-[calc(100dvh-4rem)]
-z-[1100]">
-
-            <!-- FRANJA -->
-            <div class="relative w-[6px] h-full
-bg-gradient-to-b from-gray-900 to-gray-950
-border-r border-gray-800/60
-shadow-[8px_0_40px_rgba(0,0,0,0.75)]">
-
-                <!-- BOTÓN -->
-                <button id="sidebarBubble" class="absolute top-1/2 -translate-y-1/2 -right-[18px]
-w-9 h-9
-rounded-full
-bg-gray-800
-border border-gray-700
-flex items-center justify-center
-transition-all duration-200
-active:scale-95">
-
-                    <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white/90"
-                        transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                        stroke-width="2">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-
-                    </svg>
-                </button>
-
-            </div>
-        </div>
-
         <!-- CANVAS -->
         <main class="flex-1 relative bg-white overflow-hidden touch-none"
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
@@ -470,8 +436,8 @@ hidden md:hidden">
         </div>
     </div>
 
-    <div id="fabWrapper" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[1500] flex flex-col items-center">
-
+    <div id="fabWrapper"
+        class="fixed z-[1300] flex flex-col items-center md:bottom-8 md:right-8 md:left-auto md:translate-x-0 bottom-20 left-1/2 -translate-x-1/2">
         <!-- STACK -->
         <div id="fabStack" class="flex flex-col items-center gap-4 mb-4 pointer-events-none">
 
@@ -630,6 +596,69 @@ hidden md:hidden">
         Overlay link copied
     </div>
 
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+
+    <div id="mobileNav" class="md:hidden fixed bottom-0 left-0 w-full
+bg-gray-900 border-t border-gray-800
+h-16 flex items-center justify-around
+z-[1200]">
+
+        <!-- HOME / BACK -->
+        <button class="flex flex-col items-center justify-center text-gray-400 hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2V10z" />
+            </svg>
+            <span class="text-[10px] mt-1">Home</span>
+        </button>
+
+        <!-- LAYERS -->
+        <button id="openLayersBtn"
+            class="flex flex-col items-center justify-center text-gray-400 hover:text-purple-400 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 7l8-4 8 4-8 4-8-4zM4 12l8 4 8-4M4 17l8 4 8-4" />
+            </svg>
+            <span class="text-[10px] mt-1">Layers</span>
+        </button>
+
+        <!-- FAB CENTER SLOT -->
+        <div class="relative -mt-8">
+            <!-- tu fabMain ya existe -->
+        </div>
+
+        <!-- SAVE -->
+        <button id="mobileSaveBtn"
+            class="flex flex-col items-center justify-center text-gray-400 hover:text-purple-400 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-[10px] mt-1">Save</span>
+        </button>
+
+    </div>
+
+    <!-- ===== MOBILE LAYERS SHEET ===== -->
+    <div id="layersSheet" class="md:hidden fixed bottom-0 left-0 w-full
+h-[70vh]
+bg-gray-950 border-t border-gray-800
+rounded-t-2xl
+transform translate-y-full
+transition-transform duration-300
+z-[1400] flex flex-col">
+
+        <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
+            <span class="text-sm font-medium text-gray-300">Layers</span>
+            <button id="closeLayersSheet" class="text-gray-400">✕</button>
+        </div>
+
+        <div id="mobileLayersContent" class="flex-1 overflow-y-auto p-4 space-y-2">
+        </div>
+
+    </div>
 
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
@@ -1228,6 +1257,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 console.error(error);
                 showSaveToast("Error saving", "error");
             }
+
         }
 
         function markAsChanged() {
@@ -1235,17 +1265,23 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             hasUnsavedChanges = true;
 
-            const btn = document.getElementById("saveBtn");
-            btn.disabled = false;
-            btn.classList.remove("opacity-50", "cursor-not-allowed");
+            ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.disabled = false;
+                btn.classList.remove("opacity-50", "cursor-not-allowed");
+            });
         }
 
         function resetChanges() {
             hasUnsavedChanges = false;
 
-            const btn = document.getElementById("saveBtn");
-            btn.disabled = true;
-            btn.classList.add("opacity-50", "cursor-not-allowed");
+            ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.disabled = true;
+                btn.classList.add("opacity-50", "cursor-not-allowed");
+            });
         }
 
         document.getElementById("projectNameInput")
@@ -1342,7 +1378,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
 
         function showLayers() {
-            document.getElementById("sidebarTitle").innerText = "Layers";
 
             if (selectedElement) {
                 selectedElement.style.border = "none";
@@ -1592,45 +1627,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         document.getElementById("saveIconBtn")
             .addEventListener("click", saveConfig);
 
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("sidebarOverlay");
-        const handle = document.getElementById("mobileSidebarHandle");
-        const bubble = document.getElementById("sidebarBubble");
-        const arrow = document.getElementById("sidebarArrow");
-
-        let sidebarOpen = false;
-
-        function toggleSidebarMobile() {
-            sidebarOpen = !sidebarOpen;
-
-            if (sidebarOpen) {
-                // Abrir sidebar
-                sidebar.classList.remove("-translate-x-full");
-                overlay.classList.remove("hidden");
-                arrow.style.transform = "rotate(180deg)";
-                document.body.classList.add("overflow-hidden");
-                handle.style.transform = "translateX(-6px)";
-
-                // 🔥 DESAPARECER FRANJA
-                handle.style.opacity = "0";
-                handle.style.pointerEvents = "none";
-
-            } else {
-                // Cerrar sidebar
-                sidebar.classList.add("-translate-x-full");
-                overlay.classList.add("hidden");
-                arrow.style.transform = "rotate(0deg)";
-                document.body.classList.remove("overflow-hidden");
-                handle.style.transform = "translateX(0)";
-
-                // 🔥 REAPARECER FRANJA
-                handle.style.opacity = "1";
-                handle.style.pointerEvents = "auto";
-            }
-        }
-
-        bubble.addEventListener("click", toggleSidebarMobile);
-        overlay.addEventListener("click", toggleSidebarMobile);
+        document.getElementById("mobileSaveBtn")
+            .addEventListener("click", saveConfig);
 
         // ===== MOBILE CANVAS SCALE =====
         function applyMobileScale() {
@@ -1651,6 +1649,20 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         window.addEventListener("resize", applyMobileScale);
         window.addEventListener("load", applyMobileScale);
+
+        const layersSheet = document.getElementById("layersSheet");
+        const openLayersBtn = document.getElementById("openLayersBtn");
+        const closeLayersSheet = document.getElementById("closeLayersSheet");
+
+        openLayersBtn.addEventListener("click", () => {
+            layersSheet.classList.remove("translate-y-full");
+            document.body.classList.add("overflow-hidden");
+        });
+
+        closeLayersSheet.addEventListener("click", () => {
+            layersSheet.classList.add("translate-y-full");
+            document.body.classList.remove("overflow-hidden");
+        });
     </script>
 </body>
 
