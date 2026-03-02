@@ -325,18 +325,17 @@ px-4 sm:px-6 py-2 rounded text-sm sm:text-base">
     </header>
 
     <!-- ================= MAIN ================= -->
-    <div class="pt-16 flex-1 flex relative">
+    <div class="pt-16 flex-1 flex relative min-h-0">
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="
 fixed md:relative
 top-16 md:top-0
 left-0
-h-full
 w-72
 bg-gradient-to-b from-gray-950 to-gray-900
 border-r border-gray-800
-flex flex-col
+h-full flex flex-col min-h-0
 z-[1000]
 transform -translate-x-full md:translate-x-0
 transition-transform duration-300
@@ -352,7 +351,7 @@ transition-transform duration-300
             <div id="layersPanel" class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2"></div>
 
             <!-- SETTINGS OVERLAY -->
-            <div id="settingsOverlay" class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col">
+            <div id="settingsOverlay" class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0">
 
                 <!-- SETTINGS HEADER -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
@@ -393,7 +392,7 @@ transition-transform duration-300
         </aside>
 
         <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-auto md:overflow-hidden"
+        <main class="flex-1 relative bg-white overflow-hidden"
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
 
             <div id="canvas" class="w-full h-full relative"></div>
@@ -620,22 +619,6 @@ shadow-lg">
 
             window.location.href = "/dashboard/project";
         }
-
-        const BASE_WIDTH = 1200;
-
-        function scaleCanvas() {
-            const canvas = document.getElementById("canvas");
-            const container = canvas.parentElement;
-
-            const containerWidth = container.clientWidth;
-
-            const scale = containerWidth / BASE_WIDTH;
-
-            canvas.style.transformOrigin = "top left";
-            canvas.style.transform = `scale(${scale})`;
-            canvas.style.width = BASE_WIDTH + "px";
-        }
-
 
         let widgets = [];
         let selectedWidget = null;
@@ -1495,9 +1478,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
 
         loadWidgets();
-
-        window.addEventListener("load", scaleCanvas);
-        window.addEventListener("resize", scaleCanvas);
 
         const fabMain = document.getElementById("fabMain");
         const items = document.querySelectorAll(".fab-item");
