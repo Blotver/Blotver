@@ -262,6 +262,8 @@
         }
 
         #mobileSidebarHandle {
+            box-shadow:
+                -4px 0 0 #111827;
             transition:
                 left 0.3s cubic-bezier(.4, 0, .2, 1),
                 opacity 0.25s ease;
@@ -410,26 +412,24 @@ transition-transform duration-300
         </aside>
 
 
-        <div id="mobileSidebarHandle" class="md:hidden fixed top-1/2 -translate-y-1/2 left-0
+        <div id="mobileSidebarHandle" class="md:hidden fixed top-16 left-0
 h-[calc(100dvh-4rem)]
-z-[1100] flex items-center">
+z-[1100]">
 
-            <!-- FRANJA VERTICAL -->
+            <!-- FRANJA -->
             <div class="relative w-3 h-full
-        bg-gray-900
-        border-r border-gray-800
-        shadow-[4px_0_20px_rgba(0,0,0,0.6)]">
+    bg-gray-900
+    border-r border-gray-800
+    shadow-[6px_0_30px_rgba(0,0,0,0.65)]">
 
-                <!-- BOTÓN INCRUSTADO -->
-                <button id="sidebarBubble" class="md:hidden fixed top-[48%] -translate-y-1/2 left-0
-w-8 h-8
-rounded-full
-bg-gray-900
-border border-gray-800
-flex items-center justify-center
-shadow-lg
-transition-all duration-300
-active:scale-95">
+                <!-- BOTÓN -->
+                <button id="sidebarBubble" class="absolute top-1/2 -translate-y-1/2 -right-4
+    w-8 h-8
+    rounded-r-full
+    bg-gray-900
+    flex items-center justify-center
+    transition-all duration-300
+    active:scale-95">
 
                     <svg id="sidebarArrow" xmlns="http://www.w3.org/2000/svg"
                         class="w-3.5 h-3.5 text-gray-300 transition-transform duration-300" fill="none"
@@ -439,6 +439,7 @@ active:scale-95">
 
                     </svg>
                 </button>
+
             </div>
         </div>
 
