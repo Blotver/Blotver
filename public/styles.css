@@ -685,6 +685,10 @@ video {
   top: 50%;
 }
 
+.top-16 {
+  top: 4rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -719,6 +723,10 @@ video {
 
 .z-\[1050\] {
   z-index: 1050;
+}
+
+.z-\[900\] {
+  z-index: 900;
 }
 
 .col-span-3 {
@@ -2115,6 +2123,10 @@ video {
 
   .md\:right-8 {
     right: 2rem;
+  }
+
+  .md\:top-0 {
+    top: 0px;
   }
 
   .md\:mt-0 {

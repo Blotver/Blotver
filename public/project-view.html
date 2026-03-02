@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Editor</title>
     <link rel="icon" type="image/png" href="./logo/BlotverFavicon.png">
     <link href="/styles.css" rel="stylesheet">
@@ -257,26 +256,12 @@
     </style>
 </head>
 
-<body class="bg-gray-950 text-white md:overflow-hidden overflow-auto">
+<body class="bg-gray-950 text-white overflow-hidden">
+
     <!-- ================= HEADER ================= -->
     <header
         class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-50">
-        <button id="openSidebarHeader" class="hidden">
-            <!-- Glow sutil -->
-            <span class="absolute inset-0 rounded-2xl
-                 bg-purple-500/10 opacity-0
-                 group-hover:opacity-100
-                 transition duration-300 blur-md">
-            </span>
 
-            <!-- Icono -->
-            <svg xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5 text-gray-300 relative z-10 transition-transform duration-300 group-hover:scale-110"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-
-        </button>
         <div class="flex items-center gap-4">
 
             <button onclick="goBack()"
@@ -288,7 +273,7 @@
             </button>
 
             <input id="projectNameInput"
-                class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-32 md:w-64"
+                class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-64"
                 placeholder="Untitled Overlay">
         </div>
 
@@ -300,30 +285,24 @@
         transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <path d="M12 17h.01" />
-
+                    class=" w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path
+                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm1.07-7.75l-.9.92A1.49 1.49 0 0012 12h-1v-1h1a.5.5 0 00.35-.85l-.9-.92A3 3 0 1114.07 9.25z" />
                 </svg>
-
             </button>
 
             <!-- COPY -->
             <button id="copyOverlayBtn" data-label="Copy overlay URL" class="icon-tooltip w-9 h-9 flex items-center justify-center
-    rounded-lg bg-gray-800 border border-gray-700
-    hover:bg-gray-700 hover:border-gray-600
-    transition group">
+        rounded-lg bg-gray-800 border border-gray-700
+        hover:bg-gray-700 hover:border-gray-600
+        transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-
+                    class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1z" />
+                    <path d="M20 5H8a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2z" />
                 </svg>
             </button>
 
@@ -335,17 +314,22 @@
     </header>
 
     <!-- ================= MAIN ================= -->
-    <div class="pt-16 min-h-[calc(100vh-4rem)] flex flex-col md:flex-row">
+    <div class="pt-16 h-[calc(100vh-4rem)] flex relative">
 
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0
+        <aside id="sidebar" class="
+fixed md:relative
+top-16 md:top-0
+left-0
+h-[calc(100vh-4rem)] md:h-full
 w-72
 bg-gradient-to-b from-gray-950 to-gray-900
 border-r border-gray-800
 flex flex-col
-z-[1100]
-transform -translate-x-full
-transition-transform duration-300 ease-in-out">
+z-[1000]
+transform -translate-x-full md:translate-x-0
+transition-transform duration-300
+">
             <!-- HEADER -->
             <div class="h-14 flex items-center px-4 border-b border-gray-800">
                 <h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
@@ -398,18 +382,21 @@ transition-transform duration-300 ease-in-out">
         </aside>
 
         <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-hidden md:h-full">
+        <main class="flex-1 relative bg-white overflow-hidden"
             style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
 
-            <div id="canvas" class="flex-1 relative bg-black overflow-hidden">
-            </div>
+            <div id="canvas" class="w-full h-full relative"></div>
 
             <!-- ===== FLOATING SPEED DIAL ===== -->
         </main>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm
+z-[900]
+hidden md:hidden">
+        </div>
     </div>
 
-    <div id="fabWrapper" class="fixed bottom-6 right-6 md:bottom-8 md:right-8
-z-[999] flex flex-col items-center">
+    <div id="fabWrapper" class="fixed bottom-8 right-8 z-[999] flex flex-col items-center">
+
         <!-- STACK -->
         <div id="fabStack" class="flex flex-col items-center gap-4 mb-4 pointer-events-none">
 
@@ -526,26 +513,6 @@ z-[999] flex flex-col items-center">
 
         </div>
     </div>
-    <!-- MOBILE SIDEBAR TOGGLE -->
-    <button id="openSidebar" class="md:hidden fixed left-3 top-1/2 -translate-y-1/2
-w-10 h-10
-rounded-full
-bg-gray-900 border border-gray-700
-flex items-center justify-center
-z-[1000]
-shadow-lg">
-
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-    </button>
-
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm
-z-[1050]
-hidden">
-    </div>
 
     <div id="saveToast" class="fixed bottom-6 right-6
     z-[3000]
@@ -588,51 +555,27 @@ hidden">
         Overlay link copied
     </div>
 
+    <button id="mobileSidebarBtn" class="md:hidden fixed left-4 top-1/2 -translate-y-1/2
+w-10 h-10
+rounded-full
+bg-gray-900 border border-gray-700
+flex items-center justify-center
+z-[1100]
+shadow-lg">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+
+    </button>
+
     <script src="/widgets/registry.js"></script>
     <script src="/widgets/shoutout.js"></script>
     <script src="/widgets/image.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 
     <script>
-
-        const sidebar = document.getElementById("sidebar");
-        const openSidebarBtn = document.getElementById("openSidebar");
-        const overlay = document.getElementById("sidebarOverlay");
-
-        function openSidebar() {
-            sidebar.classList.remove("-translate-x-full");
-            overlay.classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-        }
-
-        function closeSidebar() {
-            sidebar.classList.add("-translate-x-full");
-            overlay.classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
-
-        openSidebarBtn.addEventListener("click", openSidebar);
-        overlay.addEventListener("click", closeSidebar);
-        
-        document.addEventListener("click", (e) => {
-            if (
-                window.innerWidth < 768 &&
-                !sidebar.contains(e.target) &&
-                !openSidebar.contains(e.target)
-            ) {
-                sidebar.classList.add("-translate-x-full");
-            }
-        });
-
-        let resizeTimeout;
-
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                loadWidgets();
-            }, 250);
-        });
-
         const projectId = window.location.pathname.split("/").pop();
 
         const overlayURL =
@@ -1204,18 +1147,17 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     body: JSON.stringify({ name: projectTitle })
                 });
 
-                await Promise.all(
-                    widgets.map(widget =>
-                        fetch(`/api/widgets/${widget._id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                name: widget.name,
-                                data: widget.data
-                            })
+                for (let widget of widgets) {
+
+                    await fetch(`/api/widgets/${widget._id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            name: widget.name,
+                            data: widget.data   // 🔥 IMPORTANTE
                         })
-                    )
-                );
+                    });
+                }
 
                 showSaveToast("Saved", "success");
                 resetChanges();
@@ -1584,6 +1526,25 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             .addEventListener("click", () => {
                 console.log("Test action");
             });
+
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        const mobileBtn = document.getElementById("mobileSidebarBtn");
+
+        function openSidebarMobile() {
+            sidebar.classList.remove("-translate-x-full");
+            overlay.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function closeSidebarMobile() {
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        mobileBtn.addEventListener("click", openSidebarMobile);
+        overlay.addEventListener("click", closeSidebarMobile);
     </script>
 </body>
 
