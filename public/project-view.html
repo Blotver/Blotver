@@ -268,7 +268,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                height: 75px;
+                height: 85px;
                 background: #0f172a;
                 z-index: 1200;
 
@@ -276,16 +276,19 @@
                 justify-content: space-around;
                 align-items: center;
 
-                /* 🔥 EL CORTE REAL */
+                /* CORTE MÁS PROFUNDO */
                 -webkit-mask:
-                    radial-gradient(circle 38px at 50% -6px, transparent 38px, black 39px);
+                    radial-gradient(circle 42px at 50% -18px, transparent 42px, black 43px);
                 mask:
-                    radial-gradient(circle 38px at 50% -6px, transparent 38px, black 39px);
+                    radial-gradient(circle 42px at 50% -18px, transparent 42px, black 43px);
+
+                box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
             }
 
             #fabWrapper {
                 position: fixed;
-                bottom: 28px;
+                bottom: 35px;
+                /* 🔥 MÁS ARRIBA */
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
