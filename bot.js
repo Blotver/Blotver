@@ -406,6 +406,64 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
     });
     res.json({ success: true });
 });
+
+// ========================
+// TEST WIDGET
+// ========================
+
+app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
+
+    const widget = await Widget.findOne({
+        _id: req.params.id,
+        userId: req.session.user.id
+    });
+
+    if (!widget) {
+        return res.status(404).json({ error: "Widget not found" });
+    }
+
+    const project = await Project.findOne({
+        _id: widget.projectId,
+        userId: req.session.user.id
+    });
+
+    if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+    }
+
+    const userDB = await User.findOne({ twitchId: req.session.user.id });
+
+    let payload = {
+        widgetId: widget._id,
+        type: widget.type,
+        data: widget.data
+    };
+
+    // 🔥 Lógica específica por tipo
+    if (widget.type === "shoutout") {
+
+        const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
+        const randomUsername =
+            randomUsers[Math.floor(Math.random() * randomUsers.length)];
+
+        const userId = await getUserId(randomUsername, userDB);
+        const clip = userId
+            ? await getRandomClip(userId, userDB)
+            : null;
+
+        payload.testData = {
+            user: randomUsername,
+            game: "Just Chatting",
+            clipId: clip?.id
+                ?.replace("-preview-480x272.jpg", ".mp4")
+        };
+    }
+
+    // Emitir al overlay
+    io.to(project._id.toString()).emit("widgetEvent", payload);
+
+    res.json({ success: true });
+});
 // ========================
 // MIDDLEWARE AUTH
 // ========================
