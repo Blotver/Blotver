@@ -14,9 +14,43 @@ window.ShoutoutWidget = {
 
     renderCanvas(widget) {
         const el = document.createElement("div");
-        el.innerText = "🎬 ShoutOut Widget";
+
         el.style.border = "2px solid purple";
-        el.style.padding = "8px 12px";
+        el.style.borderRadius = "12px";
+        el.style.padding = "16px";
+        el.style.background = "#111";
+        el.style.color = "white";
+        el.style.minWidth = "260px";
+        el.style.minHeight = "120px";
+        el.style.display = "flex";
+        el.style.flexDirection = "column";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.textAlign = "center";
+
+        function updateView() {
+            const text =
+                widget.data.overlayText ||
+                widget.data.textTemplate ||
+                "Sigan a {user} jugando {game}";
+
+            el.innerHTML = `
+            <div style="opacity:.6;font-size:12px;margin-bottom:6px;">
+                🎬 ShoutOut Preview
+            </div>
+            <div style="font-weight:bold;">
+                ${text
+                    .replace("{user}", "StreamerX")
+                    .replace("{game}", "Just Chatting")}
+            </div>
+        `;
+        }
+
+        updateView();
+
+        // Guardamos función para poder refrescar luego
+        el.updatePreview = updateView;
+
         return el;
     },
 

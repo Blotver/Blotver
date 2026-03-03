@@ -1553,25 +1553,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             .addEventListener("click", () => createWidget("text"));
 
         document.getElementById("fabTest")
-            .addEventListener("click", async () => {
-
-                if (!selectedWidget) {
-                    alert("Selecciona un widget para probar.");
-                    return;
-                }
-
-                try {
-
-                    await fetch(`/api/widgets/${selectedWidget._id}/test`, {
-                        method: "POST"
-                    });
-
-                    console.log("Widget test enviado");
-
-                } catch (err) {
-                    console.error("Error testing widget:", err);
-                }
-            });
 
 
         document.getElementById("saveIconBtn")
