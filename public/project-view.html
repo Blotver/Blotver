@@ -210,7 +210,7 @@
         .fab-item::after {
             content: attr(data-label);
             position: absolute;
-            right: 70px;
+            right: 75px;
             /* más separado */
             top: 50%;
             transform: translateY(-50%) translateX(10px);
@@ -279,7 +279,7 @@
 
             #fabWrapper {
                 position: fixed;
-                bottom: 50px;
+                bottom: 30px;
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -312,7 +312,7 @@
         <div class="flex items-center gap-3">
             <!-- HELP -->
             <button id="helpOverlayBtn" data-label="How to use overlay"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
+                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-750 hover:bg-gray-750 hover:border-gray-600 transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class=" w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
@@ -324,7 +324,7 @@
 
             <!-- COPY -->
             <button id="copyOverlayBtn" data-label="Copy overlay URL"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
+                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-750 hover:bg-gray-750 hover:border-gray-600 transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
@@ -335,12 +335,12 @@
             </button>
 
 
-            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded hidden md:inline-block">
+            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-750 px-4 py-2 rounded hidden md:inline-block">
                 Save
             </button>
 
             <button id="saveIconBtn"
-                class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-700">
+                class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-750">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -484,7 +484,7 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
 
         <div
-            class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-700w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
+            class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-750w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
 
             <!-- Close -->
             <button id="closeUpload" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -518,7 +518,7 @@
             </div>
 
             <!-- Upload button -->
-            <button id="confirmUpload" class="w-full mt-5 bg-violet-600 hover:bg-violet-700
+            <button id="confirmUpload" class="w-full mt-5 bg-violet-600 hover:bg-violet-750
                text-white py-2 rounded-lg transition disabled:opacity-40" disabled>
                 Upload
             </button>
@@ -527,7 +527,7 @@
     </div>
 
     <div id="saveToast"
-        class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-700 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95">
+        class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-750 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95">
 
         <!-- ICON -->
         <svg id="saveToastIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none"
@@ -539,7 +539,7 @@
     </div>
 
     <div id="copyToast"
-        class="fixed top-20 right-6 bg-gray-900 border border-gray-700 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2">
+        class="fixed top-20 right-6 bg-gray-900 border border-gray-750 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
@@ -553,7 +553,7 @@
 
     <!-- ===== MOBILE LAYERS SHEET ===== -->
     <div id="layersSheet"
-        class="md:hidden fixed bottom-0 left-0 w-full h-[70vh] bg-gray-950 border-t border-gray-800 rounded-t-2xl transform translate-y-full transition-transform duration-300 z-[1400] flex flex-col">
+        class="md:hidden fixed bottom-0 left-0 w-full h-[75vh] bg-gray-950 border-t border-gray-800 rounded-t-2xl transform translate-y-full transition-transform duration-300 z-[1400] flex flex-col">
 
         <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
             <span class="text-sm font-medium text-gray-300">Layers</span>
@@ -572,14 +572,14 @@
 
             <path d="
 M0 20
-H290
-C360 20, 400 55, 500 55
-C600 55, 640 20, 710 20
+H335
+C370 20, 400 75, 500 75
+C605 75, 630 20, 665 20
 H1000
 V100
 H0
 Z
-" fill="#0B1A33"/>
+" fill="#0B1A33" />
         </svg>
 
         <!-- CONTENIDO -->
@@ -1018,7 +1018,7 @@ Z
 
                 const layerItem = document.createElement("div");
 
-                layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/70 border border-transparent hover:border-gray-700 cursor-pointer text-sm transition-all `;
+                layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-750/75 border border-transparent hover:border-gray-750 cursor-pointer text-sm transition-all `;
 
                 layerItem.dataset.id = widget._id;
 
@@ -1055,7 +1055,7 @@ Z
 <div class="flex items-center gap-2 truncate">
     
     <button 
-        class="visibility-btn w-7 h-7 flex items-center justify-center rounded-md bg-gray-800/60 hover:bg-gray-700/80 border border-transparent hover:border-gray-600 transition group">
+        class="visibility-btn w-7 h-7 flex items-center justify-center rounded-md bg-gray-800/60 hover:bg-gray-750/80 border border-transparent hover:border-gray-600 transition group">
         ${widget.data.visible === false
                         ? `
             <!-- Eye Off -->
@@ -1410,8 +1410,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 btn.className =
                     "flex-1 py-2 rounded-md border text-xs capitalize " +
                     (active
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+                        ? "bg-gray-750 border-gray-600 text-white"
+                        : "bg-gray-900 border-gray-750 text-gray-400 hover:text-white");
             });
 
 
@@ -1421,7 +1421,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
                     (selectedWidget.data.lockRatio
                         ? "bg-gray-600 border-gray-500 text-white"
-                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+                        : "bg-gray-900 border-gray-750 text-gray-400 hover:text-white");
             }
 
             // ===== 5️⃣ Marcar cambios =====
@@ -1468,12 +1468,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function updateActiveLayer(id) {
             document.querySelectorAll("#layersPanel > div").forEach(item => {
-                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
+                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-750/80");
             });
 
             const active = document.querySelector(`#layersPanel > div[data-id="${id}"]`);
             if (active) {
-                active.classList.add("ring-2", "ring-purple-500", "bg-gray-700/80");
+                active.classList.add("ring-2", "ring-purple-500", "bg-gray-750/80");
             }
         }
         /* ================= DRAG ================= */
@@ -1528,7 +1528,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 const reversedIndex = items.length - 1 - index;
 
                 if (isOpen) {
-                    item.style.transitionDelay = `${index * 55}ms`;
+                    item.style.transitionDelay = `${index * 60}ms`;
                     item.classList.remove("opacity-0", "translate-y-6", "scale-90");
                 } else {
                     item.style.transitionDelay = "0ms";

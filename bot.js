@@ -225,17 +225,26 @@ app.get("/auth/twitch/callback", async (req, res) => {
 
     const code = req.query.code;
 
+    const baseUrl =
+        process.env.NODE_ENV === "production"
+            ? "https://blotver.onrender.com"
+            : "http://localhost:3000";
+
     try {
 
-        const tokenRes = await axios.post("https://id.twitch.tv/oauth2/token", null, {
-            params: {
-                client_id: process.env.TWITCH_CLIENT_ID,
-                client_secret: process.env.TWITCH_CLIENT_SECRET,
-                code: code,
-                grant_type: "authorization_code",
-                redirect_uri: process.env.TWITCH_REDIRECT_URI
+        const tokenRes = await axios.post(
+            "https://id.twitch.tv/oauth2/token",
+            null,
+            {
+                params: {
+                    client_id: process.env.TWITCH_CLIENT_ID,
+                    client_secret: process.env.TWITCH_CLIENT_SECRET,
+                    code: code,
+                    grant_type: "authorization_code",
+                    redirect_uri: `${baseUrl}/auth/twitch/callback`
+                }
             }
-        });
+        );
 
         const accessToken = tokenRes.data.access_token;
         const refreshToken = tokenRes.data.refresh_token;
