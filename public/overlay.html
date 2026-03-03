@@ -170,6 +170,8 @@
             }
             document.getElementById("overlayText").innerText =
                 data.overlayText || "";
+                
+            console.log("Clip ID recibido:", data.clipId);
 
             container.innerHTML = `
         <iframe

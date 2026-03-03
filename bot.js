@@ -454,8 +454,7 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
         payload.testData = {
             user: randomUsername,
             game: "Just Chatting",
-            clipId: clip?.id
-                ?.replace("-preview-480x272.jpg", ".mp4")
+            clipId: clip?.id || null
         };
     }
 
