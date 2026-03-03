@@ -59,7 +59,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false
+        secure: process.env.NODE_ENV === "production"
     }
 }));
 
@@ -121,7 +121,7 @@ app.post("/api/upload-image", isAuthenticated, upload.single("image"), async (re
         );
 
         uploadStream.end(optimizedBuffer);
-        
+
         const result = await cloudinary.uploader.upload_stream({
             folder: "users",
             format: "webp",
@@ -210,7 +210,14 @@ console.log("🤖 Bot iniciado correctamente!");
 // ========================
 
 app.get("/auth/twitch", (req, res) => {
-    const redirect = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${process.env.TWITCH_REDIRECT_URI}&response_type=code&scope=chat:read+chat:edit+user:read:email+channel:read:subscriptions`;
+
+    const baseUrl =
+        process.env.NODE_ENV === "production"
+            ? "https://blotver.onrender.com"
+            : "http://localhost:3000";
+
+    const redirect = `https://id.twitch.tv/oauth2/authorize?client_id=${process.env.TWITCH_CLIENT_ID}&redirect_uri=${baseUrl}/auth/twitch/callback&response_type=code&scope=chat:read+chat:edit+user:read:email+channel:read:subscriptions`;
+
     res.redirect(redirect);
 });
 
