@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Editor</title>
-    <link rel="icon" type="image/png" href="./logo/BlotverFavicon.png">
+    <link rel="icon" type="image/png" href="/logo/BlotverFavicon.png">
     <link href="/styles.css" rel="stylesheet">
 
     <style>
@@ -210,7 +210,7 @@
         .fab-item::after {
             content: attr(data-label);
             position: absolute;
-            right: 75px;
+            right: 70px;
             /* más separado */
             top: 50%;
             transform: translateY(-50%) translateX(10px);
@@ -279,7 +279,7 @@
 
             #fabWrapper {
                 position: fixed;
-                bottom: 30px;
+                bottom: 50px;
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -312,7 +312,7 @@
         <div class="flex items-center gap-3">
             <!-- HELP -->
             <button id="helpOverlayBtn" data-label="How to use overlay"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-750 hover:bg-gray-750 hover:border-gray-600 transition group">
+                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class=" w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
@@ -324,7 +324,7 @@
 
             <!-- COPY -->
             <button id="copyOverlayBtn" data-label="Copy overlay URL"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-750 hover:bg-gray-750 hover:border-gray-600 transition group">
+                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
@@ -335,12 +335,12 @@
             </button>
 
 
-            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-750 px-4 py-2 rounded hidden md:inline-block">
+            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded hidden md:inline-block">
                 Save
             </button>
 
             <button id="saveIconBtn"
-                class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-750">
+                class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-700">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -355,8 +355,17 @@
     <div class="pt-16 flex-1 flex relative min-h-0">
 
         <!-- SIDEBAR -->
-        <aside id="sidebar"
-            class=" hidden md:flex top-16 md:top-0 left-0 w-[85vw] max-w-xs md:w-72 bg-gradient-to-b from-gray-950 to-gray-900 border-r border-gray-800 h-[calc(100dvh-4rem)] md:h-[calc(100vh-4rem)] flex flex-col z-[1000] transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <aside id="sidebar" class="fixed md:relative
+           bottom-0 md:bottom-auto
+           left-0 md:left-auto
+           w-full md:w-72
+           h-[75vh] md:h-[calc(100vh-4rem)]
+           bg-gradient-to-b from-gray-950 to-gray-900
+           border-t md:border-t-0 md:border-r border-gray-800
+           flex flex-col
+           z-[1500]
+           transform translate-y-full md:translate-y-0
+           transition-transform duration-300">
             <!-- HEADER -->
             <div class="h-14 flex items-center px-4 border-b border-gray-800">
                 <h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
@@ -369,8 +378,7 @@
 
             <!-- SETTINGS OVERLAY -->
             <div id="settingsOverlay"
-                class="absolute inset-0 md:rounded-none rounded-t-2xl bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0 transition-transform duration-300">
-
+                class="absolute inset-0 z-[1600] md:rounded-none rounded-t-2xl bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0 transition-transform duration-300">
                 <!-- SETTINGS HEADER -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
                     <div class="flex items-center gap-2">
@@ -417,7 +425,7 @@
 
             <!-- ===== FLOATING SPEED DIAL ===== -->
         </main>
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[900] hidden md:hidden">
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1400] hidden md:hidden">
         </div>
     </div>
 
@@ -484,7 +492,7 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
 
         <div
-            class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-750w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
+            class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-700w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
 
             <!-- Close -->
             <button id="closeUpload" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
@@ -518,7 +526,7 @@
             </div>
 
             <!-- Upload button -->
-            <button id="confirmUpload" class="w-full mt-5 bg-violet-600 hover:bg-violet-750
+            <button id="confirmUpload" class="w-full mt-5 bg-violet-600 hover:bg-violet-700
                text-white py-2 rounded-lg transition disabled:opacity-40" disabled>
                 Upload
             </button>
@@ -527,7 +535,7 @@
     </div>
 
     <div id="saveToast"
-        class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-750 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95">
+        class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-700 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95">
 
         <!-- ICON -->
         <svg id="saveToastIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none"
@@ -539,7 +547,7 @@
     </div>
 
     <div id="copyToast"
-        class="fixed top-20 right-6 bg-gray-900 border border-gray-750 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2">
+        class="fixed top-20 right-6 bg-gray-900 border border-gray-700 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
@@ -552,19 +560,6 @@
     <!-- ===== MOBILE BOTTOM NAV ===== -->
 
     <!-- ===== MOBILE LAYERS SHEET ===== -->
-    <div id="layersSheet"
-        class="md:hidden fixed bottom-0 left-0 w-full h-[75vh] bg-gray-950 border-t border-gray-800 rounded-t-2xl transform translate-y-full transition-transform duration-300 z-[1400] flex flex-col">
-
-        <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
-            <span class="text-sm font-medium text-gray-300">Layers</span>
-            <button id="closeLayersSheet" class="text-gray-400">✕</button>
-        </div>
-
-        <div id="mobileLayersContent" class="flex-1 overflow-y-auto p-4 space-y-2">
-        </div>
-
-    </div>
-
     <div id="mobileNav" class="md:hidden">
 
         <!-- SVG SHAPE -->
@@ -572,14 +567,14 @@
 
             <path d="
 M0 20
-H335
-C370 20, 400 75, 500 75
-C605 75, 630 20, 665 20
+H330
+C370 20, 400 73, 500 73
+C605 73, 630 20, 665 20
 H1000
 V100
 H0
 Z
-" fill="#0B1A33" />
+" fill="#0f172a" />
         </svg>
 
         <!-- CONTENIDO -->
@@ -1018,7 +1013,7 @@ Z
 
                 const layerItem = document.createElement("div");
 
-                layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-750/75 border border-transparent hover:border-gray-750 cursor-pointer text-sm transition-all `;
+                layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/70 border border-transparent hover:border-gray-700 cursor-pointer text-sm transition-all `;
 
                 layerItem.dataset.id = widget._id;
 
@@ -1055,7 +1050,7 @@ Z
 <div class="flex items-center gap-2 truncate">
     
     <button 
-        class="visibility-btn w-7 h-7 flex items-center justify-center rounded-md bg-gray-800/60 hover:bg-gray-750/80 border border-transparent hover:border-gray-600 transition group">
+        class="visibility-btn w-7 h-7 flex items-center justify-center rounded-md bg-gray-800/60 hover:bg-gray-700/80 border border-transparent hover:border-gray-600 transition group">
         ${widget.data.visible === false
                         ? `
             <!-- Eye Off -->
@@ -1348,6 +1343,14 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 widgetDef.renderConfig(widget, content, updateSelectedWidget);
 
             }
+
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById("sidebar");
+
+                sidebar.classList.remove("translate-y-full");
+                document.getElementById("sidebarOverlay").classList.remove("hidden");
+                document.body.classList.add("overflow-hidden");
+            }
         }
 
         function updateSelectedWidget(updates) {
@@ -1410,8 +1413,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 btn.className =
                     "flex-1 py-2 rounded-md border text-xs capitalize " +
                     (active
-                        ? "bg-gray-750 border-gray-600 text-white"
-                        : "bg-gray-900 border-gray-750 text-gray-400 hover:text-white");
+                        ? "bg-gray-700 border-gray-600 text-white"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
             });
 
 
@@ -1421,7 +1424,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
                     (selectedWidget.data.lockRatio
                         ? "bg-gray-600 border-gray-500 text-white"
-                        : "bg-gray-900 border-gray-750 text-gray-400 hover:text-white");
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
             }
 
             // ===== 5️⃣ Marcar cambios =====
@@ -1468,12 +1471,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
         function updateActiveLayer(id) {
             document.querySelectorAll("#layersPanel > div").forEach(item => {
-                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-750/80");
+                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
             });
 
             const active = document.querySelector(`#layersPanel > div[data-id="${id}"]`);
             if (active) {
-                active.classList.add("ring-2", "ring-purple-500", "bg-gray-750/80");
+                active.classList.add("ring-2", "ring-purple-500", "bg-gray-700/80");
             }
         }
         /* ================= DRAG ================= */
@@ -1528,7 +1531,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 const reversedIndex = items.length - 1 - index;
 
                 if (isOpen) {
-                    item.style.transitionDelay = `${index * 60}ms`;
+                    item.style.transitionDelay = `${index * 55}ms`;
                     item.classList.remove("opacity-0", "translate-y-6", "scale-90");
                 } else {
                     item.style.transitionDelay = "0ms";
@@ -1590,14 +1593,26 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         window.addEventListener("resize", applyMobileScale);
         window.addEventListener("load", applyMobileScale);
 
-        const layersSheet = document.getElementById("layersSheet");
         const openLayersBtn = document.getElementById("openLayersBtn");
-        const closeLayersSheet = document.getElementById("closeLayersSheet");
 
         openLayersBtn.addEventListener("click", () => {
-            layersSheet.classList.remove("translate-y-full");
+            const sidebar = document.getElementById("sidebar");
+
+            sidebar.classList.remove("translate-y-full");
+            document.getElementById("sidebarOverlay").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         });
+
+        document.getElementById("sidebarOverlay")
+            .addEventListener("click", closeSidebar);
+
+        function closeSidebar() {
+            const sidebar = document.getElementById("sidebar");
+
+            sidebar.classList.add("translate-y-full");
+            document.getElementById("sidebarOverlay").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
 
         closeLayersSheet.addEventListener("click", () => {
             layersSheet.classList.add("translate-y-full");
