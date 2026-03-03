@@ -268,7 +268,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                height: 70px;
+                height: 95px;
                 /* Ajustado para que no sea tan alto */
                 background: #0f172a;
                 /* El color de tu barra */
@@ -284,7 +284,7 @@
 
             #fabWrapper {
                 position: fixed;
-                bottom: 35px;
+                bottom: 50px;
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -440,7 +440,7 @@
             <div id="fabImage"
                 class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                 data-label="Image">
-                <button id="fabMain"
+                <button
                     class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center">
                     <!-- SVG IMAGE -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
@@ -606,31 +606,28 @@
 
     </div>
 
-<svg width="0" height="0">
-  <defs>
-    <mask id="navMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-      
-      <!-- Fondo visible -->
-      <rect x="0" y="0" width="1" height="1" fill="white"/>
+    <svg width="0" height="0">
+        <defs>
+            <mask id="navMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
 
-      <!-- Notch central suave -->
-      <path
-        d="
-          M 0 0
-          L 0.35 0
-          C 0.42 0, 0.43 0.45, 0.5 0.45
-          C 0.57 0.45, 0.58 0, 0.65 0
-          L 1 0
-          L 1 1
-          L 0 1
-          Z
-        "
-        fill="black"
-      />
-      
-    </mask>
-  </defs>
-</svg>
+                <!-- Fondo visible -->
+                <rect x="0" y="0" width="1" height="1" fill="white" />
+
+                <!-- Notch central suave -->
+                <path d="
+    M 0 0
+    L 0.42 0
+    C 0.46 0, 0.48 0.75, 0.5 0.75
+    C 0.52 0.75, 0.54 0, 0.58 0
+    L 1 0
+    L 1 1
+    L 0 1
+    Z
+  " fill="black" />
+
+            </mask>
+        </defs>
+    </svg>
 
 
     <script src="/widgets/registry.js"></script>
