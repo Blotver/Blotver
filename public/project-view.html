@@ -569,17 +569,14 @@
 
         <!-- SVG SHAPE -->
         <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="absolute bottom-0 left-0 w-full h-full">
+            <defs>
+                <mask id="cut">
+                    <rect width="1000" height="100" fill="white" />
+                    <circle cx="500" cy="20" r="60" fill="black" />
+                </mask>
+            </defs>
 
-            <path d="
-    M0 20
-    H380
-    C430 20, 450 80, 500 80
-    C550 80, 570 20, 620 20
-    H1000
-    V100
-    H0
-    Z
-" fill="#0B1A33" />
+            <rect width="1000" height="100" fill="#0B1A33" mask="url(#cut)" />
         </svg>
 
         <!-- CONTENIDO -->
