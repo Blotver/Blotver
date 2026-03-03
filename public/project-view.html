@@ -279,7 +279,7 @@
 
             #fabWrapper {
                 position: fixed;
-                bottom: 45px;
+                bottom: 50px;
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 1300;
@@ -569,15 +569,17 @@
 
         <!-- SVG SHAPE -->
         <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="absolute bottom-0 left-0 w-full h-full">
-            <defs>
-                <mask id="cut">
-                    <rect width="1000" height="100" fill="white" />
-                    <!-- Centro ligeramente dentro -->
-                    <circle cx="500" cy="0" r="32" fill="black" />
-                </mask>
-            </defs>
 
-            <rect width="1000" height="100" fill="#0B1A33" mask="url(#cut)" />
+            <path d="
+M0 20
+H330
+C400 20, 420 75, 500 75
+C580 75, 600 20, 670 20
+H1000
+V100
+H0
+Z
+" fill="#0B1A33" />
         </svg>
 
         <!-- CONTENIDO -->
