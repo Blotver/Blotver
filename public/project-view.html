@@ -620,20 +620,12 @@
 
         socket.on("widgetEvent", (payload) => {
 
-            if (payload.type === "shoutout") {
+            if (payload.type !== "shoutout") return;
 
-                const d = payload.data;
-                const t = payload.testData || {};
+            const widget = widgets.find(w => w._id === payload.widgetId);
+            if (!widget) return;
 
-                showShoutoutPreview({
-                    clipId: t.clipId,
-                    overlayText: d.overlayText,
-                    duration: d.duration,
-                    animationIn: d.animationIn,
-                    animationOut: d.animationOut
-                });
-            }
-
+            showShoutoutPreview(widget, payload);
         });
 
         document.getElementById("copyOverlayBtn")
@@ -897,6 +889,8 @@
                     e.stopPropagation();
                     selectWidget(widget, el);
                 });
+
+                widget.el = el;
 
                 canvas.appendChild(el);
 
@@ -1682,12 +1676,18 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                 overflow:hidden;
                 border-radius:10px;
             ">
-                <iframe
-                    src="https://clips.twitch.tv/embed?clip=${t.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true"
-                    style="width:100%;height:100%;border:none;"
-                    allow="autoplay; fullscreen"
-                    allowfullscreen>
-                </iframe>
+${t.clipId ? `
+    <iframe
+        src="https://clips.twitch.tv/embed?clip=${t.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true"
+        style="width:100%;height:100%;border:none;"
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+    </iframe>
+` : `
+    <div style="color:#aaa;font-size:14px;">
+        No clip available
+    </div>
+`}
             </div>
         </div>
     `;

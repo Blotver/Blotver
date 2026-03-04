@@ -133,9 +133,7 @@
 
 <body>
     <div id="clipContainer">
-        <div id="overlayText" style="position:absolute; top:5%; width:100%; text-align:center;
-        font-size:48px; color:white; font-weight:bold; text-shadow:0 0 20px black;">
-        </div>
+
     </div>
 
     <script>
@@ -156,72 +154,57 @@
             if (playing) return;
             playing = true;
 
-            if (data.isTest) {
-                const badge = document.createElement("div");
-                badge.innerText = "TEST MODE";
-                badge.style.position = "absolute";
-                badge.style.top = "10px";
-                badge.style.right = "10px";
-                badge.style.background = "red";
-                badge.style.padding = "6px 12px";
-                badge.style.fontSize = "14px";
-                badge.style.fontWeight = "bold";
-                container.appendChild(badge);
-            }
-            document.getElementById("overlayText").innerText =
-                data.overlayText || "";
-                
-            console.log("Clip ID recibido:", data.clipId);
+            container.innerHTML = "";
 
-            container.innerHTML = `
-        <iframe
-            src="https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true"
-            allow="autoplay; fullscreen"
-            allowfullscreen>
-        </iframe>
-        <div id="overlayText"
-            style="position:absolute; top:5%; width:100%; text-align:center;
-            font-size:48px; color:white; font-weight:bold;
-            text-shadow:0 0 20px black;">
-            ${data.overlayText || ""}
-        </div>
-    `;
+            const wrapper = document.createElement("div");
+            wrapper.style.position = "absolute";
+            wrapper.style.top = "0";
+            wrapper.style.left = "0";
+            wrapper.style.width = "100%";
+            wrapper.style.height = "100%";
 
-            container.className = `${data.animationIn || "fade"}-in`;
+            // IFRAME
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true`;
+            iframe.allow = "autoplay; fullscreen";
+            iframe.allowFullscreen = true;
+
+            iframe.style.position = "absolute";
+            iframe.style.height = "110%";
+            iframe.style.width = "auto";
+            iframe.style.minWidth = "110%";
+            iframe.style.top = "-10%";
+            iframe.style.left = "50%";
+            iframe.style.transform = "translateX(-50%)";
+            iframe.style.border = "none";
+
+            // TEXTO
+            const text = document.createElement("div");
+            text.style.position = "absolute";
+            text.style.top = "5%";
+            text.style.width = "100%";
+            text.style.textAlign = "center";
+            text.style.fontSize = "48px";
+            text.style.color = "white";
+            text.style.fontWeight = "bold";
+            text.style.textShadow = "0 0 20px black";
+            text.innerText = data.overlayText || "";
+
+            wrapper.appendChild(iframe);
+            wrapper.appendChild(text);
+            container.appendChild(wrapper);
+
+            // Animación
+            wrapper.className = `${data.animationIn || "fade"}-in`;
 
             setTimeout(() => {
-                container.className = `${data.animationOut || "fade"}-out`;
+                wrapper.className = `${data.animationOut || "fade"}-out`;
             }, (data.duration || 10000) - 600);
 
-            setTimeout(reset, data.duration || 10000);
-        }
-
-        socket.on("newClip", (data) => {
-            playClip(data);
-        });
-
-        socket.on("widgetEvent", (payload) => {
-
-            if (payload.type === "shoutout") {
-
-                const d = payload.data;
-                const t = payload.testData || {};
-
-                playClip({
-                    clipId: t.clipId || null,
-                    overlayText: d.overlayText || "",
-                    duration: d.duration,
-                    animationIn: d.animationIn,
-                    animationOut: d.animationOut
-                });
-            }
-
-
-        });
-
-        function reset() {
-            container.innerHTML = "";
-            playing = false;
+            setTimeout(() => {
+                container.innerHTML = "";
+                playing = false;
+            }, data.duration || 10000);
         }
     </script>
 </body>
