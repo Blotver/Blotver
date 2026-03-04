@@ -603,12 +603,38 @@
     <script src="/widgets/shoutout.js"></script>
     <script src="/widgets/image.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
         const projectId = window.location.pathname.split("/").pop();
 
         const overlayURL =
             window.location.origin + "/overlay/" + projectId;
+
+        const socket = io();
+        socket.emit("joinProject", projectId);
+
+        socket.on("connect", () => {
+            console.log("Editor conectado a socket:", socket.id);
+        });
+
+        socket.on("widgetEvent", (payload) => {
+
+            if (payload.type === "shoutout") {
+
+                const d = payload.data;
+                const t = payload.testData || {};
+
+                showShoutoutPreview({
+                    clipId: t.clipId,
+                    overlayText: d.overlayText,
+                    duration: d.duration,
+                    animationIn: d.animationIn,
+                    animationOut: d.animationOut
+                });
+            }
+
+        });
 
         document.getElementById("copyOverlayBtn")
             .addEventListener("click", async () => {
@@ -1620,6 +1646,64 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             document.body.classList.remove("overflow-hidden");
         }
 
+        function showShoutoutPreview(widget, payload) {
+
+            const el = widget.el;
+            if (!el) return;
+
+            const d = payload.data;
+            const t = payload.testData || {};
+
+            // Guardamos el contenido original
+            const originalContent = el.innerHTML;
+
+            el.innerHTML = `
+        <div style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:12px;
+            width:100%;
+            height:100%;
+        ">
+            <div style="
+                font-size:22px;
+                font-weight:600;
+                color:white;
+                text-align:center;
+                text-shadow:0 0 10px rgba(0,0,0,0.6);
+            ">
+                Sigan a ${t.user || "Streamer"}
+            </div>
+
+            <div style="
+                width:100%;
+                aspect-ratio:16/9;
+                overflow:hidden;
+                border-radius:10px;
+            ">
+                <iframe
+                    src="https://clips.twitch.tv/embed?clip=${t.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true"
+                    style="width:100%;height:100%;border:none;"
+                    allow="autoplay; fullscreen"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    `;
+
+            setTimeout(() => {
+                el.innerHTML = originalContent;
+
+                // volver a renderizar el widget normal
+                const widgetDef = window.WidgetRegistry[widget.type];
+                if (widgetDef && widgetDef.renderCanvas) {
+                    el.innerHTML = "";
+                    el.appendChild(widgetDef.renderCanvas(widget));
+                }
+
+            }, d.duration || 10000);
+        }
     </script>
 </body>
 
