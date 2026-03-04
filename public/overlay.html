@@ -130,18 +130,7 @@
 
         socket.emit("joinProject", projectId);
 
-        socket.on("widgetEvent", (payload) => {
-
-            if (payload.type !== "shoutout") return;
-
-            const data = {
-                clipUrl: payload.testData?.clipUrl,
-                overlayText: payload.data?.overlayText,
-                duration: payload.data?.duration,
-                animationIn: payload.data?.animationIn,
-                animationOut: payload.data?.animationOut
-            };
-
+        socket.on("newClip", (data) => {
             playClip(data);
         });
 
@@ -166,11 +155,15 @@
 
             // VIDEO limpio sin UI
             const video = document.createElement("video");
+
             video.src = data.clipUrl;
+
             video.autoplay = true;
             video.muted = true;
             video.playsInline = true;
             video.controls = false;
+            video.setAttribute("playsinline", "");
+            video.setAttribute("muted", "");
 
             video.style.position = "absolute";
             video.style.width = "100%";
@@ -197,14 +190,14 @@
             // Animación entrada
             wrapper.className = `${data.animationIn || "fade"}-in`;
 
-            setTimeout(() => {
+            video.onended = () => {
                 wrapper.className = `${data.animationOut || "fade"}-out`;
-            }, (data.duration || 10000) - 600);
 
-            setTimeout(() => {
-                container.innerHTML = "";
-                playing = false;
-            }, data.duration || 10000);
+                setTimeout(() => {
+                    container.innerHTML = "";
+                    playing = false;
+                }, 600);
+            };
         }
     </script>
 </body>

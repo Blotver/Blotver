@@ -20,35 +20,6 @@ const path = require("path");
 
 const app = express();
 console.log("🔥 Servidor cargado correctamente");
-app.get("/api/clip-proxy", async (req, res) => {
-    try {
-        const videoUrl = req.query.url;
-        console.log("[proxy] request for url", videoUrl);
-        if (!videoUrl) {
-            return res.status(400).send("Falta url");
-        }
-
-        const response = await axios({
-            method: "GET",
-            url: videoUrl,
-            responseType: "stream",
-            headers: {
-                "User-Agent": "Mozilla/5.0",
-                Range: req.headers.range || "",
-                // some twitch assets require an origin header
-                Origin: req.headers.origin || ""
-            }
-        });
-
-        res.status(response.status);
-        res.set(response.headers);
-        response.data.pipe(res);
-
-    } catch (error) {
-        console.log("❌ Error en proxy:", error.response?.status, error.message);
-        res.sendStatus(500);
-    }
-});
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -454,9 +425,16 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
         let clipUrl = null;
 
         if (clip && clip.thumbnail_url) {
-            clipUrl = clip.thumbnail_url
+
+            const rawMp4 = clip.thumbnail_url
                 .replace("-preview-480x272.jpg", ".mp4")
                 .replace("-preview-260x147.jpg", ".mp4");
+
+            clipUrl = await uploadClipToCloudinary(
+                rawMp4,
+                userDB.twitchId,
+                clip.id
+            );
         }
 
         payload.testData = {
@@ -714,6 +692,22 @@ async function getRandomClip(userId, userDB) {
     return clips[Math.floor(Math.random() * clips.length)];
 }
 
+async function uploadClipToCloudinary(clipUrl, userId, clipId) {
+    try {
+        const result = await cloudinary.uploader.upload(clipUrl, {
+            resource_type: "video",
+            folder: `clips/${userId}`,
+            public_id: clipId,
+            overwrite: false
+        });
+
+        return result.secure_url;
+    } catch (error) {
+        console.log("❌ Error subiendo clip:", error.message);
+        return null;
+    }
+}
+
 // ========================
 // COMANDOS
 // ========================
@@ -733,6 +727,7 @@ client.on("message", async (channel, tags, message, self) => {
         Widget,
         getUserId,
         getRandomClip,
-        twitchAPI
+        twitchAPI,
+        uploadClipToCloudinary   // 👈 FALTABA ESTO
     });
 });

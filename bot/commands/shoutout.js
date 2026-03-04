@@ -8,7 +8,8 @@ module.exports = async function handleShoutout({
     Widget,
     getUserId,
     getRandomClip,
-    twitchAPI
+    twitchAPI,
+    uploadClipToCloudinary   // 👈 AGREGAR
 }) {
 
     const args = message.trim().split(" ");
@@ -49,9 +50,19 @@ module.exports = async function handleShoutout({
     }
 
     const clip = await getRandomClip(userId, userDB);
-    if (!clip) {
-        client.say(channel, "⚠️ Ese canal no tiene clips.");
-        return;
+    let clipUrl = null;
+
+    if (clip && clip.thumbnail_url) {
+
+        const rawMp4 = clip.thumbnail_url
+            .replace("-preview-480x272.jpg", ".mp4")
+            .replace("-preview-260x147.jpg", ".mp4");
+
+        clipUrl = await uploadClipToCloudinary(
+            rawMp4,
+            userDB.twitchId,
+            clip.id
+        );
     }
 
     const userInfoRes = await twitchAPI(
@@ -74,7 +85,7 @@ module.exports = async function handleShoutout({
     client.say(channel, mensaje);
 
     io.to(matchedWidget.projectId.toString()).emit("newClip", {
-        clipId: clip.id,
+        clipUrl,
         duration: matchedWidget.data.duration || clip.duration,
         overlayText: matchedWidget.data.overlayText || "",
         animationIn: matchedWidget.data.animationIn || "fade",
