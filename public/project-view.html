@@ -614,6 +614,22 @@
         const socket = io();
         socket.emit("joinProject", projectId);
 
+        socket.on("newClip", (data) => {
+
+            // Buscar el widget shoutout actual
+            const widget = widgets.find(w => w.type === "shoutout");
+            if (!widget) return;
+
+            showShoutoutPreview(widget, {
+                data: widget.data,
+                testData: {
+                    user: "TestUser",
+                    clipId: data.clipId
+                }
+            });
+
+        });
+
         socket.on("connect", () => {
             console.log("Editor conectado a socket:", socket.id);
         });
