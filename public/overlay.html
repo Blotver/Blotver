@@ -126,9 +126,14 @@
       let queue = [];
       let playing = false;
 
-      socket.emit("joinProject", projectId);
+      socket.on("connect", () => {
+        console.log("🟢 Overlay conectado al socket:", socket.id);
+        console.log("📌 Uniéndose al proyecto:", projectId);
+        socket.emit("joinProject", projectId);
+      });
 
       socket.on("newClip", (data) => {
+        console.log("🎬 OVERLAY RECIBIÓ:", data);
         queue.push(data);
         processQueue();
       });
