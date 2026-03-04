@@ -1,602 +1,770 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project Editor</title>
-    <link rel="icon" type="image/png" href="/logo/BlotverFavicon.png">
-    <link href="/styles.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/logo/BlotverFavicon.png" />
+    <link href="/styles.css" rel="stylesheet" />
 
     <style>
-        /* ===== RESIZE HANDLES ===== */
+      /* ===== RESIZE HANDLES ===== */
 
-        .resize-handle {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: white;
-            border: 2px solid #3b82f6;
-            border-radius: 2px;
-            z-index: 20;
+      .resize-handle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 2px;
+        z-index: 20;
+      }
+
+      .resize-handle.corner {
+        border-radius: 3px;
+      }
+
+      .resize-handle.top {
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: ns-resize;
+      }
+
+      .resize-handle.bottom {
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: ns-resize;
+      }
+
+      .resize-handle.left {
+        left: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: ew-resize;
+      }
+
+      .resize-handle.right {
+        right: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: ew-resize;
+      }
+
+      .resize-handle.tl {
+        top: -6px;
+        left: -6px;
+        cursor: nwse-resize;
+      }
+
+      .resize-handle.tr {
+        top: -6px;
+        right: -6px;
+        cursor: nesw-resize;
+      }
+
+      .resize-handle.bl {
+        bottom: -6px;
+        left: -6px;
+        cursor: nesw-resize;
+      }
+
+      .resize-handle.br {
+        bottom: -6px;
+        right: -6px;
+        cursor: nwse-resize;
+      }
+
+      .selected-widget {
+        outline: 2px solid #6366f1;
+        outline-offset: 2px;
+      }
+
+      .layer-item.active {
+        background: #1f2937;
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* ===== SLIDE SIDEBAR SYSTEM ===== */
+
+      #sidePanel {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .sidebar-wrapper {
+        display: flex;
+        width: 200%;
+        height: 100%;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 0;
+        /* 🔥 */
+      }
+
+      .panel {
+        width: 50%;
+        padding: 16px;
+        overflow-y: auto;
+        box-sizing: border-box;
+        /* 🔥 CLAVE */
+        min-width: 0;
+        /* 🔥 evita overflow interno */
+      }
+
+      .panel::-webkit-scrollbar {
+        display: none;
+      }
+
+      .panel {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .show-settings .sidebar-wrapper {
+        transform: translateX(-50%);
+      }
+
+      .sidebar-header {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        border-bottom: 1px solid #1f2937;
+        cursor: pointer;
+        font-size: 14px;
+        color: #9ca3af;
+        background: #111827;
+      }
+
+      .sidebar-header:hover {
+        background: #1f2937;
+      }
+
+      .sidebar-header svg {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+      }
+
+      .show-settings .sidebar-header svg {
+        transform: rotate(180deg);
+      }
+
+      .widget-option {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid transparent;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .widget-option:hover {
+        background: rgba(139, 92, 246, 0.06);
+        transform: translateX(4px);
+      }
+
+      .widget-option:active {
+        transform: translateX(4px) scale(0.98);
+      }
+
+      .icon-wrap {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .widget-option:hover .icon-wrap {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
+      }
+
+      #fabMain.glow {
+        box-shadow:
+          0 0 0 1px rgba(139, 92, 246, 0.5),
+          0 0 25px rgba(139, 92, 246, 0.35),
+          0 15px 45px rgba(0, 0, 0, 0.6);
+      }
+
+      .fab-item {
+        position: relative;
+      }
+
+      .fab-item::after {
+        content: attr(data-label);
+        position: absolute;
+        right: 70px;
+        /* más separado */
+        top: 50%;
+        transform: translateY(-50%) translateX(10px);
+
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        color: white;
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 10px;
+
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        white-space: nowrap;
+
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .fab-item:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+
+      .icon-tooltip {
+        position: relative;
+      }
+
+      .icon-tooltip::after {
+        content: attr(data-label);
+        position: absolute;
+        bottom: -36px;
+        left: 50%;
+        transform: translateX(-50%) translateY(5px);
+
+        background: #0f172a;
+        border: 1px solid #1f2937;
+        padding: 6px 10px;
+        font-size: 11px;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: all 0.2s ease;
+      }
+
+      .icon-tooltip:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 767px) {
+        #mobileNav {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 100px;
+
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+
+          z-index: 1200;
         }
 
-        .resize-handle.corner {
-            border-radius: 3px;
+        #fabWrapper {
+          position: fixed;
+          bottom: 50px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1300;
         }
-
-        .resize-handle.top {
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            cursor: ns-resize;
-        }
-
-        .resize-handle.bottom {
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            cursor: ns-resize;
-        }
-
-        .resize-handle.left {
-            left: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: ew-resize;
-        }
-
-        .resize-handle.right {
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: ew-resize;
-        }
-
-        .resize-handle.tl {
-            top: -6px;
-            left: -6px;
-            cursor: nwse-resize;
-        }
-
-        .resize-handle.tr {
-            top: -6px;
-            right: -6px;
-            cursor: nesw-resize;
-        }
-
-        .resize-handle.bl {
-            bottom: -6px;
-            left: -6px;
-            cursor: nesw-resize;
-        }
-
-        .resize-handle.br {
-            bottom: -6px;
-            right: -6px;
-            cursor: nwse-resize;
-        }
-
-        .selected-widget {
-            outline: 2px solid #6366f1;
-            outline-offset: 2px;
-        }
-
-        .layer-item.active {
-            background: #1f2937;
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* ===== SLIDE SIDEBAR SYSTEM ===== */
-
-        #sidePanel {
-            overflow: hidden;
-            position: relative;
-        }
-
-        .sidebar-wrapper {
-            display: flex;
-            width: 200%;
-            height: 100%;
-            transition: transform 0.35s cubic-bezier(.4, 0, .2, 1);
-            min-width: 0;
-            /* 🔥 */
-        }
-
-        .panel {
-            width: 50%;
-            padding: 16px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            /* 🔥 CLAVE */
-            min-width: 0;
-            /* 🔥 evita overflow interno */
-        }
-
-        .panel::-webkit-scrollbar {
-            display: none;
-        }
-
-        .panel {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .show-settings .sidebar-wrapper {
-            transform: translateX(-50%);
-        }
-
-        .sidebar-header {
-            height: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 16px;
-            border-bottom: 1px solid #1f2937;
-            cursor: pointer;
-            font-size: 14px;
-            color: #9ca3af;
-            background: #111827;
-        }
-
-        .sidebar-header:hover {
-            background: #1f2937;
-        }
-
-        .sidebar-header svg {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.2s ease;
-        }
-
-        .show-settings .sidebar-header svg {
-            transform: rotate(180deg);
-        }
-
-        .widget-option {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            width: 100%;
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid transparent;
-            transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
-        }
-
-        .widget-option:hover {
-            background: rgba(139, 92, 246, 0.06);
-            transform: translateX(4px);
-        }
-
-        .widget-option:active {
-            transform: translateX(4px) scale(0.98);
-        }
-
-        .icon-wrap {
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .widget-option:hover .icon-wrap {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
-        }
-
-        #fabMain.glow {
-            box-shadow:
-                0 0 0 1px rgba(139, 92, 246, 0.5),
-                0 0 25px rgba(139, 92, 246, 0.35),
-                0 15px 45px rgba(0, 0, 0, 0.6);
-        }
-
-        .fab-item {
-            position: relative;
-        }
-
-        .fab-item::after {
-            content: attr(data-label);
-            position: absolute;
-            right: 70px;
-            /* más separado */
-            top: 50%;
-            transform: translateY(-50%) translateX(10px);
-
-            background: #0f172a;
-            border: 1px solid #1f2937;
-            color: white;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 10px;
-
-            opacity: 0;
-            transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
-            pointer-events: none;
-            white-space: nowrap;
-
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .fab-item:hover::after {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
-
-        .icon-tooltip {
-            position: relative;
-        }
-
-        .icon-tooltip::after {
-            content: attr(data-label);
-            position: absolute;
-            bottom: -36px;
-            left: 50%;
-            transform: translateX(-50%) translateY(5px);
-
-            background: #0f172a;
-            border: 1px solid #1f2937;
-            padding: 6px 10px;
-            font-size: 11px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: all 0.2s ease;
-        }
-
-        .icon-tooltip:hover::after {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        @media (max-width: 767px) {
-
-            #mobileNav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 100px;
-
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-
-                z-index: 1200;
-            }
-
-            #fabWrapper {
-                position: fixed;
-                bottom: 50px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1300;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body class="bg-gray-950 text-white overflow-x-hidden min-h-screen flex flex-col">
-
+  <body
+    class="bg-gray-950 text-white overflow-x-hidden min-h-screen flex flex-col"
+  >
     <!-- ================= HEADER ================= -->
     <header
-        class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 md:px-6 z-50">
+      class="fixed top-0 left-0 w-full h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 md:px-6 z-50"
+    >
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <button
+          onclick="goBack()"
+          class="text-gray-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-800 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
 
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <input
+          id="projectNameInput"
+          class="bg-transparent border-b border-gray-600 focus:border-purple-500 outline-none text-lg w-24 sm:w-40 md:w-64 max-w-[35vw] text-base md:text-lg"
+          placeholder="Untitled Overlay"
+        />
+      </div>
 
-            <button onclick="goBack()"
-                class="text-gray-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-800 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
+      <div class="flex items-center gap-3">
+        <!-- HELP -->
+        <button
+          id="helpOverlayBtn"
+          data-label="How to use overlay"
+          class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm1.07-7.75l-.9.92A1.49 1.49 0 0012 12h-1v-1h1a.5.5 0 00.35-.85l-.9-.92A3 3 0 1114.07 9.25z"
+            />
+          </svg>
+        </button>
 
-            <input id="projectNameInput"
-                class="bg-transparent border-b border-gray-600  focus:border-purple-500 outline-none text-lg w-24 sm:w-40 md:w-64 max-w-[35vw] text-base md:text-lg"
-                placeholder="Untitled Overlay">
-        </div>
+        <!-- COPY -->
+        <button
+          id="copyOverlayBtn"
+          data-label="Copy overlay URL"
+          class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1z" />
+            <path
+              d="M20 5H8a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2z"
+            />
+          </svg>
+        </button>
 
-        <div class="flex items-center gap-3">
-            <!-- HELP -->
-            <button id="helpOverlayBtn" data-label="How to use overlay"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
+        <button
+          id="saveBtn"
+          class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded hidden md:inline-block"
+        >
+          Save
+        </button>
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class=" w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
-                    fill="currentColor">
-                    <path
-                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm1.07-7.75l-.9.92A1.49 1.49 0 0012 12h-1v-1h1a.5.5 0 00.35-.85l-.9-.92A3 3 0 1114.07 9.25z" />
-                </svg>
-            </button>
-
-            <!-- COPY -->
-            <button id="copyOverlayBtn" data-label="Copy overlay URL"
-                class="icon-tooltip w-9 h-9 flex items-center justify-center rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition group">
-
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition" viewBox="0 0 24 24"
-                    fill="currentColor">
-                    <path d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1z" />
-                    <path d="M20 5H8a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2z" />
-                </svg>
-            </button>
-
-
-            <button id="saveBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded hidden md:inline-block">
-                Save
-            </button>
-
-            <button id="saveIconBtn"
-                class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-700">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-
-            </button>
-        </div>
+        <button
+          id="saveIconBtn"
+          class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </button>
+      </div>
     </header>
 
     <!-- ================= MAIN ================= -->
     <div class="pt-16 flex-1 flex relative min-h-0">
-
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed md:relative
-           bottom-0 md:bottom-auto
-           left-0 md:left-auto
-           w-full md:w-72
-           h-[75vh] md:h-[calc(100vh-4rem)]
-           bg-gradient-to-b from-gray-950 to-gray-900
-           border-t md:border-t-0 md:border-r border-gray-800
-           flex flex-col
-           z-[1500]
-           transform translate-y-full md:translate-y-0
-           transition-transform duration-300">
-            <!-- HEADER -->
-            <div class="h-14 flex items-center px-4 border-b border-gray-800">
-                <h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
-                    Layers
-                </h2>
-            </div>
-
-            <!-- LAYERS LIST -->
-            <div id="layersPanel" class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2"></div>
-
-            <!-- SETTINGS OVERLAY -->
-            <div id="settingsOverlay"
-                class="absolute inset-0 z-[1600] md:rounded-none rounded-t-2xl bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0 transition-transform duration-300">
-                <!-- SETTINGS HEADER -->
-                <div class="h-14 flex items-center justify-between px-4 border-b border-gray-800">
-                    <div class="flex items-center gap-2">
-                        <button onclick="closeSettings()"
-                            class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-800 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <span id="settingsTitle" class="text-sm font-medium text-gray-200">
-                            Widget Settings
-                        </span>
-                    </div>
-
-                    <!-- DELETE BUTTON -->
-                    <button class="delete-btn absolute right-2 opacity-0 group-hover:opacity-100 transition"
-                        onclick="deleteWidget('ID_DEL_WIDGET')">
-
-                        <!-- SVG Trash -->
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4 text-red-400 hover:text-red-500 transition" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-1 14H6L5 7m5-4h4m-6 4h8" />
-                        </svg>
-
-                    </button>
-                </div>
-
-                <!-- SETTINGS CONTENT -->
-                <div id="configContent" class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-6 min-w-0">
-                </div>
-
-            </div>
-
-        </aside>
-
-        <!-- CANVAS -->
-        <main class="flex-1 relative bg-white overflow-hidden touch-none"
-            style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 20px 20px;">
-
-            <div id="canvas" class="w-full h-full relative"></div>
-
-            <!-- ===== FLOATING SPEED DIAL ===== -->
-        </main>
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1400] hidden md:hidden">
-        </div>
-    </div>
-
-    <div id="fabWrapper"
-        class="fixed z-[1300] flex flex-col items-center md:bottom-8 md:right-8 md:left-auto md:translate-x-0 left-1/2 -translate-x-1/2">
-        <!-- STACK -->
-        <div id="fabStack" class="flex flex-col items-center gap-4 mb-4 pointer-events-none">
-
-            <!-- IMAGE -->
-            <div id="fabImage"
-                class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                data-label="Image">
-                <button
-                    class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center">
-                    <!-- SVG IMAGE -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="1.8">
-                        <rect x="3" y="5" width="18" height="14" rx="2" />
-                        <circle cx="8" cy="10" r="2" />
-                        <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- TEXT -->
-            <div id="fabText"
-                class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                data-label="Text">
-                <button
-                    class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:scale-[1.04] transition-all duration-200 flex items-center justify-center shadow-lg">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h7" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- TEST -->
-            <div class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                data-label="Test">
-                <button id="fabTest"
-                    class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:scale-[1.04] transition-all duration-200 flex items-center justify-center shadow-lg">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 3h6m-3 0v5m6 13H6a2 2 0 01-2-2c0-.53.21-1.04.59-1.41l4.83-4.83V8h6v4.76l4.83 4.83c.38.37.59.88.59 1.41a2 2 0 01-2 2z" />
-                    </svg>
-                </button>
-            </div>
-
+      <!-- SIDEBAR -->
+      <aside
+        id="sidebar"
+        class="fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto w-full md:w-72 h-[75vh] md:h-[calc(100vh-4rem)] bg-gradient-to-b from-gray-950 to-gray-900 border-t md:border-t-0 md:border-r border-gray-800 flex flex-col z-[1500] transform translate-y-full md:translate-y-0 transition-transform duration-300"
+      >
+        <!-- HEADER -->
+        <div class="h-14 flex items-center px-4 border-b border-gray-800">
+          <h2
+            class="text-sm font-semibold tracking-wide text-gray-300 uppercase"
+          >
+            Layers
+          </h2>
         </div>
 
-        <!-- MAIN FAB -->
-        <button id="fabMain"
-            class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:bg-gray-800 transition-all duration-300 flex items-center justify-center">
-
-            <img src="/logo/BlotverFavicon.png" class="w-8 h-8" />
-        </button>
-    </div>
-
-    <div id="uploadModal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-
+        <!-- LAYERS LIST -->
         <div
-            class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-700w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
+          id="layersPanel"
+          class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2"
+        ></div>
 
-            <!-- Close -->
-            <button id="closeUpload" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                ✕
-            </button>
-
-            <h2 class="text-lg font-semibold text-white mb-4">
-                Upload Image
-            </h2>
-
-            <!-- Dropzone -->
-            <label id="dropzone"
-                class="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-xl p-8 cursor-pointer hover:border-violet-500 hover:bg-violet-500/10 transition-all duration-300">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-3" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M3 16.5V18a3 3 0 003 3h12a3 3 0 003-3v-1.5M12 3v12m0 0l-3-3m3 3l3-3" />
+        <!-- SETTINGS OVERLAY -->
+        <div
+          id="settingsOverlay"
+          class="absolute inset-0 z-[1600] md:rounded-none rounded-t-2xl bg-gray-950/95 backdrop-blur-sm hidden flex flex-col min-h-0 transition-transform duration-300"
+        >
+          <!-- SETTINGS HEADER -->
+          <div
+            class="h-14 flex items-center justify-between px-4 border-b border-gray-800"
+          >
+            <div class="flex items-center gap-2">
+              <button
+                onclick="closeSettings()"
+                class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-800 transition"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
-
-                <span class="text-gray-300 text-sm">
-                    Click or drag image to upload
-                </span>
-
-                <input type="file" id="imageInput" class="hidden" accept="image/*">
-            </label>
-
-            <!-- Preview -->
-            <div id="imagePreview" class="mt-4 hidden">
-                <img class="rounded-lg max-h-40 mx-auto shadow-lg" />
+              </button>
+              <span
+                id="settingsTitle"
+                class="text-sm font-medium text-gray-200"
+              >
+                Widget Settings
+              </span>
             </div>
 
-            <!-- Upload button -->
-            <button id="confirmUpload" class="w-full mt-5 bg-violet-600 hover:bg-violet-700
-               text-white py-2 rounded-lg transition disabled:opacity-40" disabled>
-                Upload
+            <!-- DELETE BUTTON -->
+            <button
+              class="delete-btn absolute right-2 opacity-0 group-hover:opacity-100 transition"
+              onclick="deleteWidget('ID_DEL_WIDGET')"
+            >
+              <!-- SVG Trash -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4 text-red-400 hover:text-red-500 transition"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-1 14H6L5 7m5-4h4m-6 4h8"
+                />
+              </svg>
             </button>
+          </div>
 
+          <!-- SETTINGS CONTENT -->
+          <div
+            id="configContent"
+            class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-6 min-w-0"
+          ></div>
         </div>
+      </aside>
+
+      <!-- CANVAS -->
+      <main
+        class="flex-1 relative bg-white overflow-hidden touch-none"
+        style="
+          background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+          background-size: 20px 20px;
+        "
+      >
+        <div id="canvas" class="w-full h-full relative"></div>
+
+        <!-- ===== FLOATING SPEED DIAL ===== -->
+      </main>
+      <div
+        id="sidebarOverlay"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1400] hidden md:hidden"
+      ></div>
     </div>
 
-    <div id="saveToast"
-        class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-700 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95">
+    <div
+      id="fabWrapper"
+      class="fixed z-[1300] flex flex-col items-center md:bottom-8 md:right-8 md:left-auto md:translate-x-0 left-1/2 -translate-x-1/2"
+    >
+      <!-- STACK -->
+      <div
+        id="fabStack"
+        class="flex flex-col items-center gap-4 mb-4 pointer-events-none"
+      >
+        <!-- IMAGE -->
+        <div
+          id="fabImage"
+          class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+          data-label="Image"
+        >
+          <button
+            class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-xl hover:bg-gray-800 transition-all duration-300 flex items-center justify-center"
+          >
+            <!-- SVG IMAGE -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <circle cx="8" cy="10" r="2" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+          </button>
+        </div>
 
-        <!-- ICON -->
-        <svg id="saveToastIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
+        <!-- TEXT -->
+        <div
+          id="fabText"
+          class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          data-label="Text"
+        >
+          <button
+            class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:scale-[1.04] transition-all duration-200 flex items-center justify-center shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 6h16M4 12h10M4 18h7"
+              />
+            </svg>
+          </button>
+        </div>
 
-        <span id="saveToastText">Saved</span>
+        <!-- TEST -->
+        <div
+          class="fab-item opacity-0 translate-y-6 scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          data-label="Test"
+        >
+          <button
+            id="fabTest"
+            class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:scale-[1.04] transition-all duration-200 flex items-center justify-center shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 3h6m-3 0v5m6 13H6a2 2 0 01-2-2c0-.53.21-1.04.59-1.41l4.83-4.83V8h6v4.76l4.83 4.83c.38.37.59.88.59 1.41a2 2 0 01-2 2z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN FAB -->
+      <button
+        id="fabMain"
+        class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:bg-gray-800 transition-all duration-300 flex items-center justify-center"
+      >
+        <img src="/logo/BlotverFavicon.png" class="w-8 h-8" />
+      </button>
     </div>
 
-    <div id="copyToast"
-        class="fixed top-20 right-6 bg-gray-900 border border-gray-700 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2">
+    <div
+      id="uploadModal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-gradient-to-br from-[#0f172a] to-[#111827] border border-gray-700w-[420px] rounded-2xl shadow-2xl p-6 relative animate-fadeIn"
+      >
+        <!-- Close -->
+        <button
+          id="closeUpload"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+        >
+          ✕
+        </button>
 
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
+        <h2 class="text-lg font-semibold text-white mb-4">Upload Image</h2>
 
-        Overlay link copied
+        <!-- Dropzone -->
+        <label
+          id="dropzone"
+          class="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-xl p-8 cursor-pointer hover:border-violet-500 hover:bg-violet-500/10 transition-all duration-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-10 h-10 text-gray-400 mb-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M3 16.5V18a3 3 0 003 3h12a3 3 0 003-3v-1.5M12 3v12m0 0l-3-3m3 3l3-3"
+            />
+          </svg>
+
+          <span class="text-gray-300 text-sm">
+            Click or drag image to upload
+          </span>
+
+          <input type="file" id="imageInput" class="hidden" accept="image/*" />
+        </label>
+
+        <!-- Preview -->
+        <div id="imagePreview" class="mt-4 hidden">
+          <img class="rounded-lg max-h-40 mx-auto shadow-lg" />
+        </div>
+
+        <!-- Upload button -->
+        <button
+          id="confirmUpload"
+          class="w-full mt-5 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-lg transition disabled:opacity-40"
+          disabled
+        >
+          Upload
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="saveToast"
+      class="fixed bottom-6 right-6 z-[3000] bg-gray-800/95 border border-gray-700 text-gray-200 px-4 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3 scale-95"
+    >
+      <!-- ICON -->
+      <svg
+        id="saveToastIcon"
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-4 h-4 text-emerald-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+
+      <span id="saveToastText">Saved</span>
+    </div>
+
+    <div
+      id="copyToast"
+      class="fixed top-20 right-6 bg-gray-900 border border-gray-700 text-xs text-gray-200 px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2 scale-95 z-[2000] flex items-center gap-2"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-4 h-4 text-emerald-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+
+      Overlay link copied
     </div>
 
     <!-- ===== MOBILE BOTTOM NAV ===== -->
 
     <!-- ===== MOBILE LAYERS SHEET ===== -->
     <div id="mobileNav" class="md:hidden">
+      <!-- SVG SHAPE -->
+      <svg
+        viewBox="0 0 1000 100"
+        preserveAspectRatio="none"
+        class="absolute bottom-0 left-0 w-full h-full"
+      >
+        <path
+          d=" M0 20 H290 C360 20, 400 55, 500 55 C600 55, 640 20, 710 20 H1000 V100 H0 Z "
+          fill="#0B1A33"
+        />
+      </svg>
 
-        <!-- SVG SHAPE -->
-        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" class="absolute bottom-0 left-0 w-full h-full">
+      <!-- CONTENIDO -->
+      <div
+        class="absolute inset-0 flex items-center justify-around text-gray-400"
+      >
+        <!-- LAYERS -->
+        <button
+          id="openLayersBtn"
+          class="flex flex-col items-center justify-center hover:text-purple-400 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 7l8-4 8 4-8 4-8-4zM4 12l8 4 8-4M4 17l8 4 8-4"
+            />
+          </svg>
+          <span class="text-[10px] mt-1">Layers</span>
+        </button>
 
-            <path d=" M0 20 H290 C360 20, 400 55, 500 55 C600 55, 640 20, 710 20 H1000 V100 H0 Z " fill="#0B1A33" />
-        </svg>
+        <!-- ESPACIO CENTRAL PARA EL FAB -->
+        <div class="w-16"></div>
 
-        <!-- CONTENIDO -->
-        <div class="absolute inset-0 flex items-center justify-around text-gray-400">
-
-            <!-- LAYERS -->
-            <button id="openLayersBtn"
-                class="flex flex-col items-center justify-center hover:text-purple-400 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M4 7l8-4 8 4-8 4-8-4zM4 12l8 4 8-4M4 17l8 4 8-4" />
-                </svg>
-                <span class="text-[10px] mt-1">Layers</span>
-            </button>
-
-            <!-- ESPACIO CENTRAL PARA EL FAB -->
-            <div class="w-16"></div>
-
-            <!-- SAVE -->
-            <button id="mobileSaveBtn"
-                class="flex flex-col items-center justify-center hover:text-purple-400 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-[10px] mt-1">Save</span>
-            </button>
-
-        </div>
-
+        <!-- SAVE -->
+        <button
+          id="mobileSaveBtn"
+          class="flex flex-col items-center justify-center hover:text-purple-400 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span class="text-[10px] mt-1">Save</span>
+        </button>
+      </div>
     </div>
 
     <script src="/widgets/registry.js"></script>
@@ -606,483 +774,462 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        const projectId = window.location.pathname.split("/").pop();
+      const projectId = window.location.pathname.split("/").pop();
 
-        const overlayURL =
-            window.location.origin + "/overlay/" + projectId;
+      const overlayURL = window.location.origin + "/overlay/" + projectId;
 
-        const socket = io();
-        socket.emit("joinProject", projectId);
+      const socket = io();
+      socket.emit("joinProject", projectId);
 
-        socket.on("newClip", (data) => {
+      socket.on("newClip", (data) => {
+        const widget = widgets.find((w) => w.type === "shoutout");
+        if (!widget) return;
 
-            const widget = widgets.find(w => w.type === "shoutout");
-            if (!widget) return;
+        const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
+        if (!el) return;
 
-            const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
-            if (!el) return;
+        // Limpiar
+        const clipArea = el.querySelector(".clip-area");
+        if (!clipArea) return;
 
-            // Limpiar
-            const clipArea = el.querySelector(".clip-area");
-            if (!clipArea) return;
+        clipArea.innerHTML = "";
 
-            clipArea.innerHTML = "";
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
 
-            const iframe = document.createElement("iframe");
-            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
-            iframe.style.width = "100%";
-            iframe.style.height = "100%";
-            iframe.style.border = "none";
+        clipArea.appendChild(iframe);
 
-            clipArea.appendChild(iframe);
+        // Volver al marco después de duración
+        setTimeout(() => {
+          loadWidgets();
+        }, widget.data.duration || 10000);
+      });
 
-            // Volver al marco después de duración
-            setTimeout(() => {
-                loadWidgets();
-            }, widget.data.duration || 10000);
+      socket.on("connect", () => {
+        console.log("Editor conectado a socket:", socket.id);
+      });
 
+      document
+        .getElementById("copyOverlayBtn")
+        .addEventListener("click", async () => {
+          await navigator.clipboard.writeText(overlayURL);
+
+          const toast = document.getElementById("copyToast");
+
+          toast.classList.remove("opacity-0", "translate-y-2", "scale-95");
+          toast.classList.add("opacity-100", "translate-y-0", "scale-100");
+
+          setTimeout(() => {
+            toast.classList.remove("opacity-100", "translate-y-0", "scale-100");
+            toast.classList.add("opacity-0", "translate-y-2", "scale-95");
+          }, 2000);
         });
 
-        socket.on("connect", () => {
-            console.log("Editor conectado a socket:", socket.id);
-        });
+      function goBack() {
+        if (hasUnsavedChanges) {
+          const confirmExit = confirm(
+            "¿Estás seguro que quieres salir sin guardar el progreso?",
+          );
 
-        document.getElementById("copyOverlayBtn")
-            .addEventListener("click", async () => {
-
-                await navigator.clipboard.writeText(overlayURL);
-
-                const toast = document.getElementById("copyToast");
-
-                toast.classList.remove("opacity-0", "translate-y-2", "scale-95");
-                toast.classList.add("opacity-100", "translate-y-0", "scale-100");
-
-                setTimeout(() => {
-                    toast.classList.remove("opacity-100", "translate-y-0", "scale-100");
-                    toast.classList.add("opacity-0", "translate-y-2", "scale-95");
-                }, 2000);
-            });
-
-        function goBack() {
-
-            if (hasUnsavedChanges) {
-                const confirmExit = confirm(
-                    "¿Estás seguro que quieres salir sin guardar el progreso?"
-                );
-
-                if (!confirmExit) return;
-            }
-
-            window.location.href = "/dashboard/project";
+          if (!confirmExit) return;
         }
 
-        let widgets = [];
-        let selectedWidget = null;
-        let selectedElement = null;
-        let currentProject = null;
-        let pendingImageFile = null;
-        let hasUnsavedChanges = false;
+        window.location.href = "/dashboard/project";
+      }
 
-        window.addEventListener("beforeunload", function (e) {
+      let widgets = [];
+      let selectedWidget = null;
+      let selectedElement = null;
+      let currentProject = null;
+      let pendingImageFile = null;
+      let hasUnsavedChanges = false;
 
-            if (!hasUnsavedChanges) return;
+      window.addEventListener("beforeunload", function (e) {
+        if (!hasUnsavedChanges) return;
 
-            e.preventDefault();
-            e.returnValue = "";
-        });
+        e.preventDefault();
+        e.returnValue = "";
+      });
 
-        function openImageModal() {
-            document.getElementById("uploadModal").classList.remove("hidden");
+      function openImageModal() {
+        document.getElementById("uploadModal").classList.remove("hidden");
+      }
+
+      function closeImageModal() {
+        const modal = document.getElementById("uploadModal");
+
+        // 🔥 Ocultar modal
+        modal.classList.add("hidden");
+
+        // 🔄 Resetear estado
+        pendingImageFile = null;
+
+        const previewContainer = document.getElementById("imagePreview");
+        const previewImg = previewContainer.querySelector("img");
+
+        previewImg.src = "";
+        previewContainer.classList.add("hidden");
+
+        const uploadBtn = document.getElementById("confirmUpload");
+        uploadBtn.disabled = true;
+
+        const fileInput = document.getElementById("imageInput");
+        fileInput.value = "";
+      }
+
+      // cerrar con botón X
+      document
+        .getElementById("closeUpload")
+        .addEventListener("click", closeImageModal);
+
+      document.getElementById("uploadModal").addEventListener("click", (e) => {
+        if (e.target.id === "uploadModal") {
+          closeImageModal();
         }
+      });
 
-        function closeImageModal() {
+      // subir imagen
+      document.getElementById("imageInput").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-            const modal = document.getElementById("uploadModal");
+        pendingImageFile = file;
 
-            // 🔥 Ocultar modal
-            modal.classList.add("hidden");
+        // Mostrar preview
+        const previewContainer = document.getElementById("imagePreview");
+        const previewImg = previewContainer.querySelector("img");
 
-            // 🔄 Resetear estado
+        previewImg.src = URL.createObjectURL(file);
+        previewContainer.classList.remove("hidden");
+
+        // Activar botón Upload
+        document.getElementById("confirmUpload").disabled = false;
+      });
+
+      document
+        .getElementById("confirmUpload")
+        .addEventListener("click", async () => {
+          if (!pendingImageFile || !selectedWidget) return;
+
+          const formData = new FormData();
+          formData.append("image", pendingImageFile);
+
+          const res = await fetch("/api/upload-image", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (data.url) {
+            const img = new Image();
+
+            img.onload = async function () {
+              const canvas = document.getElementById("canvas");
+
+              const canvasWidth = canvas.clientWidth;
+              const canvasHeight = canvas.clientHeight;
+
+              const maxWidth = canvasWidth * 0.4;
+              const maxHeight = canvasHeight * 0.4;
+
+              let newWidth = img.width;
+              let newHeight = img.height;
+
+              const ratio = Math.min(
+                maxWidth / newWidth,
+                maxHeight / newHeight,
+                1,
+              );
+
+              newWidth = newWidth * ratio;
+              newHeight = newHeight * ratio;
+
+              const centerX = (canvasWidth - newWidth) / 2;
+              const centerY = (canvasHeight - newHeight) / 2;
+
+              updateSelectedWidget({
+                url: data.url,
+                width: Math.round(newWidth),
+                height: Math.round(newHeight),
+                x: Math.round(centerX),
+                y: Math.round(centerY),
+              });
+
+              closeImageModal();
+            };
+
+            img.src = data.url;
+
+            // Reset modal
             pendingImageFile = null;
+            document.getElementById("confirmUpload").disabled = true;
+            document.getElementById("imagePreview").classList.add("hidden");
+          }
+        });
 
-            const previewContainer = document.getElementById("imagePreview");
-            const previewImg = previewContainer.querySelector("img");
+      /* ================= LOAD ================= */
 
-            previewImg.src = "";
-            previewContainer.classList.add("hidden");
+      async function loadWidgets() {
+        const projectRes = await fetch("/api/projects");
+        const allProjects = await projectRes.json();
+        currentProject = allProjects.find((p) => p._id === projectId);
+        if (currentProject) {
+          document.getElementById("projectNameInput").value =
+            currentProject.name || currentProject.title || "";
+        }
+        const res = await fetch(`/api/widgets/${projectId}`);
+        widgets = await res.json();
 
-            const uploadBtn = document.getElementById("confirmUpload");
-            uploadBtn.disabled = true;
+        // 🚀 Si es proyecto shoutout y no tiene widgets → crear uno automático
+        if (currentProject?.type && widgets.length === 0) {
+          const widgetType = currentProject.type;
+          const widgetDef = window.WidgetRegistry[widgetType];
 
-            const fileInput = document.getElementById("imageInput");
-            fileInput.value = "";
+          if (widgetDef?.defaultData) {
+            await fetch("/api/widgets", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                projectId,
+                type: widgetType,
+                name: widgetType,
+                data: widgetDef.defaultData,
+              }),
+            });
+
+            const newRes = await fetch(`/api/widgets/${projectId}`);
+            widgets = await newRes.json();
+          }
         }
 
-        // cerrar con botón X
-        document.getElementById("closeUpload")
-            .addEventListener("click", closeImageModal);
+        const canvas = document.getElementById("canvas");
+        const layersPanel = document.getElementById("layersPanel");
 
-        document.getElementById("uploadModal")
-            .addEventListener("click", (e) => {
+        canvas.innerHTML = "";
+        layersPanel.innerHTML = "";
 
-                if (e.target.id === "uploadModal") {
-                    closeImageModal();
-                }
+        widgets = widgets.map((w) => ({
+          ...w,
+          data: w.data || {},
+        }));
 
+        widgets.sort((a, b) => (a.data?.zIndex ?? 0) - (b.data?.zIndex ?? 0));
+        const reversedWidgets = [...widgets].reverse();
+
+        widgets.forEach((widget) => {
+          const el = document.createElement("div");
+          el.dataset.widgetId = widget._id;
+
+          if (widget.type === "text") {
+            el.innerText = widget.data.text || "Sample Text";
+          }
+
+          const widgetDef = window.WidgetRegistry[widget.type];
+
+          if (widgetDef && widgetDef.renderCanvas) {
+            const rendered = widgetDef.renderCanvas(widget);
+            el.appendChild(rendered);
+          }
+
+          el.className = "absolute cursor-move select-none";
+          el.style.left = (widget.data.x || 100) + "px";
+          el.style.top = (widget.data.y || 100) + "px";
+          el.style.color = widget.data.color ?? "#000";
+          el.style.fontSize = (widget.data.fontSize || 32) + "px";
+          el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
+          el.classList.add("draggable-resizable");
+
+          if (widget.data.width) {
+            el.style.width = widget.data.width + "px";
+          }
+
+          if (widget.data.height) {
+            el.style.height = widget.data.height + "px";
+          }
+
+          if (widget.data.visible === false) {
+            el.style.display = "none";
+          }
+
+          el.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectWidget(widget, el);
+          });
+
+          widget.el = el;
+
+          canvas.appendChild(el);
+
+          interact(el)
+            .draggable({
+              listeners: {
+                move(event) {
+                  const target = event.target;
+
+                  const left = parseFloat(target.style.left) || 0;
+                  const top = parseFloat(target.style.top) || 0;
+
+                  target.style.left = left + event.dx + "px";
+                  target.style.top = top + event.dy + "px";
+                },
+                end(event) {
+                  const target = event.target;
+                  const widgetId = target.dataset.widgetId;
+
+                  const widget = widgets.find((w) => w._id === widgetId);
+                  if (!widget) return;
+
+                  const left = parseFloat(target.style.left) || 0;
+                  const top = parseFloat(target.style.top) || 0;
+
+                  widget.data.x = left;
+                  widget.data.y = top;
+
+                  if (selectedWidget && selectedWidget._id === widgetId) {
+                    selectedWidget.data.x = left;
+                    selectedWidget.data.y = top;
+                  }
+
+                  markAsChanged();
+                },
+              },
+            })
+
+            .resizable({
+              edges: {
+                top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
+                bottom:
+                  ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
+                left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
+                right:
+                  ".resize-handle.right, .resize-handle.tr, .resize-handle.br",
+              },
+              listeners: {
+                move(event) {
+                  const target = event.target;
+                  const widgetId = target.dataset.widgetId;
+                  const widget = widgets.find((w) => w._id === widgetId);
+                  if (!widget) return;
+
+                  let left = parseFloat(target.style.left) || 0;
+                  let top = parseFloat(target.style.top) || 0;
+
+                  const oldWidth = parseFloat(target.style.width) || 0;
+                  const oldHeight = parseFloat(target.style.height) || 0;
+
+                  let width = event.rect.width;
+                  let height = event.rect.height;
+
+                  const resizingFromLeft = event.edges.left;
+                  const resizingFromTop = event.edges.top;
+
+                  // ===== 🔒 LOCK RATIO =====
+                  const lock = widget.data.lockRatio;
+                  const ratio = widget.data.aspectRatio;
+
+                  if (lock && ratio) {
+                    if (event.edges.left || event.edges.right) {
+                      height = width / ratio;
+                    } else if (event.edges.top || event.edges.bottom) {
+                      width = height * ratio;
+                    }
+                  }
+
+                  // ===== Ajuste posición correcto =====
+                  if (resizingFromLeft) {
+                    left += oldWidth - width;
+                  }
+
+                  if (resizingFromTop) {
+                    top += oldHeight - height;
+                  }
+
+                  target.style.left = left + "px";
+                  target.style.top = top + "px";
+                  target.style.width = width + "px";
+                  target.style.height = height + "px";
+                },
+
+                end(event) {
+                  const target = event.target;
+                  const widgetId = target.dataset.widgetId;
+
+                  const widget = widgets.find((w) => w._id === widgetId);
+                  if (!widget) return;
+
+                  const left = parseFloat(target.style.left) || 0;
+                  const top = parseFloat(target.style.top) || 0;
+                  const width = parseFloat(target.style.width);
+                  const height = parseFloat(target.style.height);
+
+                  widget.data = {
+                    ...widget.data,
+                    x: left,
+                    y: top,
+                    width,
+                    height,
+                  };
+
+                  if (selectedWidget && selectedWidget._id === widgetId) {
+                    selectedWidget.data = widget.data;
+                  }
+
+                  markAsChanged();
+                },
+              },
             });
 
-        // subir imagen
-        document.getElementById("imageInput")
-            .addEventListener("change", (e) => {
+          if (widgets.length === 1) {
+            selectWidget(widget, el);
+          }
 
-                const file = e.target.files[0];
-                if (!file) return;
+          const layerItem = document.createElement("div");
 
-                pendingImageFile = file;
+          layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/70 border border-transparent hover:border-gray-700 cursor-pointer text-sm transition-all `;
 
-                // Mostrar preview
-                const previewContainer = document.getElementById("imagePreview");
-                const previewImg = previewContainer.querySelector("img");
+          layerItem.dataset.id = widget._id;
 
-                previewImg.src = URL.createObjectURL(file);
-                previewContainer.classList.remove("hidden");
+          layerItem.draggable = true;
 
-                // Activar botón Upload
-                document.getElementById("confirmUpload").disabled = false;
-            });
+          layerItem.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("id", widget._id);
+          });
 
-        document.getElementById("confirmUpload")
-            .addEventListener("click", async () => {
+          layerItem.addEventListener("dragover", (e) => {
+            e.preventDefault();
+          });
 
-                if (!pendingImageFile || !selectedWidget) return;
+          layerItem.addEventListener("drop", async (e) => {
+            e.preventDefault();
 
-                const formData = new FormData();
-                formData.append("image", pendingImageFile);
+            const draggedId = e.dataTransfer.getData("id");
+            const targetId = widget._id;
 
-                const res = await fetch("/api/upload-image", {
-                    method: "POST",
-                    body: formData
-                });
+            if (draggedId === targetId) return;
 
-                const data = await res.json();
+            const fromIndex = widgets.findIndex((w) => w._id === draggedId);
+            const toIndex = widgets.findIndex((w) => w._id === targetId);
 
-                if (data.url) {
+            const moved = widgets.splice(fromIndex, 1)[0];
+            widgets.splice(toIndex, 0, moved);
 
-                    const img = new Image();
+            await updateLayerOrder();
 
-                    img.onload = async function () {
+            loadWidgets();
+          });
 
-                        const canvas = document.getElementById("canvas");
-
-                        const canvasWidth = canvas.clientWidth;
-                        const canvasHeight = canvas.clientHeight;
-
-                        const maxWidth = canvasWidth * 0.4;
-                        const maxHeight = canvasHeight * 0.4;
-
-                        let newWidth = img.width;
-                        let newHeight = img.height;
-
-                        const ratio = Math.min(
-                            maxWidth / newWidth,
-                            maxHeight / newHeight,
-                            1
-                        );
-
-                        newWidth = newWidth * ratio;
-                        newHeight = newHeight * ratio;
-
-                        const centerX = (canvasWidth - newWidth) / 2;
-                        const centerY = (canvasHeight - newHeight) / 2;
-
-                        updateSelectedWidget({
-                            url: data.url,
-                            width: Math.round(newWidth),
-                            height: Math.round(newHeight),
-                            x: Math.round(centerX),
-                            y: Math.round(centerY)
-                        });
-
-                        closeImageModal();
-                    };
-
-                    img.src = data.url;
-
-                    // Reset modal
-                    pendingImageFile = null;
-                    document.getElementById("confirmUpload").disabled = true;
-                    document.getElementById("imagePreview").classList.add("hidden");
-                }
-            });
-
-        /* ================= LOAD ================= */
-
-        async function loadWidgets() {
-            const projectRes = await fetch("/api/projects");
-            const allProjects = await projectRes.json();
-            currentProject = allProjects.find(p => p._id === projectId);
-            if (currentProject) {
-                document.getElementById("projectNameInput").value =
-                    currentProject.name || currentProject.title || "";
-            }
-            const res = await fetch(`/api/widgets/${projectId}`);
-            widgets = await res.json();
-
-            // 🚀 Si es proyecto shoutout y no tiene widgets → crear uno automático
-            if (currentProject?.type && widgets.length === 0) {
-
-                const widgetType = currentProject.type;
-                const widgetDef = window.WidgetRegistry[widgetType];
-
-                if (widgetDef?.defaultData) {
-
-                    await fetch("/api/widgets", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            projectId,
-                            type: widgetType,
-                            name: widgetType,
-                            data: widgetDef.defaultData
-                        })
-                    });
-
-                    const newRes = await fetch(`/api/widgets/${projectId}`);
-                    widgets = await newRes.json();
-                }
-            }
-
-            const canvas = document.getElementById("canvas");
-            const layersPanel = document.getElementById("layersPanel");
-
-            canvas.innerHTML = "";
-            layersPanel.innerHTML = "";
-
-            widgets = widgets.map(w => ({
-                ...w,
-                data: w.data || {}
-            }));
-
-            widgets.sort((a, b) =>
-                (a.data?.zIndex ?? 0) - (b.data?.zIndex ?? 0)
-            );
-            const reversedWidgets = [...widgets].reverse();
-
-            widgets.forEach(widget => {
-
-                const el = document.createElement("div");
-                el.dataset.widgetId = widget._id;
-
-                if (widget.type === "text") {
-                    el.innerText = widget.data.text || "Sample Text";
-                }
-
-                const widgetDef = window.WidgetRegistry[widget.type];
-
-                if (widgetDef && widgetDef.renderCanvas) {
-                    const rendered = widgetDef.renderCanvas(widget);
-                    el.appendChild(rendered);
-                }
-
-                el.className = "absolute cursor-move select-none";
-                el.style.left = (widget.data.x || 100) + "px";
-                el.style.top = (widget.data.y || 100) + "px";
-                el.style.color = widget.data.color ?? "#000";
-                el.style.fontSize = (widget.data.fontSize || 32) + "px";
-                el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
-                el.classList.add("draggable-resizable");
-
-                if (widget.data.width) {
-                    el.style.width = widget.data.width + "px";
-                }
-
-                if (widget.data.height) {
-                    el.style.height = widget.data.height + "px";
-                }
-
-                if (widget.data.visible === false) {
-                    el.style.display = "none";
-                }
-
-                el.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    selectWidget(widget, el);
-                });
-
-                widget.el = el;
-
-                canvas.appendChild(el);
-
-                interact(el)
-                    .draggable({
-                        listeners: {
-                            move(event) {
-
-                                const target = event.target;
-
-                                const left = parseFloat(target.style.left) || 0;
-                                const top = parseFloat(target.style.top) || 0;
-
-                                target.style.left = left + event.dx + "px";
-                                target.style.top = top + event.dy + "px";
-                            },
-                            end(event) {
-
-                                const target = event.target;
-                                const widgetId = target.dataset.widgetId;
-
-                                const widget = widgets.find(w => w._id === widgetId);
-                                if (!widget) return;
-
-                                const left = parseFloat(target.style.left) || 0;
-                                const top = parseFloat(target.style.top) || 0;
-
-                                widget.data.x = left;
-                                widget.data.y = top;
-
-                                if (selectedWidget && selectedWidget._id === widgetId) {
-                                    selectedWidget.data.x = left;
-                                    selectedWidget.data.y = top;
-                                }
-
-                                markAsChanged();
-                            }
-                        }
-                    })
-
-                    .resizable({
-                        edges: {
-                            top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
-                            bottom: ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
-                            left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
-                            right: ".resize-handle.right, .resize-handle.tr, .resize-handle.br"
-                        },
-                        listeners: {
-
-                            move(event) {
-
-                                const target = event.target;
-                                const widgetId = target.dataset.widgetId;
-                                const widget = widgets.find(w => w._id === widgetId);
-                                if (!widget) return;
-
-                                let left = parseFloat(target.style.left) || 0;
-                                let top = parseFloat(target.style.top) || 0;
-
-                                const oldWidth = parseFloat(target.style.width) || 0;
-                                const oldHeight = parseFloat(target.style.height) || 0;
-
-                                let width = event.rect.width;
-                                let height = event.rect.height;
-
-                                const resizingFromLeft = event.edges.left;
-                                const resizingFromTop = event.edges.top;
-
-                                // ===== 🔒 LOCK RATIO =====
-                                const lock = widget.data.lockRatio;
-                                const ratio = widget.data.aspectRatio;
-
-                                if (lock && ratio) {
-
-                                    if (event.edges.left || event.edges.right) {
-                                        height = width / ratio;
-                                    }
-                                    else if (event.edges.top || event.edges.bottom) {
-                                        width = height * ratio;
-                                    }
-                                }
-
-                                // ===== Ajuste posición correcto =====
-                                if (resizingFromLeft) {
-                                    left += oldWidth - width;
-                                }
-
-                                if (resizingFromTop) {
-                                    top += oldHeight - height;
-                                }
-
-                                target.style.left = left + "px";
-                                target.style.top = top + "px";
-                                target.style.width = width + "px";
-                                target.style.height = height + "px";
-                            },
-
-                            end(event) {
-
-                                const target = event.target;
-                                const widgetId = target.dataset.widgetId;
-
-                                const widget = widgets.find(w => w._id === widgetId);
-                                if (!widget) return;
-
-                                const left = parseFloat(target.style.left) || 0;
-                                const top = parseFloat(target.style.top) || 0;
-                                const width = parseFloat(target.style.width);
-                                const height = parseFloat(target.style.height);
-
-                                widget.data = {
-                                    ...widget.data,
-                                    x: left,
-                                    y: top,
-                                    width,
-                                    height
-                                };
-
-                                if (selectedWidget && selectedWidget._id === widgetId) {
-                                    selectedWidget.data = widget.data;
-                                }
-
-                                markAsChanged();
-                            }
-                        }
-                    })
-
-                if (widgets.length === 1) {
-                    selectWidget(widget, el);
-                }
-
-                const layerItem = document.createElement("div");
-
-                layerItem.className = ` flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/70 border border-transparent hover:border-gray-700 cursor-pointer text-sm transition-all `;
-
-                layerItem.dataset.id = widget._id;
-
-                layerItem.draggable = true;
-
-                layerItem.addEventListener("dragstart", (e) => {
-                    e.dataTransfer.setData("id", widget._id);
-                });
-
-                layerItem.addEventListener("dragover", (e) => {
-                    e.preventDefault();
-                });
-
-                layerItem.addEventListener("drop", async (e) => {
-                    e.preventDefault();
-
-                    const draggedId = e.dataTransfer.getData("id");
-                    const targetId = widget._id;
-
-                    if (draggedId === targetId) return;
-
-                    const fromIndex = widgets.findIndex(w => w._id === draggedId);
-                    const toIndex = widgets.findIndex(w => w._id === targetId);
-
-                    const moved = widgets.splice(fromIndex, 1)[0];
-                    widgets.splice(toIndex, 0, moved);
-
-                    await updateLayerOrder();
-
-                    loadWidgets();
-                });
-
-                layerItem.innerHTML = `
+          layerItem.innerHTML = `
 <div class="flex items-center gap-2 truncate">
     
     <button 
         class="visibility-btn w-7 h-7 flex items-center justify-center rounded-md bg-gray-800/60 hover:bg-gray-700/80 border border-transparent hover:border-gray-600 transition group">
-        ${widget.data.visible === false
-                        ? `
+        ${
+          widget.data.visible === false
+            ? `
             <!-- Eye Off -->
             <svg xmlns="http://www.w3.org/2000/svg"
                 class="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition"
@@ -1091,7 +1238,7 @@
                     d="M3 3l18 18M10.73 5.08A10.94 10.94 0 0112 5c5 0 9 7 9 7a16.88 16.88 0 01-2.68 3.64M6.53 6.53A16.88 16.88 0 003 12s4 7 9 7a10.94 10.94 0 005.27-1.42"/>
             </svg>
             `
-                        : `
+            : `
             <!-- Eye -->
             <svg xmlns="http://www.w3.org/2000/svg"
                 class="w-4 h-4 text-gray-400 group-hover:text-white transition"
@@ -1101,7 +1248,7 @@
                 <circle cx="12" cy="12" r="3"/>
             </svg>
             `
-                    }
+        }
     </button>
 
     <input 
@@ -1124,156 +1271,155 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 </button>
 `;
 
-                layerItem.querySelector(".visibility-btn")
-                    .addEventListener("click", async (e) => {
-                        e.stopPropagation();
+          layerItem
+            .querySelector(".visibility-btn")
+            .addEventListener("click", async (e) => {
+              e.stopPropagation();
 
-                        const newVisibility = widget.data.visible === false ? true : false;
+              const newVisibility =
+                widget.data.visible === false ? true : false;
 
-                        await fetch(`/api/widgets/${widget._id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                data: {
-                                    ...widget.data,
-                                    visible: newVisibility
-                                }
-                            })
-                        });
+              await fetch(`/api/widgets/${widget._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  data: {
+                    ...widget.data,
+                    visible: newVisibility,
+                  },
+                }),
+              });
 
-                        loadWidgets();
-                    });
-
-                layerItem.addEventListener("click", (e) => {
-                    if (
-                        e.target.closest(".visibility-btn") ||
-                        e.target.closest(".delete-btn") ||
-                        e.target.tagName === "INPUT"
-                    ) return;
-
-                    selectWidget(widget, el);
-                });
-
-                layerItem.querySelector(".delete-btn").addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    selectedWidget = widget;
-                    deleteSelectedWidget();
-                });
-
-                layersPanel.appendChild(layerItem);
-
-                layerItem.querySelector("input")
-                    .addEventListener("input", (e) => {
-
-                        e.stopPropagation();
-
-                        widget.name = e.target.value;
-
-                        if (selectedWidget && selectedWidget._id === widget._id) {
-                            document.getElementById("settingsTitle").innerText =
-                                widget.name || widget.type;
-                        }
-
-                        markAsChanged();
-                    });
-
+              loadWidgets();
             });
 
-            resetChanges();
+          layerItem.addEventListener("click", (e) => {
+            if (
+              e.target.closest(".visibility-btn") ||
+              e.target.closest(".delete-btn") ||
+              e.target.tagName === "INPUT"
+            )
+              return;
 
-        }
+            selectWidget(widget, el);
+          });
 
+          layerItem
+            .querySelector(".delete-btn")
+            .addEventListener("click", (e) => {
+              e.stopPropagation();
+              selectedWidget = widget;
+              deleteSelectedWidget();
+            });
 
-        document.getElementById("saveBtn").addEventListener("click", saveConfig);
+          layersPanel.appendChild(layerItem);
 
-        async function saveConfig() {
-            if (!currentProject) return;
+          layerItem.querySelector("input").addEventListener("input", (e) => {
+            e.stopPropagation();
 
-            const projectTitle =
-                document.getElementById("projectNameInput").value;
+            widget.name = e.target.value;
 
-            showSaveToast("Saving", "loading");
-
-            try {
-
-                await fetch(`/api/projects/${currentProject._id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name: projectTitle })
-                });
-
-                for (let widget of widgets) {
-
-                    await fetch(`/api/widgets/${widget._id}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            name: widget.name,
-                            data: widget.data   // 🔥 IMPORTANTE
-                        })
-                    });
-                }
-
-                showSaveToast("Saved", "success");
-                resetChanges();
-                loadWidgets();
-
-            } catch (error) {
-                console.error(error);
-                showSaveToast("Error saving", "error");
+            if (selectedWidget && selectedWidget._id === widget._id) {
+              document.getElementById("settingsTitle").innerText =
+                widget.name || widget.type;
             }
 
-        }
+            markAsChanged();
+          });
+        });
 
-        function markAsChanged() {
-            if (hasUnsavedChanges) return;
+        resetChanges();
+      }
 
-            hasUnsavedChanges = true;
+      document.getElementById("saveBtn").addEventListener("click", saveConfig);
 
-            ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach(id => {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                btn.disabled = false;
-                btn.classList.remove("opacity-50", "cursor-not-allowed");
+      async function saveConfig() {
+        if (!currentProject) return;
+
+        const projectTitle = document.getElementById("projectNameInput").value;
+
+        showSaveToast("Saving", "loading");
+
+        try {
+          await fetch(`/api/projects/${currentProject._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: projectTitle }),
+          });
+
+          for (let widget of widgets) {
+            await fetch(`/api/widgets/${widget._id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: widget.name,
+                data: widget.data, // 🔥 IMPORTANTE
+              }),
             });
+          }
+
+          showSaveToast("Saved", "success");
+          resetChanges();
+          loadWidgets();
+        } catch (error) {
+          console.error(error);
+          showSaveToast("Error saving", "error");
         }
+      }
 
-        function resetChanges() {
-            hasUnsavedChanges = false;
+      function markAsChanged() {
+        if (hasUnsavedChanges) return;
 
-            ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach(id => {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                btn.disabled = true;
-                btn.classList.add("opacity-50", "cursor-not-allowed");
-            });
-        }
+        hasUnsavedChanges = true;
 
-        document.getElementById("projectNameInput")
-            .addEventListener("input", markAsChanged);
+        ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach((id) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.disabled = false;
+          btn.classList.remove("opacity-50", "cursor-not-allowed");
+        });
+      }
 
-        /* ================= SELECT ================= */
-        function showSaveToast(message, type = "success") {
+      function resetChanges() {
+        hasUnsavedChanges = false;
 
-            const toast = document.getElementById("saveToast");
-            const text = document.getElementById("saveToastText");
-            const icon = document.getElementById("saveToastIcon");
+        ["saveBtn", "mobileSaveBtn", "saveIconBtn"].forEach((id) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.disabled = true;
+          btn.classList.add("opacity-50", "cursor-not-allowed");
+        });
+      }
 
-            text.innerText = message;
+      document
+        .getElementById("projectNameInput")
+        .addEventListener("input", markAsChanged);
 
-            // Reset icon color
-            icon.classList.remove("text-emerald-400", "text-red-400", "text-gray-400");
+      /* ================= SELECT ================= */
+      function showSaveToast(message, type = "success") {
+        const toast = document.getElementById("saveToast");
+        const text = document.getElementById("saveToastText");
+        const icon = document.getElementById("saveToastIcon");
 
-            if (type === "success") {
-                icon.innerHTML = `
+        text.innerText = message;
+
+        // Reset icon color
+        icon.classList.remove(
+          "text-emerald-400",
+          "text-red-400",
+          "text-gray-400",
+        );
+
+        if (type === "success") {
+          icon.innerHTML = `
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M5 13l4 4L19 7" />
         `;
-                icon.classList.add("text-emerald-400");
-            }
+          icon.classList.add("text-emerald-400");
+        }
 
-            if (type === "loading") {
-                icon.innerHTML = `
+        if (type === "loading") {
+          icon.innerHTML = `
             <circle cx="12" cy="12" r="10" stroke="currentColor"
                 stroke-width="2" fill="none" stroke-dasharray="60"
                 stroke-dashoffset="20">
@@ -1285,381 +1431,383 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     repeatCount="indefinite"/>
             </circle>
         `;
-                icon.classList.add("text-gray-400");
-            }
+          icon.classList.add("text-gray-400");
+        }
 
-            if (type === "error") {
-                icon.innerHTML = `
+        if (type === "error") {
+          icon.innerHTML = `
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M6 18L18 6M6 6l12 12" />
         `;
-                icon.classList.add("text-red-400");
-            }
-
-            toast.classList.remove("opacity-0", "translate-y-3", "scale-95");
-            toast.classList.add("opacity-100", "translate-y-0", "scale-100");
-
-            if (type !== "loading") {
-                setTimeout(() => {
-                    toast.classList.remove("opacity-100", "translate-y-0", "scale-100");
-                    toast.classList.add("opacity-0", "translate-y-3", "scale-95");
-                }, 2200);
-            }
+          icon.classList.add("text-red-400");
         }
 
-        function selectWidget(widget, element) {
+        toast.classList.remove("opacity-0", "translate-y-3", "scale-95");
+        toast.classList.add("opacity-100", "translate-y-0", "scale-100");
 
-            if (selectedElement) {
-                selectedElement.style.border = "none";
-                selectedElement.querySelectorAll(".resize-handle")
-                    .forEach(h => h.remove());
-            }
+        if (type !== "loading") {
+          setTimeout(() => {
+            toast.classList.remove("opacity-100", "translate-y-0", "scale-100");
+            toast.classList.add("opacity-0", "translate-y-3", "scale-95");
+          }, 2200);
+        }
+      }
 
-            selectedWidget = widget;
-            selectedElement = element;
-
-            element.style.border = "2px solid #3b82f6";
-            element.style.boxSizing = "border-box";
-
-            openConfig(widget);
-            addResizeHandles(element);
-
+      function selectWidget(widget, element) {
+        if (selectedElement) {
+          selectedElement.style.border = "none";
+          selectedElement
+            .querySelectorAll(".resize-handle")
+            .forEach((h) => h.remove());
         }
 
-        function addResizeHandles(el) {
+        selectedWidget = widget;
+        selectedElement = element;
 
-            el.querySelectorAll(".resize-handle").forEach(h => h.remove());
+        element.style.border = "2px solid #3b82f6";
+        element.style.boxSizing = "border-box";
 
-            const positions = [
-                "top", "bottom", "left", "right",
-                "tl", "tr", "bl", "br"
-            ];
+        openConfig(widget);
+        addResizeHandles(element);
+      }
 
-            positions.forEach(pos => {
-                const handle = document.createElement("div");
-                handle.className = "resize-handle " + pos;
-                el.appendChild(handle);
-            });
+      function addResizeHandles(el) {
+        el.querySelectorAll(".resize-handle").forEach((h) => h.remove());
+
+        const positions = [
+          "top",
+          "bottom",
+          "left",
+          "right",
+          "tl",
+          "tr",
+          "bl",
+          "br",
+        ];
+
+        positions.forEach((pos) => {
+          const handle = document.createElement("div");
+          handle.className = "resize-handle " + pos;
+          el.appendChild(handle);
+        });
+      }
+
+      function showLayers() {
+        if (selectedElement) {
+          selectedElement.style.border = "none";
+          selectedElement
+            .querySelectorAll(".resize-handle")
+            .forEach((h) => h.remove());
         }
 
-        function showLayers() {
+        selectedWidget = null;
+        selectedElement = null;
+      }
 
-            if (selectedElement) {
-                selectedElement.style.border = "none";
-                selectedElement.querySelectorAll(".resize-handle")
-                    .forEach(h => h.remove());
-            }
+      function openConfig(widget) {
+        selectedWidget = widget;
 
-            selectedWidget = null;
-            selectedElement = null;
+        document.getElementById("settingsOverlay").classList.remove("hidden");
+        document.getElementById("settingsTitle").innerText =
+          widget.name || widget.type;
+
+        updateActiveLayer(widget._id);
+
+        const content = document.getElementById("configContent");
+        content.innerHTML = ""; // 🔥 LIMPIAR ANTES
+
+        const widgetDef = window.WidgetRegistry[widget.type];
+
+        if (widgetDef && widgetDef.renderConfig) {
+          widgetDef.renderConfig(widget, content, updateSelectedWidget);
         }
 
-        function openConfig(widget) {
+        if (window.innerWidth < 768) {
+          const sidebar = document.getElementById("sidebar");
 
-            selectedWidget = widget;
+          sidebar.classList.remove("translate-y-full");
+          document.getElementById("sidebarOverlay").classList.remove("hidden");
+          document.body.classList.add("overflow-hidden");
+        }
+      }
 
-            document.getElementById("settingsOverlay").classList.remove("hidden");
-            document.getElementById("settingsTitle").innerText =
-                widget.name || widget.type;
+      function updateSelectedWidget(updates) {
+        if (!selectedWidget || !selectedElement) return;
 
-            updateActiveLayer(widget._id);
+        // ===== 1️⃣ Actualizar memoria =====
+        selectedWidget.data = {
+          ...selectedWidget.data,
+          ...updates,
+        };
 
-            const content = document.getElementById("configContent");
-            content.innerHTML = ""; // 🔥 LIMPIAR ANTES
-
-            const widgetDef = window.WidgetRegistry[widget.type];
-
-            if (widgetDef && widgetDef.renderConfig) {
-                widgetDef.renderConfig(widget, content, updateSelectedWidget);
-
-            }
-
-            if (window.innerWidth < 768) {
-                const sidebar = document.getElementById("sidebar");
-
-                sidebar.classList.remove("translate-y-full");
-                document.getElementById("sidebarOverlay").classList.remove("hidden");
-                document.body.classList.add("overflow-hidden");
-            }
+        const index = widgets.findIndex((w) => w._id === selectedWidget._id);
+        if (index !== -1) {
+          widgets[index].data = selectedWidget.data;
         }
 
-        function updateSelectedWidget(updates) {
+        // ===== 2️⃣ Actualizar posición y tamaño =====
+        if (updates.x !== undefined)
+          selectedElement.style.left = updates.x + "px";
 
-            if (!selectedWidget || !selectedElement) return;
+        if (updates.y !== undefined)
+          selectedElement.style.top = updates.y + "px";
 
-            // ===== 1️⃣ Actualizar memoria =====
-            selectedWidget.data = {
-                ...selectedWidget.data,
-                ...updates
-            };
+        if (updates.width !== undefined)
+          selectedElement.style.width = updates.width + "px";
 
-            const index = widgets.findIndex(w => w._id === selectedWidget._id);
-            if (index !== -1) {
-                widgets[index].data = selectedWidget.data;
-            }
+        if (updates.height !== undefined)
+          selectedElement.style.height = updates.height + "px";
 
-            // ===== 2️⃣ Actualizar posición y tamaño =====
-            if (updates.x !== undefined)
-                selectedElement.style.left = updates.x + "px";
+        // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
+        const widgetDef = window.WidgetRegistry[selectedWidget.type];
 
-            if (updates.y !== undefined)
-                selectedElement.style.top = updates.y + "px";
-
-            if (updates.width !== undefined)
-                selectedElement.style.width = updates.width + "px";
-
-            if (updates.height !== undefined)
-                selectedElement.style.height = updates.height + "px";
-
-            // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
-            const widgetDef = window.WidgetRegistry[selectedWidget.type];
-
-            if (widgetDef && widgetDef.renderCanvas) {
-                selectedElement.innerHTML = "";
-                const rendered = widgetDef.renderCanvas(selectedWidget);
-                selectedElement.appendChild(rendered);
-            }
-
-            // ===== 4️⃣ Sincronizar panel =====
-            const panel = document.getElementById("configContent");
-            if (!panel) return;
-
-            panel.querySelectorAll("input[data-field]").forEach(input => {
-                const field = input.dataset.field;
-                if (selectedWidget.data[field] !== undefined) {
-                    input.value = selectedWidget.data[field];
-                }
-            });
-
-            panel.querySelectorAll("input[type='range']").forEach(range => {
-                const span = range.parentElement.querySelector("span");
-                if (span && range.dataset.field) {
-                    span.innerText = selectedWidget.data[range.dataset.field];
-                }
-            });
-
-            panel.querySelectorAll("[data-fit]").forEach(btn => {
-                const active = btn.dataset.fit === selectedWidget.data.objectFit;
-                btn.className =
-                    "flex-1 py-2 rounded-md border text-xs capitalize " +
-                    (active
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
-            });
-
-
-            const lockBtn = panel.querySelector("#lockRatio");
-            if (lockBtn) {
-                lockBtn.className =
-                    "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
-                    (selectedWidget.data.lockRatio
-                        ? "bg-gray-600 border-gray-500 text-white"
-                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
-            }
-
-            // ===== 5️⃣ Marcar cambios =====
-            markAsChanged();
+        if (widgetDef && widgetDef.renderCanvas) {
+          selectedElement.innerHTML = "";
+          const rendered = widgetDef.renderCanvas(selectedWidget);
+          selectedElement.appendChild(rendered);
         }
 
-        function closeSettings() {
-            document.getElementById("settingsOverlay").classList.add("hidden");
+        // ===== 4️⃣ Sincronizar panel =====
+        const panel = document.getElementById("configContent");
+        if (!panel) return;
 
-            document.querySelectorAll("#layersPanel > div")
-                .forEach(i => i.classList.remove("ring-2", "ring-purple-500"));
+        panel.querySelectorAll("input[data-field]").forEach((input) => {
+          const field = input.dataset.field;
+          if (selectedWidget.data[field] !== undefined) {
+            input.value = selectedWidget.data[field];
+          }
+        });
+
+        panel.querySelectorAll("input[type='range']").forEach((range) => {
+          const span = range.parentElement.querySelector("span");
+          if (span && range.dataset.field) {
+            span.innerText = selectedWidget.data[range.dataset.field];
+          }
+        });
+
+        panel.querySelectorAll("[data-fit]").forEach((btn) => {
+          const active = btn.dataset.fit === selectedWidget.data.objectFit;
+          btn.className =
+            "flex-1 py-2 rounded-md border text-xs capitalize " +
+            (active
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+        });
+
+        const lockBtn = panel.querySelector("#lockRatio");
+        if (lockBtn) {
+          lockBtn.className =
+            "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
+            (selectedWidget.data.lockRatio
+              ? "bg-gray-600 border-gray-500 text-white"
+              : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
         }
 
-        async function deleteSelectedWidget() {
-            if (!selectedWidget) return;
+        // ===== 5️⃣ Marcar cambios =====
+        markAsChanged();
+      }
 
-            await fetch(`/api/widgets/${selectedWidget._id}`, {
-                method: "DELETE"
-            });
+      function closeSettings() {
+        document.getElementById("settingsOverlay").classList.add("hidden");
 
-            selectedWidget = null;
-            selectedElement = null;
+        document
+          .querySelectorAll("#layersPanel > div")
+          .forEach((i) => i.classList.remove("ring-2", "ring-purple-500"));
+      }
 
-            document.getElementById("settingsOverlay").classList.add("hidden");
+      async function deleteSelectedWidget() {
+        if (!selectedWidget) return;
 
-            loadWidgets();
-        }
-        /* ================= UPDATE ================= */
+        await fetch(`/api/widgets/${selectedWidget._id}`, {
+          method: "DELETE",
+        });
 
-        async function updateLayerOrder() {
-            for (let i = 0; i < widgets.length; i++) {
-                await fetch(`/api/widgets/${widgets[i]._id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        data: {
-                            ...widgets[i].data,
-                            zIndex: i
-                        }
-                    })
-                });
-            }
-        }
+        selectedWidget = null;
+        selectedElement = null;
 
-        function updateActiveLayer(id) {
-            document.querySelectorAll("#layersPanel > div").forEach(item => {
-                item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
-            });
-
-            const active = document.querySelector(`#layersPanel > div[data-id="${id}"]`);
-            if (active) {
-                active.classList.add("ring-2", "ring-purple-500", "bg-gray-700/80");
-            }
-        }
-        /* ================= DRAG ================= */
-
-        async function createWidget(type) {
-
-            const widgetDef = window.WidgetRegistry[type];
-
-            const defaultData = widgetDef?.defaultData || {
-                x: 100,
-                y: 100,
-                visible: true,
-                zIndex: widgets.length
-            };
-
-            await fetch("/api/widgets", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    projectId,
-                    type,
-                    name: type,
-                    data: defaultData
-                })
-            });
-
-            loadWidgets();
-        }
+        document.getElementById("settingsOverlay").classList.add("hidden");
 
         loadWidgets();
+      }
+      /* ================= UPDATE ================= */
 
-        const fabMain = document.getElementById("fabMain");
-        const items = document.querySelectorAll(".fab-item");
-        const fabWrapper = document.getElementById("fabWrapper");
-        let isOpen = false;
+      async function updateLayerOrder() {
+        for (let i = 0; i < widgets.length; i++) {
+          await fetch(`/api/widgets/${widgets[i]._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              data: {
+                ...widgets[i].data,
+                zIndex: i,
+              },
+            }),
+          });
+        }
+      }
 
-        const fabStack = document.getElementById("fabStack");
-
-        fabMain.addEventListener("click", (e) => {
-            e.stopPropagation();
-            isOpen = !isOpen;
-
-            if (isOpen) {
-                fabStack.classList.remove("pointer-events-none");
-                fabMain.classList.add("glow");
-            } else {
-                fabStack.classList.add("pointer-events-none");
-                fabMain.classList.remove("glow");
-            }
-
-            items.forEach((item, index) => {
-                const reversedIndex = items.length - 1 - index;
-
-                if (isOpen) {
-                    item.style.transitionDelay = `${index * 55}ms`;
-                    item.classList.remove("opacity-0", "translate-y-6", "scale-90");
-                } else {
-                    item.style.transitionDelay = "0ms";
-                    item.classList.add("opacity-0", "translate-y-6", "scale-90");
-                }
-            });
+      function updateActiveLayer(id) {
+        document.querySelectorAll("#layersPanel > div").forEach((item) => {
+          item.classList.remove("ring-2", "ring-purple-500", "bg-gray-700/80");
         });
 
-        document.addEventListener("click", (e) => {
-            if (!fabWrapper.contains(e.target) && isOpen) {
+        const active = document.querySelector(
+          `#layersPanel > div[data-id="${id}"]`,
+        );
+        if (active) {
+          active.classList.add("ring-2", "ring-purple-500", "bg-gray-700/80");
+        }
+      }
+      /* ================= DRAG ================= */
 
-                isOpen = false;
+      async function createWidget(type) {
+        const widgetDef = window.WidgetRegistry[type];
 
-                fabStack.classList.add("pointer-events-none");
-                fabMain.classList.remove("glow");
+        const defaultData = widgetDef?.defaultData || {
+          x: 100,
+          y: 100,
+          visible: true,
+          zIndex: widgets.length,
+        };
 
-                items.forEach(item => {
-                    item.style.transitionDelay = "0ms";
-                    item.classList.add("opacity-0", "translate-y-6", "scale-90");
-                });
-            }
+        await fetch("/api/widgets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectId,
+            type,
+            name: type,
+            data: defaultData,
+          }),
         });
 
-        document.getElementById("fabImage")
-            .addEventListener("click", () => createWidget("image"));
+        loadWidgets();
+      }
 
-        document.getElementById("fabText")
-            .addEventListener("click", () => createWidget("text"));
+      loadWidgets();
 
-        document.getElementById("fabTest")
-            .addEventListener("click", async () => {
+      const fabMain = document.getElementById("fabMain");
+      const items = document.querySelectorAll(".fab-item");
+      const fabWrapper = document.getElementById("fabWrapper");
+      let isOpen = false;
 
-                const shoutoutWidget = widgets.find(w => w.type === "shoutout");
+      const fabStack = document.getElementById("fabStack");
 
-                if (!shoutoutWidget) {
-                    alert("No hay widget shoutout en este proyecto.");
-                    return;
-                }
+      fabMain.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
 
-                try {
-                    await fetch(`/api/widgets/${shoutoutWidget._id}/test`, {
-                        method: "POST"
-                    });
-
-                    console.log("✅ Test enviado");
-                } catch (err) {
-                    console.error("❌ Error enviando test:", err);
-                }
-
-            });
-
-        document.getElementById("saveIconBtn")
-            .addEventListener("click", saveConfig);
-
-        document.getElementById("mobileSaveBtn")
-            .addEventListener("click", saveConfig);
-
-        // ===== MOBILE CANVAS SCALE =====
-        function applyMobileScale() {
-            const canvas = document.getElementById("canvas");
-            if (!canvas) return;
-
-            const baseWidth = 1280;
-            const screenWidth = window.innerWidth;
-
-            if (screenWidth < 768) {
-                const scale = screenWidth / baseWidth;
-                canvas.style.transform = `scale(${scale})`;
-                canvas.style.transformOrigin = "top left";
-            } else {
-                canvas.style.transform = "scale(1)";
-            }
+        if (isOpen) {
+          fabStack.classList.remove("pointer-events-none");
+          fabMain.classList.add("glow");
+        } else {
+          fabStack.classList.add("pointer-events-none");
+          fabMain.classList.remove("glow");
         }
 
-        window.addEventListener("resize", applyMobileScale);
-        window.addEventListener("load", applyMobileScale);
+        items.forEach((item, index) => {
+          const reversedIndex = items.length - 1 - index;
 
-        const openLayersBtn = document.getElementById("openLayersBtn");
-
-        openLayersBtn.addEventListener("click", () => {
-            const sidebar = document.getElementById("sidebar");
-
-            sidebar.classList.remove("translate-y-full");
-            document.getElementById("sidebarOverlay").classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
+          if (isOpen) {
+            item.style.transitionDelay = `${index * 55}ms`;
+            item.classList.remove("opacity-0", "translate-y-6", "scale-90");
+          } else {
+            item.style.transitionDelay = "0ms";
+            item.classList.add("opacity-0", "translate-y-6", "scale-90");
+          }
         });
+      });
 
-        document.getElementById("sidebarOverlay")
-            .addEventListener("click", closeSidebar);
+      document.addEventListener("click", (e) => {
+        if (!fabWrapper.contains(e.target) && isOpen) {
+          isOpen = false;
 
-        function closeSidebar() {
-            const sidebar = document.getElementById("sidebar");
+          fabStack.classList.add("pointer-events-none");
+          fabMain.classList.remove("glow");
 
-            sidebar.classList.add("translate-y-full");
-            document.getElementById("sidebarOverlay").classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
+          items.forEach((item) => {
+            item.style.transitionDelay = "0ms";
+            item.classList.add("opacity-0", "translate-y-6", "scale-90");
+          });
         }
+      });
+
+      document
+        .getElementById("fabImage")
+        .addEventListener("click", () => createWidget("image"));
+
+      document
+        .getElementById("fabText")
+        .addEventListener("click", () => createWidget("text"));
+
+      document.getElementById("fabTest").addEventListener("click", async () => {
+        const shoutoutWidget = widgets.find((w) => w.type === "shoutout");
+
+        if (!shoutoutWidget) {
+          alert("No hay widget shoutout en este proyecto.");
+          return;
+        }
+
+        try {
+          await fetch(`/api/widgets/${shoutoutWidget._id}/test`, {
+            method: "POST",
+          });
+
+          console.log("✅ Test enviado");
+        } catch (err) {
+          console.error("❌ Error enviando test:", err);
+        }
+      });
+
+      document
+        .getElementById("saveIconBtn")
+        .addEventListener("click", saveConfig);
+
+      document
+        .getElementById("mobileSaveBtn")
+        .addEventListener("click", saveConfig);
+
+      // ===== MOBILE CANVAS SCALE =====
+      function applyMobileScale() {
+        const canvas = document.getElementById("canvas");
+        if (!canvas) return;
+
+        const baseWidth = 1280;
+        const screenWidth = window.innerWidth;
+
+        if (screenWidth < 768) {
+          const scale = screenWidth / baseWidth;
+          canvas.style.transform = `scale(${scale})`;
+          canvas.style.transformOrigin = "top left";
+        } else {
+          canvas.style.transform = "scale(1)";
+        }
+      }
+
+      window.addEventListener("resize", applyMobileScale);
+      window.addEventListener("load", applyMobileScale);
+
+      const openLayersBtn = document.getElementById("openLayersBtn");
+
+      openLayersBtn.addEventListener("click", () => {
+        const sidebar = document.getElementById("sidebar");
+
+        sidebar.classList.remove("translate-y-full");
+        document.getElementById("sidebarOverlay").classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      });
+
+      document
+        .getElementById("sidebarOverlay")
+        .addEventListener("click", closeSidebar);
+
+      function closeSidebar() {
+        const sidebar = document.getElementById("sidebar");
+
+        sidebar.classList.add("translate-y-full");
+        document.getElementById("sidebarOverlay").classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
     </script>
-</body>
-
+  </body>
 </html>

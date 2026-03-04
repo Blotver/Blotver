@@ -1,208 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Overlay</title>
     <script src="/socket.io/socket.io.js"></script>
 
     <style>
-        body {
-            margin: 0;
-            background: transparent;
-            overflow: hidden;
+      body {
+        margin: 0;
+        background: transparent;
+        overflow: hidden;
+      }
+
+      #clipContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.6s forwards;
+      }
+
+      .fade-out {
+        animation: fadeOut 0.6s forwards;
+      }
+
+      .zoom-in {
+        animation: zoomIn 0.6s forwards;
+      }
+
+      .zoom-out {
+        animation: zoomOut 0.6s forwards;
+      }
+
+      .slide-in {
+        animation: slideIn 0.6s forwards;
+      }
+
+      .slide-out {
+        animation: slideOut 0.6s forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
 
-        #clipContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
         }
 
-        .fade-in {
-            animation: fadeIn 0.6s forwards;
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
         }
 
-        .fade-out {
-            animation: fadeOut 0.6s forwards;
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes zoomOut {
+        from {
+          transform: scale(1);
+          opacity: 1;
         }
 
-        .zoom-in {
-            animation: zoomIn 0.6s forwards;
+        to {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
         }
 
-        .zoom-out {
-            animation: zoomOut 0.6s forwards;
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateY(0);
+          opacity: 1;
         }
 
-        .slide-in {
-            animation: slideIn 0.6s forwards;
+        to {
+          transform: translateY(50px);
+          opacity: 0;
         }
-
-        .slide-out {
-            animation: slideOut 0.6s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0
-            }
-
-            to {
-                opacity: 1
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1
-            }
-
-            to {
-                opacity: 0
-            }
-        }
-
-        @keyframes zoomIn {
-            from {
-                transform: scale(0.8);
-                opacity: 0
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1
-            }
-        }
-
-        @keyframes zoomOut {
-            from {
-                transform: scale(1);
-                opacity: 1
-            }
-
-            to {
-                transform: scale(0.8);
-                opacity: 0
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(50px);
-                opacity: 0
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateY(0);
-                opacity: 1
-            }
-
-            to {
-                transform: translateY(50px);
-                opacity: 0
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <div id="clipContainer">
-
-    </div>
+  <body>
+    <div id="clipContainer"></div>
 
     <script>
-        const projectId = window.location.pathname.split("/").pop();
-        const socket = io();
-        const container = document.getElementById("clipContainer");
+      const projectId = window.location.pathname.split("/").pop();
+      const socket = io();
+      const container = document.getElementById("clipContainer");
 
-        let queue = [];
-        let playing = false;
+      let queue = [];
+      let playing = false;
 
-        socket.emit("joinProject", projectId);
+      socket.emit("joinProject", projectId);
 
-        socket.on("newClip", (data) => {
-            queue.push(data);
-            processQueue();
-        });
+      socket.on("newClip", (data) => {
+        queue.push(data);
+        processQueue();
+      });
 
-        function processQueue() {
-            if (playing) return;
-            if (queue.length === 0) return;
+      function processQueue() {
+        if (playing) return;
+        if (queue.length === 0) return;
 
-            const data = queue.shift();
-            playClip(data);
-        }
+        const data = queue.shift();
+        playClip(data);
+      }
 
-        function playClip(data) {
+      function playClip(data) {
+        if (!data.clipId) return;
 
-            if (!data.clipId) return;
+        playing = true;
+        container.innerHTML = "";
 
-            playing = true;
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "absolute";
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
+        wrapper.style.overflow = "hidden";
+
+        // 🎬 TWITCH EMBED
+        const iframe = document.createElement("iframe");
+
+        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
+        iframe.width = "100%";
+        iframe.height = "100%";
+        iframe.allowFullscreen = true;
+        iframe.frameBorder = "0";
+        iframe.style.position = "absolute";
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+
+        wrapper.appendChild(iframe);
+
+        // TEXTO SUPERIOR
+        const text = document.createElement("div");
+        text.style.position = "absolute";
+        text.style.top = "5%";
+        text.style.width = "100%";
+        text.style.textAlign = "center";
+        text.style.fontSize = "48px";
+        text.style.color = "white";
+        text.style.fontWeight = "bold";
+        text.style.textShadow = "0 0 20px black";
+        text.innerText = data.overlayText || "";
+
+        wrapper.appendChild(text);
+
+        container.appendChild(wrapper);
+
+        wrapper.className = `${data.animationIn || "fade"}-in`;
+
+        setTimeout(() => {
+          wrapper.className = `${data.animationOut || "fade"}-out`;
+
+          setTimeout(() => {
             container.innerHTML = "";
-
-            const wrapper = document.createElement("div");
-            wrapper.style.position = "absolute";
-            wrapper.style.width = "100%";
-            wrapper.style.height = "100%";
-            wrapper.style.overflow = "hidden";
-
-            // 🎬 TWITCH EMBED
-            const iframe = document.createElement("iframe");
-
-            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
-            iframe.width = "100%";
-            iframe.height = "100%";
-            iframe.allowFullscreen = true;
-            iframe.frameBorder = "0";
-            iframe.style.position = "absolute";
-            iframe.style.top = "0";
-            iframe.style.left = "0";
-
-            wrapper.appendChild(iframe);
-
-            // TEXTO SUPERIOR
-            const text = document.createElement("div");
-            text.style.position = "absolute";
-            text.style.top = "5%";
-            text.style.width = "100%";
-            text.style.textAlign = "center";
-            text.style.fontSize = "48px";
-            text.style.color = "white";
-            text.style.fontWeight = "bold";
-            text.style.textShadow = "0 0 20px black";
-            text.innerText = data.overlayText || "";
-
-            wrapper.appendChild(text);
-
-            container.appendChild(wrapper);
-
-            wrapper.className = `${data.animationIn || "fade"}-in`;
-
-            setTimeout(() => {
-
-                wrapper.className = `${data.animationOut || "fade"}-out`;
-
-                setTimeout(() => {
-                    container.innerHTML = "";
-                    playing = false;
-                    processQueue();
-                }, 600);
-
-            }, data.duration || 10000);
-        }
-
+            playing = false;
+            processQueue();
+          }, 600);
+        }, data.duration || 10000);
+      }
     </script>
-</body>
-
+  </body>
 </html>
