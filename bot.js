@@ -275,24 +275,6 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
 
     let defaultData;
 
-    if (widgetType === "shoutout") {
-
-        const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
-        const randomUsername =
-            randomUsers[Math.floor(Math.random() * randomUsers.length)];
-
-        const userId = await getUserId(randomUsername, userDB);
-        const clip = userId
-            ? await getRandomClip(userId, userDB)
-            : null;
-
-        payload.testData = {
-            user: randomUsername,
-            game: "Just Chatting",
-            clipId: clip ? clip.id : null
-        };
-    }
-
     // Si viene data (ej: duplicate), usarla directamente
     if (req.body.data) {
         defaultData = req.body.data;
@@ -419,11 +401,14 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     if (!userDB) {
         return res.status(404).json({ error: "User not found" });
     }
-
+    
     // Usuario random para test
-    const testUser = "ninja";
+    const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
+    const randomUsername =
+        randomUsers[Math.floor(Math.random() * randomUsers.length)];
 
-    const userId = await getUserId(testUser, userDB);
+    const userId = await getUserId(randomUsername, userDB);
+
     if (!userId) {
         return res.json({ error: "No test user found" });
     }

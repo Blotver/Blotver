@@ -78,6 +78,7 @@ module.exports = async function handleShoutout({
 
     io.to(matchedWidget.projectId.toString()).emit("newClip", {
         clipId: clip.id,
+        user: randomUsername,
         overlayText: matchedWidget.data.overlayText || "",
         animationIn: matchedWidget.data.animationIn || "fade",
         animationOut: matchedWidget.data.animationOut || "fade",
