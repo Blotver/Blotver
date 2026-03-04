@@ -160,7 +160,7 @@
             // 🎬 TWITCH EMBED
             const iframe = document.createElement("iframe");
 
-            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}`;
+            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
             iframe.width = "100%";
             iframe.height = "100%";
             iframe.allowFullscreen = true;
