@@ -81,25 +81,25 @@ window.ShoutoutWidget = {
       ${parseVariables(text)}
   </div>
 
-  <div style="
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-top:1px solid rgba(255,255,255,0.05);
-      background:
-          repeating-linear-gradient(
-              45deg,
-              rgba(255,255,255,0.05),
-              rgba(255,255,255,0.05) 10px,
-              transparent 10px,
-              transparent 20px
-          );
-      font-size:14px;
-      color:rgba(255,255,255,0.6);
-  ">
-      CLIP PREVIEW AREA
-  </div>
+  <div class="clip-area" style="
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-top:1px solid rgba(255,255,255,0.05);
+    background:
+        repeating-linear-gradient(
+            45deg,
+            rgba(255,255,255,0.05),
+            rgba(255,255,255,0.05) 10px,
+            transparent 10px,
+            transparent 20px
+        );
+    font-size:14px;
+    color:rgba(255,255,255,0.6);
+">
+    CLIP PREVIEW AREA
+</div>
 `;
     }
 
