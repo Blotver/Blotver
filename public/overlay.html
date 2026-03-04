@@ -166,7 +166,7 @@
 
             // VIDEO limpio sin UI
             const video = document.createElement("video");
-            video.src = `/api/clip-proxy?url=${encodeURIComponent(data.clipUrl)}`;
+            video.src = data.clipUrl;
             video.autoplay = true;
             video.muted = true;
             video.playsInline = true;
