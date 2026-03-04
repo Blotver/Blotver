@@ -157,30 +157,20 @@
             wrapper.style.height = "100%";
             wrapper.style.overflow = "hidden";
 
-            // 🎬 EMBED OFICIAL TWITCH
-            const video = document.createElement("video");
+            // 🎬 TWITCH EMBED
+            const iframe = document.createElement("iframe");
 
-            video.src = data.videoUrl;
-            video.autoplay = true;
-            video.playsInline = true;
-            video.controls = false;
-            video.style.position = "absolute";
-            video.style.width = "100%";
-            video.style.height = "100%";
-            video.style.objectFit = "cover";
+            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}`;
+            iframe.width = "100%";
+            iframe.height = "100%";
+            iframe.allowFullscreen = true;
+            iframe.frameBorder = "0";
+            iframe.style.position = "absolute";
+            iframe.style.top = "0";
+            iframe.style.left = "0";
 
-            wrapper.appendChild(video);
+            wrapper.appendChild(iframe);
 
-            video.onended = () => {
-                wrapper.className = `${data.animationOut || "fade"}-out`;
-
-                setTimeout(() => {
-                    container.innerHTML = "";
-                    playing = false;
-                    processQueue();
-                }, 600);
-            };
-            
             // TEXTO SUPERIOR
             const text = document.createElement("div");
             text.style.position = "absolute";
@@ -194,11 +184,11 @@
             text.innerText = data.overlayText || "";
 
             wrapper.appendChild(text);
+
             container.appendChild(wrapper);
 
             wrapper.className = `${data.animationIn || "fade"}-in`;
 
-            // duración fija 10s (luego podemos hacer configurable)
             setTimeout(() => {
 
                 wrapper.className = `${data.animationOut || "fade"}-out`;
@@ -211,6 +201,7 @@
 
             }, 10000);
         }
+
     </script>
 </body>
 
