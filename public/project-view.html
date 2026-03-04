@@ -619,11 +619,8 @@
             const widget = widgets.find(w => w.type === "shoutout");
             if (!widget) return;
 
-            const el = document.querySelector(`[data-id="${widget._id}"]`);
+            const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
             if (!el) return;
-
-            // Guardar marco original
-            const originalContent = el.innerHTML;
 
             // Limpiar
             el.innerHTML = "";
@@ -638,23 +635,13 @@
 
             // Volver al marco después de duración
             setTimeout(() => {
-                renderCanvas(); // vuelve a dibujar el marco
+                loadWidgets();
             }, widget.data.duration || 10000);
 
         });
 
         socket.on("connect", () => {
             console.log("Editor conectado a socket:", socket.id);
-        });
-
-        socket.on("widgetEvent", (payload) => {
-
-            if (payload.type !== "shoutout") return;
-
-            const widget = widgets.find(w => w._id === payload.widgetId);
-            if (!widget) return;
-
-            showShoutoutPreview(widget, payload);
         });
 
         document.getElementById("copyOverlayBtn")
@@ -1604,13 +1591,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         document.getElementById("fabTest")
             .addEventListener("click", async () => {
 
-                if (!selectedWidget) {
-                    alert("Selecciona un widget para testear.");
+                const shoutoutWidget = widgets.find(w => w.type === "shoutout");
+
+                if (!shoutoutWidget) {
+                    alert("No hay widget shoutout en este proyecto.");
                     return;
                 }
 
                 try {
-                    await fetch(`/api/widgets/${selectedWidget._id}/test`, {
+                    await fetch(`/api/widgets/${shoutoutWidget._id}/test`, {
                         method: "POST"
                     });
 
@@ -1619,8 +1608,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
                     console.error("❌ Error enviando test:", err);
                 }
 
-            }); document.getElementById("fabTest")
-
+            });
 
         document.getElementById("saveIconBtn")
             .addEventListener("click", saveConfig);
@@ -1667,71 +1655,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             sidebar.classList.add("translate-y-full");
             document.getElementById("sidebarOverlay").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
-        }
-
-        function showShoutoutPreview(widget, payload) {
-
-            const el = widget.el;
-            if (!el) return;
-
-            const d = payload.data;
-            const t = payload.testData || {};
-
-            // Guardamos el contenido original
-            const originalContent = el.innerHTML;
-
-            el.innerHTML = `
-        <div style="
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:12px;
-            width:100%;
-            height:100%;
-        ">
-            <div style="
-                font-size:22px;
-                font-weight:600;
-                color:white;
-                text-align:center;
-                text-shadow:0 0 10px rgba(0,0,0,0.6);
-            ">
-                Sigan a ${t.user || "Streamer"}
-            </div>
-
-            <div style="
-                width:100%;
-                aspect-ratio:16/9;
-                overflow:hidden;
-                border-radius:10px;
-            ">
-${t.clipId ? `
-    <iframe
-        src="https://clips.twitch.tv/embed?clip=${t.clipId}&parent=${window.location.hostname}&autoplay=true&muted=true"
-        style="width:100%;height:100%;border:none;"
-        allow="autoplay; fullscreen"
-        allowfullscreen>
-    </iframe>
-` : `
-    <div style="color:#aaa;font-size:14px;">
-        No clip available
-    </div>
-`}
-            </div>
-        </div>
-    `;
-
-            setTimeout(() => {
-                el.innerHTML = originalContent;
-
-                // volver a renderizar el widget normal
-                const widgetDef = window.WidgetRegistry[widget.type];
-                if (widgetDef && widgetDef.renderCanvas) {
-                    el.innerHTML = "";
-                    el.appendChild(widgetDef.renderCanvas(widget));
-                }
-
-            }, d.duration || 10000);
         }
     </script>
 </body>
