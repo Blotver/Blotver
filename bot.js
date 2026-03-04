@@ -275,6 +275,24 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
 
     let defaultData;
 
+    if (widgettype === "shoutout") {
+
+        const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
+        const randomUsername =
+            randomUsers[Math.floor(Math.random() * randomUsers.length)];
+
+        const userId = await getUserId(randomUsername, userDB);
+        const clip = userId
+            ? await getRandomClip(userId, userDB)
+            : null;
+
+        payload.testData = {
+            user: randomUsername,
+            game: "Just Chatting",
+            clipId: clip ? clip.id : null
+        };
+    }
+
     // Si viene data (ej: duplicate), usarla directamente
     if (req.body.data) {
         defaultData = req.body.data;
@@ -382,73 +400,7 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
 // TEST WIDGET
 // ========================
 
-app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
-    const widget = await Widget.findOne({
-        _id: req.params.id,
-        userId: req.session.user.id
-    });
-
-    if (!widget) {
-        return res.status(404).json({ error: "Widget not found" });
-    }
-
-    const project = await Project.findOne({
-        _id: widget.projectId,
-        userId: req.session.user.id
-    });
-
-    if (!project) {
-        return res.status(404).json({ error: "Project not found" });
-    }
-
-    const userDB = await User.findOne({ twitchId: req.session.user.id });
-
-    let payload = {
-        widgetId: widget._id,
-        type: widget.type,
-        data: widget.data
-    };
-
-    // 🔥 Lógica específica por tipo
-    if (widget.type === "shoutout") {
-
-        const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
-        const randomUsername =
-            randomUsers[Math.floor(Math.random() * randomUsers.length)];
-
-        const userId = await getUserId(randomUsername, userDB);
-        const clip = userId
-            ? await getRandomClip(userId, userDB)
-            : null;
-
-        let clipUrl = null;
-
-        if (clip && clip.thumbnail_url) {
-
-            const rawMp4 = clip.thumbnail_url
-                .replace("-preview-480x272.jpg", ".mp4")
-                .replace("-preview-260x147.jpg", ".mp4");
-
-            clipUrl = await uploadClipToCloudinary(
-                rawMp4,
-                userDB.twitchId,
-                clip.id
-            );
-        }
-
-        payload.testData = {
-            user: randomUsername,
-            game: "Just Chatting",
-            clipUrl
-        };
-    }
-
-    // Emitir al overlay
-    io.to(project._id.toString()).emit("widgetEvent", payload);
-
-    res.json({ success: true });
-});
 // ========================
 // MIDDLEWARE AUTH
 // ========================
@@ -692,22 +644,6 @@ async function getRandomClip(userId, userDB) {
     return clips[Math.floor(Math.random() * clips.length)];
 }
 
-async function uploadClipToCloudinary(clipUrl, userId, clipId) {
-    try {
-        const result = await cloudinary.uploader.upload(clipUrl, {
-            resource_type: "video",
-            folder: `clips/${userId}`,
-            public_id: clipId,
-            overwrite: false
-        });
-
-        return result.secure_url;
-    } catch (error) {
-        console.log("❌ Error subiendo clip:", error.message);
-        return null;
-    }
-}
-
 // ========================
 // COMANDOS
 // ========================
@@ -728,6 +664,6 @@ client.on("message", async (channel, tags, message, self) => {
         getUserId,
         getRandomClip,
         twitchAPI,
-        uploadClipToCloudinary   // 👈 FALTABA ESTO
+
     });
 });

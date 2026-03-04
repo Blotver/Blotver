@@ -126,53 +126,53 @@
         const socket = io();
         const container = document.getElementById("clipContainer");
 
+        let queue = [];
         let playing = false;
 
         socket.emit("joinProject", projectId);
 
         socket.on("newClip", (data) => {
-            playClip(data);
+            queue.push(data);
+            processQueue();
         });
+
+        function processQueue() {
+            if (playing) return;
+            if (queue.length === 0) return;
+
+            const data = queue.shift();
+            playClip(data);
+        }
 
         function playClip(data) {
 
-            if (playing) return;
+            if (!data.clipId) return;
+
             playing = true;
-
-            if (!data.clipUrl) {
-                playing = false;
-                return;
-            }
-
             container.innerHTML = "";
 
             const wrapper = document.createElement("div");
             wrapper.style.position = "absolute";
-            wrapper.style.top = "0";
-            wrapper.style.left = "0";
             wrapper.style.width = "100%";
             wrapper.style.height = "100%";
+            wrapper.style.overflow = "hidden";
 
-            // VIDEO limpio sin UI
-            const video = document.createElement("video");
+            // 🎬 EMBED OFICIAL TWITCH
+            const iframe = document.createElement("iframe");
 
-            video.src = data.clipUrl;
+            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
 
-            video.autoplay = true;
-            video.muted = true;
-            video.playsInline = true;
-            video.controls = false;
-            video.setAttribute("playsinline", "");
-            video.setAttribute("muted", "");
+            iframe.style.position = "absolute";
+            iframe.style.width = "120%";
+            iframe.style.height = "120%";
+            iframe.style.top = "-10%";
+            iframe.style.left = "-10%";
+            iframe.style.border = "none";
+            iframe.style.pointerEvents = "none";
 
-            video.style.position = "absolute";
-            video.style.width = "100%";
-            video.style.height = "100%";
-            video.style.objectFit = "cover";
+            wrapper.appendChild(iframe);
 
-            wrapper.appendChild(video);
-
-            // TEXTO
+            // TEXTO SUPERIOR
             const text = document.createElement("div");
             text.style.position = "absolute";
             text.style.top = "5%";
@@ -187,17 +187,20 @@
             wrapper.appendChild(text);
             container.appendChild(wrapper);
 
-            // Animación entrada
             wrapper.className = `${data.animationIn || "fade"}-in`;
 
-            video.onended = () => {
+            // duración fija 10s (luego podemos hacer configurable)
+            setTimeout(() => {
+
                 wrapper.className = `${data.animationOut || "fade"}-out`;
 
                 setTimeout(() => {
                     container.innerHTML = "";
                     playing = false;
+                    processQueue();
                 }, 600);
-            };
+
+            }, 10000);
         }
     </script>
 </body>
