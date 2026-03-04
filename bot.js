@@ -453,10 +453,9 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
         let clipUrl = null;
 
-        if (clip && clip.thumbnail_url) {
-            clipUrl = clip.thumbnail_url
-                .replace("-preview-480x272.jpg", ".mp4")
-                .replace("-preview-260x147.jpg", ".mp4");
+        if (clip && clip.url) {
+            const slug = clip.url.split("/").pop();
+            clipUrl = `https://clips-media-assets2.twitch.tv/${slug}.mp4`;
         }
 
         payload.testData = {
