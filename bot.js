@@ -451,10 +451,18 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
             ? await getRandomClip(userId, userDB)
             : null;
 
+        let clipUrl = null;
+
+        if (clip && clip.thumbnail_url) {
+            clipUrl = clip.thumbnail_url
+                .replace("-preview-480x272.jpg", ".mp4")
+                .replace("-preview-260x147.jpg", ".mp4");
+        }
+
         payload.testData = {
             user: randomUsername,
             game: "Just Chatting",
-            clipId: clip?.id || null
+            clipUrl
         };
     }
 
