@@ -15,48 +15,61 @@ window.ShoutoutWidget = {
     renderCanvas(widget) {
         const el = document.createElement("div");
 
-        el.style.border = "2px solid purple";
-        el.style.borderRadius = "12px";
-        el.style.padding = "16px";
-        el.style.background = "#111";
-        el.style.color = "white";
-        el.style.minWidth = "260px";
-        el.style.minHeight = "120px";
+        el.style.width = "100%";
+        el.style.height = "100%";
         el.style.display = "flex";
         el.style.flexDirection = "column";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.textAlign = "center";
+        el.style.background = "#111";
+        el.style.borderRadius = "12px";
+        el.style.overflow = "hidden";
+
+        function parseVariables(text) {
+            return text
+                .replaceAll("{user}", "StreamerX")
+                .replaceAll("{game}", "Just Chatting");
+        }
 
         function updateView() {
 
+            const text =
+                widget.data.overlayText ||
+                widget.data.textTemplate ||
+                "Sigan a {user} jugando {game}";
+
             el.innerHTML = `
-        <div style="
-            width:100%;
-            height:100%;
-            border:2px dashed rgba(255,255,255,0.6);
-            background:
-                repeating-linear-gradient(
-                    45deg,
-                    rgba(255,255,255,0.05),
-                    rgba(255,255,255,0.05) 10px,
-                    transparent 10px,
-                    transparent 20px
-                );
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:14px;
-            color:rgba(255,255,255,0.6);
-        ">
-            CLIP PREVIEW AREA
-        </div>
-    `;
+            <div style="
+                padding:10px;
+                font-weight:600;
+                font-size:16px;
+                text-align:center;
+                border-bottom:1px solid rgba(255,255,255,0.1);
+            ">
+                ${parseVariables(text)}
+            </div>
+
+            <div style="
+                flex:1;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-top:1px solid rgba(255,255,255,0.05);
+                background:
+                    repeating-linear-gradient(
+                        45deg,
+                        rgba(255,255,255,0.05),
+                        rgba(255,255,255,0.05) 10px,
+                        transparent 10px,
+                        transparent 20px
+                    );
+                font-size:14px;
+                color:rgba(255,255,255,0.6);
+            ">
+                CLIP PREVIEW AREA
+            </div>
+        `;
         }
 
         updateView();
-
-        // Guardamos función para poder refrescar luego
         el.updatePreview = updateView;
 
         return el;

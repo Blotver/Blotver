@@ -623,7 +623,10 @@
             if (!el) return;
 
             // Limpiar
-            el.innerHTML = "";
+            const clipArea = el.querySelector(".clip-area");
+            if (!clipArea) return;
+
+            clipArea.innerHTML = "";
 
             const iframe = document.createElement("iframe");
             iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
@@ -631,7 +634,7 @@
             iframe.style.height = "100%";
             iframe.style.border = "none";
 
-            el.appendChild(iframe);
+            clipArea.appendChild(iframe);
 
             // Volver al marco después de duración
             setTimeout(() => {
