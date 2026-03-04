@@ -79,7 +79,11 @@ module.exports = async function handleShoutout({
 
   const mp4 = clip.thumbnail_url.split("-preview-")[0] + ".mp4";
 
-  io.to(matchedWidget.projectId.toString()).emit("newClip", {
+  const projectRoom = String(matchedWidget.projectId);
+
+  console.log("🚀 Enviando clip al proyecto:", projectRoom);
+
+  io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: usuario,
     overlayText: matchedWidget.data.overlayText || "",

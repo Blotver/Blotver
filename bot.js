@@ -407,8 +407,12 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
   if (!clip) {
     return res.json({ error: "No clip found" });
   }
+  
+  const projectRoom = String(widget.projectId);
 
-  io.to(widget.projectId.toString()).emit("newClip", {
+  console.log("🧪 TEST enviando a:", projectRoom);
+
+  io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: randomUsername,
     overlayText: widget.data.overlayText || "",
