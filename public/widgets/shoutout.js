@@ -62,30 +62,43 @@ window.ShoutoutWidget = {
 `;
 
       el.innerHTML = `
-    <div style="${style}">
-        ${parseVariables(text)}
-    </div>
+  <div style="
+      flex:0 0 auto;
+      padding:8px 12px;
+      font-weight:700;
+      font-size:${widget.data.fontSize || 28}px;
+      text-align:center;
+      color:${widget.data.textColor || "#ffffff"};
+      background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
+      text-shadow:
+          ${strokeSize}px ${strokeSize}px 0 ${strokeColor},
+          -${strokeSize}px -${strokeSize}px 0 ${strokeColor},
+          ${strokeSize}px -${strokeSize}px 0 ${strokeColor},
+          -${strokeSize}px ${strokeSize}px 0 ${strokeColor};
+  ">
+      ${parseVariables(text)}
+  </div>
 
-    <div style="
-        flex:1;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        border-top:1px solid rgba(255,255,255,0.05);
-        background:
-            repeating-linear-gradient(
-                45deg,
-                rgba(255,255,255,0.05),
-                rgba(255,255,255,0.05) 10px,
-                transparent 10px,
-                transparent 20px
-            );
-        font-size:14px;
-        color:rgba(255,255,255,0.6);
-    ">
-        CLIP PREVIEW AREA
-    </div>
-            `;
+  <div style="
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-top:1px solid rgba(255,255,255,0.05);
+      background:
+          repeating-linear-gradient(
+              45deg,
+              rgba(255,255,255,0.05),
+              rgba(255,255,255,0.05) 10px,
+              transparent 10px,
+              transparent 20px
+          );
+      font-size:14px;
+      color:rgba(255,255,255,0.6);
+  ">
+      CLIP PREVIEW AREA
+  </div>
+`;
     }
 
     updateView();
@@ -297,7 +310,7 @@ window.ShoutoutWidget = {
       .addEventListener("input", (e) =>
         update({ backgroundColor: e.target.value }),
       );
-      
+
     document
       .getElementById("cfgStrokeColor")
       .addEventListener("input", (e) =>
