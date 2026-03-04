@@ -74,8 +74,10 @@ module.exports = async function handleShoutout({
 
     client.say(channel, mensaje);
 
+    const mp4 = clip.thumbnail_url.split("-preview-")[0] + ".mp4";
+
     io.to(matchedWidget.projectId.toString()).emit("newClip", {
-        clipId: clip.id,
+        videoUrl: mp4,
         overlayText: matchedWidget.data.overlayText || "",
         animationIn: matchedWidget.data.animationIn || "fade",
         animationOut: matchedWidget.data.animationOut || "fade"

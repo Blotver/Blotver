@@ -158,18 +158,29 @@
             wrapper.style.overflow = "hidden";
 
             // 🎬 EMBED OFICIAL TWITCH
-            const iframe = document.createElement("iframe");
+            const video = document.createElement("video");
 
-            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
+            video.src = data.videoUrl;
+            video.autoplay = true;
+            video.playsInline = true;
+            video.controls = false;
+            video.style.position = "absolute";
+            video.style.width = "100%";
+            video.style.height = "100%";
+            video.style.objectFit = "cover";
 
-            iframe.style.position = "absolute";
-            iframe.style.width = "120%";
-            iframe.style.height = "120%";
-            iframe.style.top = "-10%";
-            iframe.style.left = "-10%";
-            iframe.style.border = "none";
-            iframe.style.pointerEvents = "none";
+            wrapper.appendChild(video);
 
+            video.onended = () => {
+                wrapper.className = `${data.animationOut || "fade"}-out`;
+
+                setTimeout(() => {
+                    container.innerHTML = "";
+                    playing = false;
+                    processQueue();
+                }, 600);
+            };
+            
             wrapper.appendChild(iframe);
 
             // TEXTO SUPERIOR
