@@ -275,7 +275,7 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
 
     let defaultData;
 
-    if (widgettype === "shoutout") {
+    if (widgetType === "shoutout") {
 
         const randomUsers = ["ninja", "shroud", "pokimane", "xqc"];
         const randomUsername =
@@ -400,6 +400,48 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
 // TEST WIDGET
 // ========================
 
+
+app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
+
+    const widget = await Widget.findOne({
+        _id: req.params.id,
+        userId: req.session.user.id
+    });
+
+    if (!widget) {
+        return res.status(404).json({ error: "Widget not found" });
+    }
+
+    const userDB = await User.findOne({
+        twitchId: req.session.user.id
+    });
+
+    if (!userDB) {
+        return res.status(404).json({ error: "User not found" });
+    }
+
+    // Usuario random para test
+    const testUser = "ninja";
+
+    const userId = await getUserId(testUser, userDB);
+    if (!userId) {
+        return res.json({ error: "No test user found" });
+    }
+
+    const clip = await getRandomClip(userId, userDB);
+    if (!clip) {
+        return res.json({ error: "No clip found" });
+    }
+
+    io.to(widget.projectId.toString()).emit("newClip", {
+        clipId: clip.id,
+        overlayText: "Clip de prueba",
+        animationIn: widget.data.animationIn || "fade",
+        animationOut: widget.data.animationOut || "fade"
+    });
+
+    res.json({ success: true });
+});
 
 // ========================
 // MIDDLEWARE AUTH

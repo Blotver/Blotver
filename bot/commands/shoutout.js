@@ -80,6 +80,7 @@ module.exports = async function handleShoutout({
         clipId: clip.id,
         overlayText: matchedWidget.data.overlayText || "",
         animationIn: matchedWidget.data.animationIn || "fade",
-        animationOut: matchedWidget.data.animationOut || "fade"
+        animationOut: matchedWidget.data.animationOut || "fade",
+        duration: matchedWidget.data.duration || 10000
     });
 };
