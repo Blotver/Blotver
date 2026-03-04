@@ -27,8 +27,10 @@ window.ShoutoutWidget = {
     el.style.height = "100%";
     el.style.display = "flex";
     el.style.flexDirection = "column";
-    el.style.background = "transparent";
-    el.style.borderRadius = "12px";
+    el.style.background = "#0f0f0f";
+    el.style.borderRadius = widget.data.borderRadius + "px";
+    el.style.border = "1px solid rgba(255,255,255,0.06)";
+    el.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
     el.style.overflow = "hidden";
 
     function parseVariables(text) {
