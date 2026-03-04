@@ -435,7 +435,7 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
     io.to(widget.projectId.toString()).emit("newClip", {
         clipId: clip.id,
-        overlayText: "Clip de prueba",
+        overlayText: widget.data.overlayText || "",
         animationIn: widget.data.animationIn || "fade",
         animationOut: widget.data.animationOut || "fade"
     });

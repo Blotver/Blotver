@@ -616,17 +616,30 @@
 
         socket.on("newClip", (data) => {
 
-            // Buscar el widget shoutout actual
             const widget = widgets.find(w => w.type === "shoutout");
             if (!widget) return;
 
-            showShoutoutPreview(widget, {
-                data: widget.data,
-                testData: {
-                    user: "TestUser",
-                    clipId: data.clipId
-                }
-            });
+            const el = document.querySelector(`[data-id="${widget._id}"]`);
+            if (!el) return;
+
+            // Guardar marco original
+            const originalContent = el.innerHTML;
+
+            // Limpiar
+            el.innerHTML = "";
+
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${location.hostname}&autoplay=true`;
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.border = "none";
+
+            el.appendChild(iframe);
+
+            // Volver al marco después de duración
+            setTimeout(() => {
+                renderCanvas(); // vuelve a dibujar el marco
+            }, widget.data.duration || 10000);
 
         });
 

@@ -29,21 +29,29 @@ window.ShoutoutWidget = {
         el.style.textAlign = "center";
 
         function updateView() {
-            const text =
-                widget.data.overlayText ||
-                widget.data.textTemplate ||
-                "Sigan a {user} jugando {game}";
 
             el.innerHTML = `
-            <div style="opacity:.6;font-size:12px;margin-bottom:6px;">
-                🎬 ShoutOut Preview
-            </div>
-            <div style="font-weight:bold;">
-                ${text
-                    .replace("{user}", "StreamerX")
-                    .replace("{game}", "Just Chatting")}
-            </div>
-        `;
+        <div style="
+            width:100%;
+            height:100%;
+            border:2px dashed rgba(255,255,255,0.6);
+            background:
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(255,255,255,0.05),
+                    rgba(255,255,255,0.05) 10px,
+                    transparent 10px,
+                    transparent 20px
+                );
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            color:rgba(255,255,255,0.6);
+        ">
+            CLIP PREVIEW AREA
+        </div>
+    `;
         }
 
         updateView();
