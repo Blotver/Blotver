@@ -158,8 +158,6 @@
         wrapper.style.height = "100%";
         wrapper.style.overflow = "hidden";
 
-        wrapper.appendChild(iframe);
-
         // IMAGEN OVERLAY
         const image = document.createElement("img");
 
@@ -188,6 +186,7 @@
         iframe.style.left = "0";
 
         wrapper.appendChild(iframe);
+        wrapper.appendChild(image);
 
         // TEXTO SUPERIOR
         const text = document.createElement("div");
