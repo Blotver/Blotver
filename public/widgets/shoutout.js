@@ -62,18 +62,29 @@ window.ShoutoutWidget = {
 
         if (imgWidget?.data?.url) {
           imageHTML = `
-<img
+<img src="${imgWidget.data.url}"
 class="clip-image"
-src="${imgWidget.data.url}"
 style="
 position:absolute;
-left:${widget.data.imgX}px;
-top:${widget.data.imgY}px;
+left:${widget.data.imgX || 20}px;
+top:${widget.data.imgY || 60}px;
 width:120px;
-cursor:move;
+pointer-events:auto;
 ">
 `;
         }
+      } else if (widget.data.imageUrl) {
+        imageHTML = `
+<img src="${widget.data.imageUrl}"
+class="clip-image"
+style="
+position:absolute;
+left:${widget.data.imgX || 20}px;
+top:${widget.data.imgY || 60}px;
+width:120px;
+pointer-events:auto;
+">
+`;
       }
 
       el.innerHTML = `

@@ -993,10 +993,11 @@
                   y: Math.round(centerY),
                 });
               } else if (selectedWidget.type === "shoutout") {
-                updateSelectedWidget({
-                  imageUrl: data.url,
-                });
-              }
+  updateSelectedWidget({
+    imageWidgetId: null,
+    imageUrl: data.url
+  });
+}
 
               closeImageModal();
             };
