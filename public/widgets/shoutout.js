@@ -40,7 +40,7 @@ window.ShoutoutWidget = {
     imgX: 20,
     imgY: 60,
 
-    fontSize: 40,
+    fontSize: 20,
     textColor: "#ffffff",
     strokeColor: "#000000",
     strokeSize: 2,
@@ -423,11 +423,6 @@ Decoration Image
         update({ animationOut: e.target.value }),
       );
 
-    select.addEventListener("change", (e) => {
-      update({
-        imageWidgetId: e.target.value || null,
-      });
-    });
   },
 };
 
