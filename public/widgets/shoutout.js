@@ -89,15 +89,15 @@ window.ShoutoutWidget = {
     ${
       widget.data.imageUrl
         ? `
-        <img src="${widget.data.imageUrl}"
-        style="
-            position:absolute;
-            inset:0;
-            width:100%;
-            height:100%;
-            object-fit:contain;
-            pointer-events:none;
-        ">
+<img src="${widget.data.imageUrl}"
+class="clip-image"
+style="
+    position:absolute;
+    left:${widget.data.imgX || 0}px;
+    top:${widget.data.imgY || 0}px;
+    width:120px;
+    cursor:move;
+">
         `
         : ""
     }
@@ -115,6 +115,36 @@ window.ShoutoutWidget = {
     }
 
     updateView();
+    setTimeout(() => {
+      const img = el.querySelector(".clip-image");
+      if (!img) return;
+
+      let dragging = false;
+      let startX, startY;
+
+      img.addEventListener("mousedown", (e) => {
+        dragging = true;
+        startX = e.clientX - (widget.data.imgX || 0);
+        startY = e.clientY - (widget.data.imgY || 0);
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+
+        const x = e.clientX - startX;
+        const y = e.clientY - startY;
+
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+
+        widget.data.imgX = x;
+        widget.data.imgY = y;
+      });
+
+      window.addEventListener("mouseup", () => {
+        dragging = false;
+      });
+    }, 0);
     el.updatePreview = updateView;
 
     return el;
