@@ -89,6 +89,6 @@ module.exports = async function handleShoutout({
     overlayText: matchedWidget.data.overlayText || "",
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",
-    duration: matchedWidget.data.duration || 10000,
+    duration: (matchedWidget.data.duration || 10) * 1000,
   });
 };

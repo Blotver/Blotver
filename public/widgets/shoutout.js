@@ -6,7 +6,7 @@ window.ShoutoutWidget = {
     y: 100,
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
-    duration: 10000,
+    duration: 30,
     overlayText: "",
     animationIn: "fade",
     animationOut: "fade",
@@ -159,7 +159,7 @@ window.ShoutoutWidget = {
 
                     <div>
                         <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Duration (ms)
+                            Duration (seconds)
                         </label>
                         <input type="number" id="cfgDuration"
                             class="w-full bg-gray-900 border border-gray-700
@@ -167,7 +167,7 @@ window.ShoutoutWidget = {
                             focus:outline-none focus:ring-2
                             focus:ring-purple-500/50 focus:border-purple-500
                             transition"
-                            value="${widget.data.duration || 10000}">
+                            value="${widget.data.duration || 10}"
                     </div>
 
                     <div>
@@ -338,5 +338,34 @@ window.ShoutoutWidget = {
       );
   },
 };
+
+// ================= SOCKET EVENT =================
+
+function registerShoutoutSocket(socket) {
+  socket.on("newClip", (data) => {
+    const widget = widgets.find((w) => w.type === "shoutout");
+    if (!widget) return;
+
+    const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
+    if (!el) return;
+
+    const clipArea = el.querySelector(".clip-area");
+    if (!clipArea) return;
+
+    clipArea.innerHTML = "";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
+
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+
+    clipArea.appendChild(iframe);
+
+    setTimeout(() => {
+      clipArea.innerHTML = "";
+    }, widget.data.duration || 10000);
+  });
+}
 
 registerWidget(window.ShoutoutWidget);

@@ -781,33 +781,6 @@
       const socket = io();
       socket.emit("joinProject", projectId);
 
-      socket.on("newClip", (data) => {
-        const widget = widgets.find((w) => w.type === "shoutout");
-        if (!widget) return;
-
-        const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
-        if (!el) return;
-
-        // Limpiar
-        const clipArea = el.querySelector(".clip-area");
-        if (!clipArea) return;
-
-        clipArea.innerHTML = "";
-
-        const iframe = document.createElement("iframe");
-        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-
-        clipArea.appendChild(iframe);
-
-        // Volver al marco después de duración
-        setTimeout(() => {
-          loadWidgets();
-        }, widget.data.duration || 10000);
-      });
-
       socket.on("connect", () => {
         console.log("Editor conectado a socket:", socket.id);
       });
