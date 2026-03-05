@@ -781,6 +781,65 @@
       const socket = io();
       socket.emit("joinProject", projectId);
 
+      socket.on("newClip", (data) => {
+        const widget = widgets.find((w) => w.type === "shoutout");
+        if (!widget) return;
+
+        const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
+        if (!el) return;
+
+        const title = el.querySelector("div");
+
+        if (title) {
+          let text =
+            data.overlayText ||
+            widget.data.overlayText ||
+            widget.data.textTemplate ||
+            "Clip de {user}";
+
+          text = text.replaceAll("{user}", data.user);
+
+          title.innerText = text;
+        }
+
+        const clipArea = el.querySelector(".clip-area");
+        if (!clipArea) return;
+
+        clipArea.innerHTML = "";
+
+        const iframe = document.createElement("iframe");
+
+        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${window.location.hostname}&autoplay=true`;
+
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+
+        clipArea.appendChild(iframe);
+
+        if (data.imageUrl) {
+          const img = document.createElement("img");
+
+          img.src = data.imageUrl;
+
+          img.style.position = "absolute";
+          img.style.top = "0";
+          img.style.left = "0";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.pointerEvents = "none";
+
+          clipArea.appendChild(img);
+        }
+
+        setTimeout(
+          () => {
+            clipArea.innerHTML = "";
+          },
+          (widget.data.duration || 10) * 1000,
+        );
+      });
+
       socket.on("connect", () => {
         console.log("Editor conectado a socket:", socket.id);
       });
