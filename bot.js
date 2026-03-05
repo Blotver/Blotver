@@ -97,12 +97,6 @@ app.post(
 
       uploadStream.end(optimizedBuffer);
 
-      const result = await cloudinary.uploader.upload_stream({
-        folder: "users",
-        format: "webp",
-        quality: "auto:low",
-        fetch_format: "auto",
-      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Processing failed" });

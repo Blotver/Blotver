@@ -51,21 +51,6 @@ window.ShoutoutWidget = {
       const strokeSize = widget.data.strokeSize || 2;
       const strokeColor = widget.data.strokeColor || "#000";
 
-      const style = `
-    padding:12px;
-    font-weight:700;
-    font-size:${widget.data.fontSize || 40}px;
-    text-align:center;
-    color:${widget.data.textColor || "#ffffff"};
-    background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
-    border-radius:${widget.data.borderRadius || 12}px;
-    text-shadow:
-        ${strokeSize}px ${strokeSize}px 0 ${strokeColor},
-        -${strokeSize}px -${strokeSize}px 0 ${strokeColor},
-        ${strokeSize}px -${strokeSize}px 0 ${strokeColor},
-        -${strokeSize}px ${strokeSize}px 0 ${strokeColor};
-`;
-
       el.innerHTML = `
 <div style="
     flex:0 0 auto;
@@ -114,20 +99,23 @@ style="
     }
 
     updateView();
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const img = el.querySelector(".clip-image");
       if (!img) return;
 
       let dragging = false;
       let startX, startY;
 
+      img.onmousedown = null;
+
       img.addEventListener("mousedown", (e) => {
+        e.preventDefault();
         dragging = true;
         startX = e.clientX - (widget.data.imgX || 0);
         startY = e.clientY - (widget.data.imgY || 0);
       });
 
-      window.addEventListener("mousemove", (e) => {
+      document.onmousemove = (e) => {
         if (!dragging) return;
 
         const x = e.clientX - startX;
@@ -138,12 +126,12 @@ style="
 
         widget.data.imgX = x;
         widget.data.imgY = y;
-      });
+      };
 
-      window.addEventListener("mouseup", () => {
+      document.onmouseup = () => {
         dragging = false;
-      });
-    }, 0);
+      };
+    });
     el.updatePreview = updateView;
 
     return el;
