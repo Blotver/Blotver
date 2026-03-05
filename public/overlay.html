@@ -214,7 +214,7 @@
             playing = false;
             processQueue();
           }, 600);
-        }, data.duration || 10000);
+        }, (data.duration || 10) * 1000);
       }
     </script>
   </body>
