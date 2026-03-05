@@ -83,15 +83,11 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
-  let imageUrl = null;
-
-  if (matchedWidget.data.imageWidgetId) {
-    const imgWidget = await Widget.findById(matchedWidget.data.imageWidgetId);
-
-    if (imgWidget && imgWidget.data.url) {
-      imageUrl = imgWidget.data.url;
-    }
-  }
+const childImages = await Widget.find({
+  projectId: widget.projectId,
+  parent: widget._id,
+  type: "image",
+});
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
@@ -100,6 +96,6 @@ module.exports = async function handleShoutout(ctx, widget) {
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",
     duration: matchedWidget.data.duration || 10,
-    imageUrl: imageUrl,
+    images: childImages.map((i) => i.data),
   });
 };

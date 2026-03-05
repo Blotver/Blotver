@@ -999,7 +999,11 @@
         widgets.sort((a, b) => (a.data?.zIndex ?? 0) - (b.data?.zIndex ?? 0));
         const reversedWidgets = [...widgets].reverse();
 
-        widgets.forEach((widget) => {
+        const rootWidgets = widgets.filter((w) => !w.parent);
+
+        rootWidgets.forEach(renderWidget);
+
+        function renderWidget(widget, level = 0) {
           const el = document.createElement("div");
           el.dataset.widgetId = widget._id;
 
@@ -1072,7 +1076,7 @@
                     selectedWidget.data.x = left;
                     selectedWidget.data.y = top;
                   }
-
+                  detectParent(widget);
                   markAsChanged();
                 },
               },
@@ -1291,6 +1295,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
               deleteSelectedWidget();
             });
 
+          layerItem.style.paddingLeft = 12 + level * 20 + "px";
+
           layersPanel.appendChild(layerItem);
 
           layerItem.querySelector("input").addEventListener("input", (e) => {
@@ -1305,7 +1311,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
             markAsChanged();
           });
-        });
+
+          /* 🔥 AQUI AGREGAS ESTO */
+
+          const children = widgets.filter((w) => w.parent === widget._id);
+
+          children.forEach((child) => {
+            renderWidget(child, level + 1);
+          });
+        }
 
         resetChanges();
       }
@@ -1332,7 +1346,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 name: widget.name,
-                data: widget.data, // 🔥 IMPORTANTE
+                parent: widget.parent,
+                data: widget.data,
               }),
             });
           }
@@ -1586,6 +1601,32 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         markAsChanged();
       }
 
+      function detectParent(widget) {
+        const el = widget.el;
+
+        const rect = el.getBoundingClientRect();
+
+        let newParent = null;
+
+        widgets.forEach((other) => {
+          if (other._id === widget._id) return;
+
+          const otherRect = other.el.getBoundingClientRect();
+
+          const inside =
+            rect.left > otherRect.left &&
+            rect.right < otherRect.right &&
+            rect.top > otherRect.top &&
+            rect.bottom < otherRect.bottom;
+
+          if (inside) {
+            newParent = other._id;
+          }
+        });
+
+        widget.parent = newParent;
+      }
+
       function closeSettings() {
         document.getElementById("settingsOverlay").classList.add("hidden");
 
@@ -1649,6 +1690,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
           zIndex: widgets.length,
         };
 
+        const parent = null;
+
         await fetch("/api/widgets", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1656,6 +1699,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             projectId,
             type,
             name: type,
+            parent,
             data: defaultData,
           }),
         });
@@ -1786,6 +1830,46 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         sidebar.classList.add("translate-y-full");
         document.getElementById("sidebarOverlay").classList.add("hidden");
         document.body.classList.remove("overflow-hidden");
+      }
+
+      function detectParent(widget) {
+        const shoutouts = widgets.filter((w) => w.type === "shoutout");
+
+        let parent = null;
+
+        shoutouts.forEach((so) => {
+          if (so._id === widget._id) return;
+
+          const insideX =
+            widget.data.x > so.data.x &&
+            widget.data.x < so.data.x + (so.data.width || 400);
+
+          const insideY =
+            widget.data.y > so.data.y &&
+            widget.data.y < so.data.y + (so.data.height || 300);
+
+          if (insideX && insideY) {
+            parent = so._id;
+          }
+        });
+
+        widget.parent = parent;
+      }
+
+      function renderLayer(widget) {
+        const layerItem = createLayerItem(widget);
+
+        layersPanel.appendChild(layerItem);
+
+        const children = widgets.filter((w) => w.parent === widget._id);
+
+        children.forEach((child) => {
+          const childItem = createLayerItem(child);
+
+          childItem.style.marginLeft = "20px";
+
+          layersPanel.appendChild(childItem);
+        });
       }
     </script>
   </body>

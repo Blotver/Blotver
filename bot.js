@@ -96,7 +96,6 @@ app.post(
       );
 
       uploadStream.end(optimizedBuffer);
-
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Processing failed" });
@@ -309,6 +308,7 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
     userId: req.session.user.id,
     name: req.body.name || "New Widget",
     type: widgetType,
+    parent: req.body.parent || null,
     data: defaultData,
   });
 
@@ -335,6 +335,10 @@ app.put("/api/widgets/:id", isAuthenticated, async (req, res) => {
 
   if (req.body.data !== undefined) {
     updateFields.data = req.body.data;
+  }
+
+  if (req.body.parent !== undefined) {
+    updateFields.parent = req.body.parent;
   }
 
   const widget = await Widget.findOneAndUpdate(
@@ -413,7 +417,6 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     animationIn: widget.data.animationIn || "fade",
     animationOut: widget.data.animationOut || "fade",
     duration: widget.data.duration || 10,
-    imageUrl: widget.data.imageUrl || null,
   });
 
   res.json({ success: true });

@@ -1,3 +1,28 @@
+function detectParent(widget) {
+
+  const others = (window.widgets || []).filter(w => w._id !== widget._id)
+
+  let parent = null
+
+  others.forEach((other) => {
+
+    const insideX =
+      widget.data.x > other.data.x &&
+      widget.data.x < other.data.x + (other.data.width || 400)
+
+    const insideY =
+      widget.data.y > other.data.y &&
+      widget.data.y < other.data.y + (other.data.height || 300)
+
+    if (insideX && insideY) {
+      parent = other._id
+    }
+
+  })
+
+  widget.parent = parent
+}
+
 window.ShoutoutWidget = {
   type: "shoutout",
 
@@ -6,8 +31,6 @@ window.ShoutoutWidget = {
     y: 100,
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
-
-    imageWidgetId: null,
 
     duration: 30,
     overlayText: "",
@@ -44,6 +67,29 @@ window.ShoutoutWidget = {
         .replaceAll("{game}", "Just Chatting");
     }
 
+    function getChildrenHTML() {
+      let html = "";
+
+      children.forEach((child) => {
+        if (child.type === "image" && child.data.url) {
+          html += `
+      <img src="${child.data.url}"
+      style="
+        position:absolute;
+        left:${child.data.x - widget.data.x}px;
+        top:${child.data.y - widget.data.y}px;
+        width:${child.data.width}px;
+        height:${child.data.height}px;
+        object-fit:${child.data.objectFit || "cover"};
+        pointer-events:none;
+      ">
+      `;
+        }
+      });
+
+      return html;
+    }
+
     function updateView() {
       const text =
         widget.data.overlayText ||
@@ -52,40 +98,6 @@ window.ShoutoutWidget = {
 
       const strokeSize = widget.data.strokeSize || 2;
       const strokeColor = widget.data.strokeColor || "#000";
-
-      let imageHTML = "";
-
-      if (widget.data.imageWidgetId) {
-        const imgWidget = (window.widgets || []).find(
-          (w) => w._id === widget.data.imageWidgetId,
-        );
-
-        if (imgWidget?.data?.url) {
-          imageHTML = `
-<img src="${imgWidget.data.url}"
-class="clip-image"
-style="
-position:absolute;
-left:${widget.data.imgX || 20}px;
-top:${widget.data.imgY || 60}px;
-width:120px;
-pointer-events:auto;
-">
-`;
-        }
-      } else if (widget.data.imageUrl) {
-        imageHTML = `
-<img src="${widget.data.imageUrl}"
-class="clip-image"
-style="
-position:absolute;
-left:${widget.data.imgX || 20}px;
-top:${widget.data.imgY || 60}px;
-width:120px;
-pointer-events:auto;
-">
-`;
-      }
 
       el.innerHTML = `
 <div style="
@@ -116,12 +128,32 @@ color:rgba(255,255,255,0.6);
 CLIP PREVIEW AREA
 </div>
 
-${imageHTML}
-
+${getChildrenHTML()}
 </div>
 `;
     }
+    const children = (window.widgets || []).filter(
+      (w) => w.parent === widget._id,
+    );
 
+    let childrenHTML = "";
+
+    children.forEach((child) => {
+      if (child.type === "image") {
+        childrenHTML += `
+    <img src="${child.data.url}"
+    style="
+      position:absolute;
+      left:${child.data.x - widget.data.x}px;
+      top:${child.data.y - widget.data.y}px;
+      width:${child.data.width}px;
+      height:${child.data.height}px;
+      object-fit:${child.data.objectFit};
+      pointer-events:none;
+    ">
+    `;
+      }
+    });
     updateView();
     requestAnimationFrame(() => {
       const img = el.querySelector(".clip-image");
@@ -152,9 +184,6 @@ ${imageHTML}
         widget.data.imgY = y;
       };
 
-      document.onmouseup = () => {
-        dragging = false;
-      };
     });
     el.updatePreview = updateView;
 
@@ -213,11 +242,6 @@ ${imageHTML}
 Decoration Image
 </label>
 
-<select id="cfgImageWidget"
-class="w-full bg-gray-900 border border-gray-700
-rounded-lg px-3 py-2.5 text-sm text-gray-200">
-<option value="">None</option>
-</select>
 </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-400 mb-2">
@@ -398,25 +422,6 @@ rounded-lg px-3 py-2.5 text-sm text-gray-200">
       .addEventListener("change", (e) =>
         update({ animationOut: e.target.value }),
       );
-
-    const select = document.getElementById("cfgImageWidget");
-
-    const imageWidgets = (window.widgets || []).filter(
-      (w) => w.type === "image",
-    );
-
-    imageWidgets.forEach((img) => {
-      const opt = document.createElement("option");
-
-      opt.value = img._id;
-      opt.textContent = "Image " + img._id.slice(-4);
-
-      if (widget.data.imageWidgetId === img._id) {
-        opt.selected = true;
-      }
-
-      select.appendChild(opt);
-    });
 
     select.addEventListener("change", (e) => {
       update({

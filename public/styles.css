@@ -1565,21 +1565,12 @@ video {
   padding-bottom: 1rem;
 }
 
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
 .pt-16 {
   padding-top: 4rem;
 }
 
 .pt-32 {
   padding-top: 8rem;
-}
-
-.pl-8 {
-  padding-left: 2rem;
 }
 
 .text-left {
