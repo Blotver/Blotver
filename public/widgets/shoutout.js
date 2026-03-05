@@ -1,6 +1,11 @@
 window.ShoutoutWidget = {
   type: "shoutout",
 
+  layers: [
+    { id: "text", name: "Text" },
+    { id: "frame", name: "Frame" },
+  ],
+
   defaultData: {
     x: 100,
     y: 100,
@@ -50,7 +55,6 @@ window.ShoutoutWidget = {
       const strokeSize = widget.data.strokeSize || 2;
       const strokeColor = widget.data.strokeColor || "#000";
 
-
       el.innerHTML = `
 <div style="
 flex:0 0 auto;
@@ -86,7 +90,6 @@ CLIP PREVIEW AREA
 
     updateView();
     requestAnimationFrame(() => {
-
       img.addEventListener("mousedown", (e) => {
         e.preventDefault();
         dragging = true;

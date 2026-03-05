@@ -1,6 +1,11 @@
 window.ImageWidget = {
   type: "image",
 
+  layers: [
+    { id: "image", name: "Image" },
+    { id: "config", name: "Config" },
+  ],
+
   defaultData: {
     x: 100,
     y: 100,

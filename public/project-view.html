@@ -993,11 +993,11 @@
                   y: Math.round(centerY),
                 });
               } else if (selectedWidget.type === "shoutout") {
-  updateSelectedWidget({
-    imageWidgetId: null,
-    imageUrl: data.url
-  });
-}
+                updateSelectedWidget({
+                  imageWidgetId: null,
+                  imageUrl: data.url,
+                });
+              }
 
               closeImageModal();
             };
@@ -1066,13 +1066,6 @@
 
           if (widget.type === "text") {
             el.innerText = widget.data.text || "Sample Text";
-          }
-
-          const widgetDef = window.WidgetRegistry[widget.type];
-
-          if (widgetDef && widgetDef.renderCanvas) {
-            const rendered = widgetDef.renderCanvas(widget);
-            el.appendChild(rendered);
           }
 
           el.className = "absolute cursor-move select-none";
@@ -1311,6 +1304,31 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 </button>
 `;
 
+          const widgetDef = window.WidgetRegistry[widget.type];
+
+          if (widgetDef && widgetDef.layers) {
+            const subContainer = document.createElement("div");
+            subContainer.className = "flex flex-col mt-1";
+
+            widgetDef.layers.forEach((layer) => {
+              const subLayer = document.createElement("div");
+
+              subLayer.className =
+                "pl-8 text-xs text-gray-400 hover:text-white cursor-pointer py-1";
+
+              subLayer.innerText = layer.name;
+
+              subLayer.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openConfig(widget, layer.id);
+              });
+
+              subContainer.appendChild(subLayer);
+            });
+
+            layerItem.appendChild(subContainer); // ✅ AQUÍ
+          }
+
           layerItem
             .querySelector(".visibility-btn")
             .addEventListener("click", async (e) => {
@@ -1544,7 +1562,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         selectedElement = null;
       }
 
-      function openConfig(widget) {
+      function openConfig(widget, layerId = null) {
+        let activeLayer = layerId || "main";
         selectedWidget = widget;
 
         document.getElementById("settingsOverlay").classList.remove("hidden");
@@ -1559,7 +1578,12 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         const widgetDef = window.WidgetRegistry[widget.type];
 
         if (widgetDef && widgetDef.renderConfig) {
-          widgetDef.renderConfig(widget, content, updateSelectedWidget);
+          widgetDef.renderConfig(
+            widget,
+            content,
+            updateSelectedWidget,
+            activeLayer,
+          );
         }
 
         if (window.innerWidth < 768) {
