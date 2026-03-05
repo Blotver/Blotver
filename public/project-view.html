@@ -924,13 +924,19 @@
               const centerX = (canvasWidth - newWidth) / 2;
               const centerY = (canvasHeight - newHeight) / 2;
 
-              updateSelectedWidget({
-                url: data.url,
-                width: Math.round(newWidth),
-                height: Math.round(newHeight),
-                x: Math.round(centerX),
-                y: Math.round(centerY),
-              });
+              if (selectedWidget.type === "image") {
+                updateSelectedWidget({
+                  url: data.url,
+                  width: Math.round(newWidth),
+                  height: Math.round(newHeight),
+                  x: Math.round(centerX),
+                  y: Math.round(centerY),
+                });
+              } else if (selectedWidget.type === "shoutout") {
+                updateSelectedWidget({
+                  imageUrl: data.url,
+                });
+              }
 
               closeImageModal();
             };

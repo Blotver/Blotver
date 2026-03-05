@@ -6,6 +6,7 @@ window.ShoutoutWidget = {
     y: 100,
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
+    imageUrl: "",
     duration: 30,
     overlayText: "",
     animationIn: "fade",
@@ -83,6 +84,7 @@ window.ShoutoutWidget = {
 
   <div class="clip-area" style="
     flex:1;
+    position:relative;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -341,31 +343,63 @@ window.ShoutoutWidget = {
 
 // ================= SOCKET EVENT =================
 
-function registerShoutoutSocket(socket) {
-  socket.on("newClip", (data) => {
-    const widget = widgets.find((w) => w.type === "shoutout");
-    if (!widget) return;
+socket.on("newClip", (data) => {
+  const widget = widgets.find((w) => w.type === "shoutout");
+  if (!widget) return;
 
-    const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
-    if (!el) return;
+  const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
+  if (!el) return;
 
-    const clipArea = el.querySelector(".clip-area");
-    if (!clipArea) return;
+  const title = el.querySelector("div");
 
-    clipArea.innerHTML = "";
+  if (title) {
+    let text =
+      data.overlayText ||
+      widget.data.overlayText ||
+      widget.data.textTemplate ||
+      "Clip de {user}";
 
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
+    text = text.replaceAll("{user}", data.user);
 
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
+    title.innerText = text;
+  }
 
-    clipArea.appendChild(iframe);
+  const clipArea = el.querySelector(".clip-area");
+  if (!clipArea) return;
 
-    setTimeout(() => {
+  clipArea.innerHTML = "";
+
+  const iframe = document.createElement("iframe");
+
+  iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${window.location.hostname}&autoplay=true`;
+
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.border = "none";
+
+  clipArea.appendChild(iframe);
+
+  if (data.imageUrl) {
+    const img = document.createElement("img");
+
+    img.src = data.imageUrl;
+
+    img.style.position = "absolute";
+    img.style.top = "0";
+    img.style.left = "0";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.pointerEvents = "none";
+
+    clipArea.appendChild(img);
+  }
+
+  setTimeout(
+    () => {
       clipArea.innerHTML = "";
-    }, widget.data.duration || 10000);
-  });
-}
+    },
+    (widget.data.duration || 10) * 1000,
+  );
+});
 
 registerWidget(window.ShoutoutWidget);

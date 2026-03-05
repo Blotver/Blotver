@@ -158,7 +158,23 @@
         wrapper.style.height = "100%";
         wrapper.style.overflow = "hidden";
 
+        wrapper.appendChild(iframe);
+
+        // IMAGEN OVERLAY
+        const image = document.createElement("img");
+
+        image.src = "https://i.imgur.com/4M7IWwP.png";
+
+        image.style.position = "absolute";
+        image.style.top = "0";
+        image.style.left = "0";
+        image.style.width = "100%";
+        image.style.height = "100%";
+        image.style.objectFit = "contain";
+        image.style.pointerEvents = "none";
+
         // 🎬 TWITCH EMBED
+
         const iframe = document.createElement("iframe");
 
         iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;

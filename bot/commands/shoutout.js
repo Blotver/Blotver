@@ -90,5 +90,7 @@ module.exports = async function handleShoutout({
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",
     duration: (matchedWidget.data.duration || 10) * 1000,
+
+    imageUrl: matchedWidget.data.imageUrl || null,
   });
 };
