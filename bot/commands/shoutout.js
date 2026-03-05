@@ -85,12 +85,11 @@ module.exports = async function handleShoutout({
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
-    user: usuario,
-    overlayText: matchedWidget.data.overlayText || "",
-    animationIn: matchedWidget.data.animationIn || "fade",
-    animationOut: matchedWidget.data.animationOut || "fade",
-    duration: (matchedWidget.data.duration || 10) * 1000,
-
-    imageUrl: matchedWidget.data.imageUrl || null,
+    user: randomUsername,
+    overlayText: widget.data.overlayText || "",
+    animationIn: widget.data.animationIn || "fade",
+    animationOut: widget.data.animationOut || "fade",
+    duration: widget.data.duration || 10,
+    imageUrl: widget.data.imageUrl || null,
   });
 };

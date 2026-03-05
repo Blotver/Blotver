@@ -407,7 +407,7 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
   if (!clip) {
     return res.json({ error: "No clip found" });
   }
-  
+
   const projectRoom = String(widget.projectId);
 
   console.log("🧪 TEST enviando a:", projectRoom);
@@ -418,7 +418,8 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     overlayText: widget.data.overlayText || "",
     animationIn: widget.data.animationIn || "fade",
     animationOut: widget.data.animationOut || "fade",
-    duration: widget.data.duration || 10000,
+    duration: widget.data.duration || 10,
+    imageUrl: widget.data.imageUrl || null,
   });
 
   res.json({ success: true });
