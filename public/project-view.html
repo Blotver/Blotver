@@ -781,66 +781,6 @@
       const socket = io();
       socket.emit("joinProject", projectId);
 
-      socket.on("newClip", (data) => {
-        const widget = widgets.find((w) => w.type === "shoutout");
-        if (!widget) return;
-
-        const el = document.querySelector(`[data-widget-id="${widget._id}"]`);
-        if (!el) return;
-
-        const title = el.querySelector("div");
-
-        if (title) {
-          let text =
-            data.overlayText ||
-            widget.data.overlayText ||
-            widget.data.textTemplate ||
-            "Clip de {user}";
-
-          text = text.replaceAll("{user}", data.user);
-
-          title.innerText = text;
-        }
-
-        const clipArea = el.querySelector(".clip-area");
-        if (!clipArea) return;
-
-        clipArea.innerHTML = "";
-
-        const iframe = document.createElement("iframe");
-
-        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${window.location.hostname}&autoplay=true`;
-
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-
-        clipArea.appendChild(iframe);
-
-        const imageUrl = data.imageUrl || widget.data.imageUrl;
-
-        if (imageUrl) {
-          const img = document.createElement("img");
-
-          img.src = imageUrl;
-          img.style.position = "absolute";
-          img.style.inset = "0";
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "contain";
-          img.style.pointerEvents = "none";
-
-          clipArea.appendChild(img);
-        }
-
-        setTimeout(
-          () => {
-            clipArea.innerHTML = "";
-          },
-          (widget.data.duration || 10) * 1000,
-        );
-      });
-
       socket.on("connect", () => {
         console.log("Editor conectado a socket:", socket.id);
       });
@@ -994,7 +934,6 @@
                 });
               } else if (selectedWidget.type === "shoutout") {
                 updateSelectedWidget({
-                  imageWidgetId: null,
                   imageUrl: data.url,
                 });
               }
@@ -1066,6 +1005,13 @@
 
           if (widget.type === "text") {
             el.innerText = widget.data.text || "Sample Text";
+          }
+
+          const widgetDef = window.WidgetRegistry[widget.type];
+
+          if (widgetDef && widgetDef.renderCanvas) {
+            const rendered = widgetDef.renderCanvas(widget);
+            el.appendChild(rendered);
           }
 
           el.className = "absolute cursor-move select-none";
@@ -1304,31 +1250,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 </button>
 `;
 
-          const widgetDef = window.WidgetRegistry[widget.type];
-
-          if (widgetDef && widgetDef.layers) {
-            const subContainer = document.createElement("div");
-            subContainer.className = "flex flex-col mt-1";
-
-            widgetDef.layers.forEach((layer) => {
-              const subLayer = document.createElement("div");
-
-              subLayer.className =
-                "pl-8 text-xs text-gray-400 hover:text-white cursor-pointer py-1";
-
-              subLayer.innerText = layer.name;
-
-              subLayer.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openConfig(widget, layer.id);
-              });
-
-              subContainer.appendChild(subLayer);
-            });
-
-            layerItem.appendChild(subContainer); // ✅ AQUÍ
-          }
-
           layerItem
             .querySelector(".visibility-btn")
             .addEventListener("click", async (e) => {
@@ -1562,8 +1483,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         selectedElement = null;
       }
 
-      function openConfig(widget, layerId = null) {
-        let activeLayer = layerId || "main";
+      function openConfig(widget) {
         selectedWidget = widget;
 
         document.getElementById("settingsOverlay").classList.remove("hidden");
@@ -1578,12 +1498,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         const widgetDef = window.WidgetRegistry[widget.type];
 
         if (widgetDef && widgetDef.renderConfig) {
-          widgetDef.renderConfig(
-            widget,
-            content,
-            updateSelectedWidget,
-            activeLayer,
-          );
+          widgetDef.renderConfig(widget, content, updateSelectedWidget);
         }
 
         if (window.innerWidth < 768) {
@@ -1796,9 +1711,9 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
       });
 
-      document.getElementById("fabImage").addEventListener("click", () => {
-        openImageModal();
-      });
+      document
+        .getElementById("fabImage")
+        .addEventListener("click", () => createWidget("image"));
 
       document
         .getElementById("fabText")

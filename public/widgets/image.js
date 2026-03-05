@@ -1,67 +1,64 @@
 window.ImageWidget = {
-  type: "image",
+    type: "image",
 
-  layers: [
-    { id: "image", name: "Image" },
-    { id: "config", name: "Config" },
-  ],
+    defaultData: {
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 300,
+        url: "",
+        visible: true,
 
-  defaultData: {
-    x: 100,
-    y: 100,
-    width: 300,
-    height: 300,
-    url: "",
-    visible: true,
+        objectFit: "cover",   // cover | contain
+        borderRadius: 0,
+        shadow: 0,
+        opacity: 1,
+        lockRatio: false,
+        aspectRatio: null
+    },
 
-    objectFit: "cover", // cover | contain
-    borderRadius: 0,
-    shadow: 0,
-    opacity: 1,
-    lockRatio: false,
-    aspectRatio: null,
-  },
+    renderCanvas(widget) {
 
-  renderCanvas(widget) {
-    const wrapper = document.createElement("div");
-    wrapper.style.width = "100%";
-    wrapper.style.height = "100%";
-    wrapper.style.position = "relative";
+        const wrapper = document.createElement("div");
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
+        wrapper.style.position = "relative";
 
-    const img = document.createElement("img");
+        const img = document.createElement("img");
 
-    if (widget.data.url) {
-      img.src = widget.data.url;
-    } else {
-      wrapper.style.background = "#1f293700";
-      wrapper.style.border = "2px dashed #37415100";
-    }
+        if (widget.data.url) {
+            img.src = widget.data.url;
+        } else {
+            wrapper.style.background = "#1f293700";
+            wrapper.style.border = "2px dashed #37415100";
+        }
 
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = widget.data.objectFit || "cover";
-    img.style.borderRadius = (widget.data.borderRadius || 0) + "px";
-    img.style.opacity = widget.data.opacity ?? 1;
-    img.style.boxShadow = widget.data.shadow
-      ? `0 10px 30px rgba(0,0,0,${widget.data.shadow / 100})`
-      : "none";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = widget.data.objectFit || "cover";
+        img.style.borderRadius = (widget.data.borderRadius || 0) + "px";
+        img.style.opacity = widget.data.opacity ?? 1;
+        img.style.boxShadow = widget.data.shadow
+            ? `0 10px 30px rgba(0,0,0,${widget.data.shadow / 100})`
+            : "none";
 
-    img.draggable = false;
+        img.draggable = false;
 
-    // 🔥 Capturar proporción real cuando carga
-    img.onload = () => {
-      if (!widget.data.width || !widget.data.height) {
-        widget.data.width = img.naturalWidth / 2;
-        widget.data.height = img.naturalHeight / 2;
-      }
-    };
+        // 🔥 Capturar proporción real cuando carga
+        img.onload = () => {
+            if (img.naturalWidth) {
+                widget.data.aspectRatio =
+                    img.naturalWidth / img.naturalHeight;
+            }
+        };
 
-    wrapper.appendChild(img);
-    return wrapper;
-  },
+        wrapper.appendChild(img);
+        return wrapper;
+    },
 
-  renderConfig(widget, container, updateSelectedWidget) {
-    container.innerHTML = `
+    renderConfig(widget, container, updateSelectedWidget) {
+
+        container.innerHTML = `
 <div class="space-y-6 text-sm text-gray-300">
 
     <!-- IMAGE -->
@@ -71,8 +68,7 @@ window.ImageWidget = {
         </label>
 
         <div class="mt-2 relative group cursor-pointer" id="changeImage">
-            ${
-              widget.data.url
+            ${widget.data.url
                 ? `<img src="${widget.data.url}" 
                    class="rounded-md w-full h-28 object-cover border border-gray-700"/>`
                 : `<div class="h-28 flex items-center justify-center 
@@ -109,15 +105,12 @@ window.ImageWidget = {
 
             <button id="lockRatio"
                 class="flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border
-                ${
-                  widget.data.lockRatio
-                    ? "bg-gray-600 border-gray-500 text-white"
-                    : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"
-                }">
+                ${widget.data.lockRatio
+                ? "bg-gray-600 border-gray-500 text-white"
+                : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"}">
 
-                ${
-                  widget.data.lockRatio
-                    ? `
+                ${widget.data.lockRatio
+                ? `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
      class="w-4 h-4">
@@ -125,7 +118,7 @@ window.ImageWidget = {
   <rect x="4" y="10" width="16" height="10" rx="2"/>
 </svg>
                 `
-                    : `
+                : `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
      class="w-4 h-4">
@@ -133,7 +126,7 @@ window.ImageWidget = {
   <rect x="4" y="10" width="16" height="10" rx="2"/>
 </svg>
                 `
-                }
+            }
 
             </button>
         </div>
@@ -147,21 +140,15 @@ window.ImageWidget = {
 
         <div class="flex gap-2 mt-2">
 
-            ${["cover", "contain"]
-              .map(
-                (mode) => `
+            ${["cover", "contain"].map(mode => `
                 <button data-fit="${mode}"
                     class="flex-1 py-2 rounded-md border text-xs capitalize
-                    ${
-                      widget.data.objectFit === mode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"
-                    }">
+                    ${widget.data.objectFit === mode
+                    ? "bg-gray-700 border-gray-600 text-white"
+                    : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"}">
                     ${mode}
                 </button>
-            `,
-              )
-              .join("")}
+            `).join("")}
 
         </div>
     </div>
@@ -219,64 +206,61 @@ window.ImageWidget = {
 
 </div>
 `;
-    container
-      .querySelector("#changeImage")
-      ?.addEventListener("click", openImageModal);
+        container.querySelector("#changeImage")
+            ?.addEventListener("click", openImageModal);
 
-    container.querySelectorAll("input[data-field]").forEach((input) => {
-      const valueLabel = input.parentElement.querySelector("span");
+        container.querySelectorAll("input[data-field]")
+            .forEach(input => {
 
-      input.addEventListener("input", (e) => {
-        const field = e.target.dataset.field;
-        let value =
-          e.target.type === "range"
-            ? parseFloat(e.target.value)
-            : parseInt(e.target.value);
+                const valueLabel = input.parentElement.querySelector("span");
 
-        // 🔥 ACTUALIZAR EL NUMERITO DEL PANEL
-        if (valueLabel) {
-          valueLabel.innerText = value;
-        }
+                input.addEventListener("input", (e) => {
 
-        // 🔒 Lock aspect ratio
-        if (
-          widget.data.lockRatio &&
-          widget.data.aspectRatio &&
-          field === "width"
-        ) {
-          updateSelectedWidget({
-            width: value,
-            height: value / widget.data.aspectRatio,
-          });
-        } else if (
-          widget.data.lockRatio &&
-          widget.data.aspectRatio &&
-          field === "height"
-        ) {
-          updateSelectedWidget({
-            height: value,
-            width: value * widget.data.aspectRatio,
-          });
-        } else {
-          updateSelectedWidget({ [field]: value });
-        }
-      });
-    });
+                    const field = e.target.dataset.field;
+                    let value = e.target.type === "range"
+                        ? parseFloat(e.target.value)
+                        : parseInt(e.target.value);
 
-    container.querySelectorAll("[data-fit]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        updateSelectedWidget({
-          objectFit: btn.dataset.fit,
-        });
-      });
-    });
+                    // 🔥 ACTUALIZAR EL NUMERITO DEL PANEL
+                    if (valueLabel) {
+                        valueLabel.innerText = value;
+                    }
 
-    container.querySelector("#lockRatio")?.addEventListener("click", () => {
-      updateSelectedWidget({
-        lockRatio: !widget.data.lockRatio,
-      });
-    });
-  },
+                    // 🔒 Lock aspect ratio
+                    if (widget.data.lockRatio && widget.data.aspectRatio && field === "width") {
+                        updateSelectedWidget({
+                            width: value,
+                            height: value / widget.data.aspectRatio
+                        });
+                    }
+                    else if (widget.data.lockRatio && widget.data.aspectRatio && field === "height") {
+                        updateSelectedWidget({
+                            height: value,
+                            width: value * widget.data.aspectRatio
+                        });
+                    }
+                    else {
+                        updateSelectedWidget({ [field]: value });
+                    }
+                });
+            });
+
+        container.querySelectorAll("[data-fit]")
+            .forEach(btn => {
+                btn.addEventListener("click", () => {
+                    updateSelectedWidget({
+                        objectFit: btn.dataset.fit
+                    });
+                });
+            });
+
+        container.querySelector("#lockRatio")
+            ?.addEventListener("click", () => {
+                updateSelectedWidget({
+                    lockRatio: !widget.data.lockRatio
+                });
+            });
+    }
 };
 
 registerWidget(window.ImageWidget);
