@@ -817,17 +817,19 @@
 
         clipArea.appendChild(iframe);
 
-        if (data.imageUrl) {
+        const imageUrl = data.imageUrl || widget.data.imageUrl;
+
+        if (imageUrl) {
           const img = document.createElement("img");
 
-          img.src = data.imageUrl;
-
+          img.src = imageUrl;
           img.style.position = "absolute";
-          img.style.top = "0";
-          img.style.left = "0";
-          img.style.width = "100%";
-          img.style.height = "100%";
+          img.style.width = widget.data.width + "px";
+          img.style.height = widget.data.height + "px";
+          img.style.left = widget.data.x + "px";
+          img.style.top = widget.data.y + "px";
           img.style.pointerEvents = "none";
+          img.style.objectFit = "contain";
 
           clipArea.appendChild(img);
         }
@@ -1770,9 +1772,9 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         }
       });
 
-      document
-        .getElementById("fabImage")
-        .addEventListener("click", () => createWidget("image"));
+      document.getElementById("fabImage").addEventListener("click", () => {
+        openImageModal();
+      });
 
       document
         .getElementById("fabText")
