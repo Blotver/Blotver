@@ -1,15 +1,17 @@
-module.exports = async function handleShoutout({
-  client,
-  io,
-  channel,
-  tags,
-  message,
-  User,
-  Widget,
-  getUserId,
-  getRandomClip,
-  twitchAPI,
-}) {
+module.exports = async function handleShoutout(ctx, widget) {
+  const {
+    client,
+    io,
+    channel,
+    tags,
+    message,
+    User,
+    Widget,
+    getUserId,
+    getRandomClip,
+    twitchAPI,
+  } = ctx;
+
   const args = message.trim().split(" ");
   const command = args[0].toLowerCase();
 
@@ -77,19 +79,17 @@ module.exports = async function handleShoutout({
 
   client.say(channel, mensaje);
 
-  const mp4 = clip.thumbnail_url.split("-preview-")[0] + ".mp4";
-
   const projectRoom = String(matchedWidget.projectId);
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
-    user: randomUsername,
-    overlayText: widget.data.overlayText || "",
-    animationIn: widget.data.animationIn || "fade",
-    animationOut: widget.data.animationOut || "fade",
-    duration: widget.data.duration || 10,
-    imageUrl: widget.data.imageUrl || null,
+    user: usuario,
+    overlayText: matchedWidget.data.overlayText || "",
+    animationIn: matchedWidget.data.animationIn || "fade",
+    animationOut: matchedWidget.data.animationOut || "fade",
+    duration: matchedWidget.data.duration || 10,
+    imageUrl: matchedWidget.data.imageUrl || null,
   });
 };
