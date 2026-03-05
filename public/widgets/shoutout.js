@@ -14,9 +14,6 @@ window.ShoutoutWidget = {
     animationIn: "fade",
     animationOut: "fade",
 
-    imgX: 20,
-    imgY: 60,
-
     fontSize: 40,
     textColor: "#ffffff",
     strokeColor: "#000000",
@@ -53,39 +50,6 @@ window.ShoutoutWidget = {
       const strokeSize = widget.data.strokeSize || 2;
       const strokeColor = widget.data.strokeColor || "#000";
 
-      let imageHTML = "";
-
-      if (widget.data.imageWidgetId) {
-        const imgWidget = (window.widgets || []).find(
-          (w) => w._id === widget.data.imageWidgetId,
-        );
-
-        if (imgWidget?.data?.url) {
-          imageHTML = `
-<img src="${imgWidget.data.url}"
-class="clip-image"
-style="
-position:absolute;
-left:${widget.data.imgX || 20}px;
-top:${widget.data.imgY || 60}px;
-width:120px;
-pointer-events:auto;
-">
-`;
-        }
-      } else if (widget.data.imageUrl) {
-        imageHTML = `
-<img src="${widget.data.imageUrl}"
-class="clip-image"
-style="
-position:absolute;
-left:${widget.data.imgX || 20}px;
-top:${widget.data.imgY || 60}px;
-width:120px;
-pointer-events:auto;
-">
-`;
-      }
 
       el.innerHTML = `
 <div style="
@@ -116,21 +80,12 @@ color:rgba(255,255,255,0.6);
 CLIP PREVIEW AREA
 </div>
 
-${imageHTML}
-
 </div>
 `;
     }
 
     updateView();
     requestAnimationFrame(() => {
-      const img = el.querySelector(".clip-image");
-      if (!img) return;
-
-      let dragging = false;
-      let startX, startY;
-
-      img.onmousedown = null;
 
       img.addEventListener("mousedown", (e) => {
         e.preventDefault();
