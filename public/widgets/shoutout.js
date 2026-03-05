@@ -12,7 +12,9 @@ window.ShoutoutWidget = {
     animationIn: "fade",
     animationOut: "fade",
 
-    // NUEVO
+    imgX: 20,
+    imgY: 60,
+
     fontSize: 40,
     textColor: "#ffffff",
     strokeColor: "#000000",
@@ -85,32 +87,29 @@ window.ShoutoutWidget = {
     justify-content:center;
     overflow:hidden;
 ">
-
-    ${
-      widget.data.imageUrl
-        ? `
-<img src="${widget.data.imageUrl}"
-class="clip-image"
-style="
-    position:absolute;
-    left:${widget.data.imgX || 0}px;
-    top:${widget.data.imgY || 0}px;
-    width:120px;
-    cursor:move;
-">
-        `
-        : ""
-    }
-
     <div style="
-        z-index:2;
         font-size:14px;
         color:rgba(255,255,255,0.6);
     ">
         CLIP PREVIEW AREA
     </div>
-
 </div>
+
+${
+  widget.data.imageUrl
+    ? `
+<img src="${widget.data.imageUrl}"
+class="clip-image"
+style="
+    position:absolute;
+    left:${widget.data.imgX || 20}px;
+    top:${widget.data.imgY || 60}px;
+    width:120px;
+    cursor:move;
+">
+`
+    : ""
+}
 `;
     }
 
