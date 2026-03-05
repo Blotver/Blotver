@@ -6,7 +6,9 @@ window.ShoutoutWidget = {
     y: 100,
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
-    imageUrl: "",
+
+    imageWidgetId: null,
+
     duration: 30,
     overlayText: "",
     animationIn: "fade",
@@ -40,6 +42,24 @@ window.ShoutoutWidget = {
       return text
         .replaceAll("{user}", "StreamerX")
         .replaceAll("{game}", "Just Chatting");
+    }
+
+    if (widget.data.imageWidgetId) {
+      const imgWidget = window.widgets.find(
+        (w) => w._id === widget.data.imageWidgetId,
+      );
+
+      if (imgWidget?.data?.url) {
+        el.innerHTML += `
+      <img src="${imgWidget.data.url}"
+      style="
+        position:absolute;
+        left:${widget.data.imgX}px;
+        top:${widget.data.imgY}px;
+        width:120px;
+      ">
+    `;
+      }
     }
 
     function updateView() {
@@ -79,22 +99,6 @@ window.ShoutoutWidget = {
         CLIP PREVIEW AREA
     </div>
 </div>
-
-${
-  widget.data.imageUrl
-    ? `
-<img src="${widget.data.imageUrl}"
-class="clip-image"
-style="
-    position:absolute;
-    left:${widget.data.imgX || 20}px;
-    top:${widget.data.imgY || 60}px;
-    width:120px;
-    cursor:move;
-">
-`
-    : ""
-}
 `;
     }
 
@@ -184,7 +188,17 @@ style="
                     <h3 class="text-xs uppercase tracking-wider text-gray-500">
                         Display
                     </h3>
+<div>
+<label class="block text-xs font-medium text-gray-400 mb-2">
+Decoration Image
+</label>
 
+<select id="cfgImageWidget"
+class="w-full bg-gray-900 border border-gray-700
+rounded-lg px-3 py-2.5 text-sm text-gray-200">
+<option value="">None</option>
+</select>
+</div>
                     <div>
                         <label class="block text-xs font-medium text-gray-400 mb-2">
                             Duration (seconds)
@@ -195,7 +209,7 @@ style="
                             focus:outline-none focus:ring-2
                             focus:ring-purple-500/50 focus:border-purple-500
                             transition"
-                            value="${widget.data.duration || 10}"
+                            value="${widget.data.duration || 10}">
                     </div>
 
                     <div>
@@ -364,6 +378,31 @@ style="
       .addEventListener("change", (e) =>
         update({ animationOut: e.target.value }),
       );
+
+    const select = document.getElementById("cfgImageWidget");
+
+    const imageWidgets = (window.widgets || []).filter(
+      (w) => w.type === "image",
+    );
+
+    imageWidgets.forEach((img) => {
+      const opt = document.createElement("option");
+
+      opt.value = img._id;
+      opt.textContent = "Image " + img._id.slice(-4);
+
+      if (widget.data.imageWidgetId === img._id) {
+        opt.selected = true;
+      }
+
+      select.appendChild(opt);
+    });
+
+    select.addEventListener("change", (e) => {
+      update({
+        imageWidgetId: e.target.value || null,
+      });
+    });
   },
 };
 

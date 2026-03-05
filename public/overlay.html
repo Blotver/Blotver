@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Overlay</title>
-    <script src="/socket.io/socket.io.js"></script>
+
 
     <style>
       body {
@@ -118,6 +118,7 @@
   <body>
     <div id="clipContainer"></div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
       const projectId = window.location.pathname.split("/").pop();
       const socket = io();
