@@ -44,24 +44,6 @@ window.ShoutoutWidget = {
         .replaceAll("{game}", "Just Chatting");
     }
 
-    if (widget.data.imageWidgetId) {
-      const imgWidget = window.widgets.find(
-        (w) => w._id === widget.data.imageWidgetId,
-      );
-
-      if (imgWidget?.data?.url) {
-        el.innerHTML += `
-      <img src="${imgWidget.data.url}"
-      style="
-        position:absolute;
-        left:${widget.data.imgX}px;
-        top:${widget.data.imgY}px;
-        width:120px;
-      ">
-    `;
-      }
-    }
-
     function updateView() {
       const text =
         widget.data.overlayText ||
@@ -71,33 +53,60 @@ window.ShoutoutWidget = {
       const strokeSize = widget.data.strokeSize || 2;
       const strokeColor = widget.data.strokeColor || "#000";
 
+      let imageHTML = "";
+
+      if (widget.data.imageWidgetId) {
+        const imgWidget = (window.widgets || []).find(
+          (w) => w._id === widget.data.imageWidgetId,
+        );
+
+        if (imgWidget?.data?.url) {
+          imageHTML = `
+<img
+class="clip-image"
+src="${imgWidget.data.url}"
+style="
+position:absolute;
+left:${widget.data.imgX}px;
+top:${widget.data.imgY}px;
+width:120px;
+cursor:move;
+">
+`;
+        }
+      }
+
       el.innerHTML = `
 <div style="
-    flex:0 0 auto;
-    padding:8px 12px;
-    font-weight:700;
-    font-size:${widget.data.fontSize || 28}px;
-    text-align:center;
-    color:${widget.data.textColor || "#ffffff"};
-    background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
+flex:0 0 auto;
+padding:8px 12px;
+font-weight:700;
+font-size:${widget.data.fontSize || 28}px;
+text-align:center;
+color:${widget.data.textColor || "#ffffff"};
+background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
 ">
-    ${parseVariables(text)}
+${parseVariables(text)}
 </div>
 
 <div class="clip-area" style="
-    flex:1;
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
+flex:1;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
 ">
-    <div style="
-        font-size:14px;
-        color:rgba(255,255,255,0.6);
-    ">
-        CLIP PREVIEW AREA
-    </div>
+
+<div style="
+font-size:14px;
+color:rgba(255,255,255,0.6);
+">
+CLIP PREVIEW AREA
+</div>
+
+${imageHTML}
+
 </div>
 `;
     }
