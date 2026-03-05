@@ -302,7 +302,7 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
         textTemplate: "Sigan a {user}",
         color: "#ffffff",
         fontSize: 40,
-        duration: 10000,
+        duration: 30,
         overlayText: "",
         animationIn: "fade",
         animationOut: "fade",

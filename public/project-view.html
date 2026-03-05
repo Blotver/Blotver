@@ -824,12 +824,11 @@
 
           img.src = imageUrl;
           img.style.position = "absolute";
-          img.style.width = widget.data.width + "px";
-          img.style.height = widget.data.height + "px";
-          img.style.left = widget.data.x + "px";
-          img.style.top = widget.data.y + "px";
-          img.style.pointerEvents = "none";
+          img.style.inset = "0";
+          img.style.width = "100%";
+          img.style.height = "100%";
           img.style.objectFit = "contain";
+          img.style.pointerEvents = "none";
 
           clipArea.appendChild(img);
         }

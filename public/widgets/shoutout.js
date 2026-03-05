@@ -65,42 +65,51 @@ window.ShoutoutWidget = {
 `;
 
       el.innerHTML = `
-  <div style="
-      flex:0 0 auto;
-      padding:8px 12px;
-      font-weight:700;
-      font-size:${widget.data.fontSize || 28}px;
-      text-align:center;
-      color:${widget.data.textColor || "#ffffff"};
-      background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
-      text-shadow:
-          ${strokeSize}px ${strokeSize}px 0 ${strokeColor},
-          -${strokeSize}px -${strokeSize}px 0 ${strokeColor},
-          ${strokeSize}px -${strokeSize}px 0 ${strokeColor},
-          -${strokeSize}px ${strokeSize}px 0 ${strokeColor};
-  ">
-      ${parseVariables(text)}
-  </div>
+<div style="
+    flex:0 0 auto;
+    padding:8px 12px;
+    font-weight:700;
+    font-size:${widget.data.fontSize || 28}px;
+    text-align:center;
+    color:${widget.data.textColor || "#ffffff"};
+    background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
+">
+    ${parseVariables(text)}
+</div>
 
-  <div class="clip-area" style="
+<div class="clip-area" style="
     flex:1;
     position:relative;
     display:flex;
     align-items:center;
     justify-content:center;
-    border-top:1px solid rgba(255,255,255,0.05);
-    background:
-        repeating-linear-gradient(
-            45deg,
-            rgba(255,255,255,0.05),
-            rgba(255,255,255,0.05) 10px,
-            transparent 10px,
-            transparent 20px
-        );
-    font-size:14px;
-    color:rgba(255,255,255,0.6);
+    overflow:hidden;
 ">
-    CLIP PREVIEW AREA
+
+    ${
+      widget.data.imageUrl
+        ? `
+        <img src="${widget.data.imageUrl}"
+        style="
+            position:absolute;
+            inset:0;
+            width:100%;
+            height:100%;
+            object-fit:contain;
+            pointer-events:none;
+        ">
+        `
+        : ""
+    }
+
+    <div style="
+        z-index:2;
+        font-size:14px;
+        color:rgba(255,255,255,0.6);
+    ">
+        CLIP PREVIEW AREA
+    </div>
+
 </div>
 `;
     }
