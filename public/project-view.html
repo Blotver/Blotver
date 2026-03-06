@@ -1333,35 +1333,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         resetChanges();
       }
 
-      function detectParent(widget) {
-        const el = widget.el;
-
-        const rect = el.getBoundingClientRect();
-
-        let newParent = null;
-
-        widgets.forEach((w) => {
-          if (w._id === widget._id) return;
-
-          const parentEl = w.el;
-          if (!parentEl) return;
-
-          const parentRect = parentEl.getBoundingClientRect();
-
-          const inside =
-            rect.left > parentRect.left &&
-            rect.right < parentRect.right &&
-            rect.top > parentRect.top &&
-            rect.bottom < parentRect.bottom;
-
-          if (inside && w.type === "shoutout") {
-            newParent = w._id;
-          }
-        });
-
-        widget.parent = newParent;
-      }
-
       document.getElementById("saveBtn").addEventListener("click", saveConfig);
 
       async function saveConfig() {
@@ -1639,32 +1610,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         markAsChanged();
       }
 
-      function detectParent(widget) {
-        const el = widget.el;
-
-        const rect = el.getBoundingClientRect();
-
-        let newParent = null;
-
-        widgets.forEach((other) => {
-          if (other._id === widget._id) return;
-
-          const otherRect = other.el.getBoundingClientRect();
-
-          const inside =
-            rect.left > otherRect.left &&
-            rect.right < otherRect.right &&
-            rect.top > otherRect.top &&
-            rect.bottom < otherRect.bottom;
-
-          if (inside) {
-            newParent = other._id;
-          }
-        });
-
-        widget.parent = newParent;
-      }
-
       function closeSettings() {
         document.getElementById("settingsOverlay").classList.add("hidden");
 
@@ -1890,7 +1835,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
             parent = so._id;
           }
           
-          console.log("Parent detectado:", newParent);
+          console.log("Parent detectado:", parent);
         });
 
         widget.parent = parent;
