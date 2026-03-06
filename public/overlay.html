@@ -133,6 +133,8 @@
       });
 
       socket.on("newClip", (data) => {
+        console.log("🎬 DATA RECIBIDA DEL SOCKET:", data);
+
         queue.push(data);
         processQueue();
       });
@@ -176,6 +178,9 @@
 
         // 🎨 IMÁGENES HIJAS
         if (data.images && data.images.length) {
+
+          console.log("🖼️ Renderizando imágenes:", data.images);
+          
           data.images.forEach((imgData) => {
             const img = document.createElement("img");
 

@@ -89,6 +89,13 @@ module.exports = async function handleShoutout(ctx, widget) {
     type: "image",
   });
 
+  console.log("🖼️ Child images encontradas:", childImages);
+
+  console.log(
+    "📦 Enviando images al overlay:",
+    childImages.map((i) => i.data),
+  );
+
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: usuario,
