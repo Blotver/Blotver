@@ -410,9 +410,14 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
   console.log("🧪 TEST enviando a:", projectRoom);
 
+  const widgets = await Widget.find({
+    projectId: widget.projectId,
+  });
+
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: randomUsername,
+    widgets,
     overlayText: widget.data.overlayText || "",
     animationIn: widget.data.animationIn || "fade",
     animationOut: widget.data.animationOut || "fade",

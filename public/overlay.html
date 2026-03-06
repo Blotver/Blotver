@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Overlay</title>
 
-
     <style>
       body {
         margin: 0;
@@ -134,7 +133,6 @@
       });
 
       socket.on("newClip", (data) => {
-        console.log("🎬 OVERLAY RECIBIÓ:", data);
         queue.push(data);
         processQueue();
       });
@@ -174,36 +172,57 @@
 
         wrapper.appendChild(iframe);
 
-        // IMAGEN OVERLAY
-        if (data.imageUrl) {
-          const image = document.createElement("img");
-
-          image.src = data.imageUrl;
-          image.style.position = "absolute";
-          image.style.top = "0";
-          image.style.left = "0";
-          image.style.width = "100%";
-          image.style.height = "100%";
-          image.style.objectFit = "contain";
-          image.style.pointerEvents = "none";
-
-          wrapper.appendChild(image);
-        }
-        // TEXTO SUPERIOR
-        const text = document.createElement("div");
-        text.style.position = "absolute";
-        text.style.top = "5%";
-        text.style.width = "100%";
-        text.style.textAlign = "center";
-        text.style.fontSize = "48px";
-        text.style.color = "white";
-        text.style.fontWeight = "bold";
-        text.style.textShadow = "0 0 20px black";
-        text.innerText = data.overlayText || "";
-
-        wrapper.appendChild(text);
-
         container.appendChild(wrapper);
+
+        data.widgets.forEach((widget) => {
+          if (widget.type === "image") {
+            const img = document.createElement("img");
+
+            img.src = widget.data.url;
+            img.style.position = "absolute";
+            img.style.left = widget.data.x + "px";
+            img.style.top = widget.data.y + "px";
+            img.style.width = widget.data.width + "px";
+            img.style.height = widget.data.height + "px";
+            img.style.objectFit = widget.data.objectFit || "cover";
+
+            container.appendChild(img);
+          }
+
+          if (widget.type === "shoutout") {
+            const text = document.createElement("div");
+
+            let textTemplate =
+              widget.data.overlayText ||
+              widget.data.textTemplate ||
+              "Sigan a {user} jugando {game}";
+
+            textTemplate = textTemplate
+              .replaceAll("{user}", data.user)
+              .replaceAll("{game}", data.game);
+
+            text.innerText = textTemplate;
+
+            text.style.position = "absolute";
+            text.style.left = widget.data.x + "px";
+            text.style.top = widget.data.y + "px";
+
+            text.style.fontSize = (widget.data.fontSize || 28) + "px";
+            text.style.color = widget.data.textColor || "#ffffff";
+            text.style.background =
+              widget.data.backgroundColor || "transparent";
+            text.style.borderRadius = (widget.data.borderRadius || 0) + "px";
+            text.style.padding = "8px 12px";
+            text.style.fontWeight = "bold";
+
+            text.style.webkitTextStroke =
+              (widget.data.strokeSize || 0) +
+              "px " +
+              (widget.data.strokeColor || "#000");
+
+            container.appendChild(text);
+          }
+        });
 
         wrapper.className = `${data.animationIn || "fade"}-in`;
 
