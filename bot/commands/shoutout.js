@@ -83,15 +83,16 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
-const childImages = await Widget.find({
-  projectId: matchedWidget.projectId,
-  parent: matchedWidget._id,
-  type: "image",
-});
+  const childImages = await Widget.find({
+    projectId: matchedWidget.projectId,
+    parent: matchedWidget._id,
+    type: "image",
+  });
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: usuario,
+    game: gameName,
     overlayText: matchedWidget.data.overlayText || "",
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",

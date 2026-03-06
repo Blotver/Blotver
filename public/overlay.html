@@ -174,55 +174,47 @@
 
         container.appendChild(wrapper);
 
-        data.widgets.forEach((widget) => {
-          if (widget.type === "image") {
+        // 🎨 IMÁGENES HIJAS
+        if (data.images && data.images.length) {
+          data.images.forEach((imgData) => {
             const img = document.createElement("img");
 
-            img.src = widget.data.url;
+            img.src = imgData.url;
             img.style.position = "absolute";
-            img.style.left = widget.data.x + "px";
-            img.style.top = widget.data.y + "px";
-            img.style.width = widget.data.width + "px";
-            img.style.height = widget.data.height + "px";
-            img.style.objectFit = widget.data.objectFit || "cover";
+            img.style.left = imgData.x + "px";
+            img.style.top = imgData.y + "px";
+            img.style.width = imgData.width + "px";
+            img.style.height = imgData.height + "px";
+            img.style.objectFit = imgData.objectFit || "cover";
 
             container.appendChild(img);
-          }
+          });
+        }
 
-          if (widget.type === "shoutout") {
-            const text = document.createElement("div");
+        // 📝 TEXTO
+        if (data.overlayText) {
+          const text = document.createElement("div");
 
-            let textTemplate =
-              widget.data.overlayText ||
-              widget.data.textTemplate ||
-              "Sigan a {user} jugando {game}";
+          let textTemplate =
+            data.overlayText || "Sigan a {user} jugando {game}";
 
-            textTemplate = textTemplate
-              .replaceAll("{user}", data.user)
-              .replaceAll("{game}", data.game);
+          textTemplate = textTemplate
+            .replaceAll("{user}", data.user)
+            .replaceAll("{game}", data.game || "");
 
-            text.innerText = textTemplate;
+          text.innerText = textTemplate;
 
-            text.style.position = "absolute";
-            text.style.left = widget.data.x + "px";
-            text.style.top = widget.data.y + "px";
+          text.style.position = "absolute";
+          text.style.top = "40px";
+          text.style.left = "50%";
+          text.style.transform = "translateX(-50%)";
+          text.style.fontSize = "40px";
+          text.style.color = "white";
+          text.style.fontWeight = "bold";
+          text.style.webkitTextStroke = "2px black";
 
-            text.style.fontSize = (widget.data.fontSize || 28) + "px";
-            text.style.color = widget.data.textColor || "#ffffff";
-            text.style.background =
-              widget.data.backgroundColor || "transparent";
-            text.style.borderRadius = (widget.data.borderRadius || 0) + "px";
-            text.style.padding = "8px 12px";
-            text.style.fontWeight = "bold";
-
-            text.style.webkitTextStroke =
-              (widget.data.strokeSize || 0) +
-              "px " +
-              (widget.data.strokeColor || "#000");
-
-            container.appendChild(text);
-          }
-        });
+          container.appendChild(text);
+        }
 
         wrapper.className = `${data.animationIn || "fade"}-in`;
 
