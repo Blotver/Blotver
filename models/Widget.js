@@ -6,22 +6,33 @@ const widgetSchema = new mongoose.Schema({
         ref: "Project",
         required: true
     },
+
     userId: {
         type: String,
         required: true
     },
+
     name: {
         type: String,
         default: "New Widget"
     },
+
     type: {
         type: String,
         default: "overlay"
     },
+
+    parent: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Widget",
+        default: null
+    },
+
     data: {
         type: Object,
         default: {}
     },
+
     createdAt: {
         type: Date,
         default: Date.now

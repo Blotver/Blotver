@@ -533,6 +533,7 @@ app.delete("/api/delete-account", isAuthenticated, async (req, res) => {
     res.json({ success: true });
   });
 });
+
 app.post("/api/toggle-bot", isAuthenticated, async (req, res) => {
   const userDB = await User.findOne({ twitchId: req.session.user.id });
 
