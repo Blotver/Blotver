@@ -1076,7 +1076,16 @@
                     selectedWidget.data.x = left;
                     selectedWidget.data.y = top;
                   }
+
+                  // 🔥 Detectar nuevo parent
+                  const oldParent = widget.parent;
                   detectParent(widget);
+
+                  // 🔥 Si cambió el parent, marcar cambios
+                  if (oldParent !== widget.parent) {
+                    console.log("Nuevo parent:", widget.parent);
+                  }
+
                   markAsChanged();
                 },
               },
