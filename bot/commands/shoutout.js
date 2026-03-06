@@ -97,6 +97,10 @@ module.exports = async function handleShoutout(ctx, widget) {
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",
     duration: matchedWidget.data.duration || 10,
-    images: childImages.map((i) => i.data),
+    images: childImages.map((i) => ({
+      ...i.data,
+      parentX: matchedWidget.data.x,
+      parentY: matchedWidget.data.y,
+    })),
   });
 };
