@@ -85,7 +85,7 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   const childImages = await Widget.find({
     projectId: matchedWidget.projectId,
-    parent: matchedWidget._id,
+    parent: matchedWidget._id.toString(),
     type: "image",
   });
 
