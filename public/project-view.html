@@ -1341,6 +1341,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         const projectTitle = document.getElementById("projectNameInput").value;
 
         showSaveToast("Saving", "loading");
+        
+        console.log("Widgets antes de guardar:", widgets); // 👈 AQUÍ
 
         try {
           await fetch(`/api/projects/${currentProject._id}`, {
@@ -1816,29 +1818,28 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       }
 
       function detectParent(widget) {
-        const shoutouts = widgets.filter((w) => w.type === "shoutout");
+        let parentId = null;
 
-        let parent = null;
+        widgets.forEach((w) => {
+          if (w._id === widget._id) return;
 
-        shoutouts.forEach((so) => {
-          if (so._id === widget._id) return;
+          if (w.type === "shoutout") {
+            const childRect = widget.el.getBoundingClientRect();
+            const parentRect = w.el.getBoundingClientRect();
 
-          const insideX =
-            widget.data.x > so.data.x &&
-            widget.data.x < so.data.x + (so.data.width || 400);
+            const inside =
+              childRect.left > parentRect.left &&
+              childRect.right < parentRect.right &&
+              childRect.top > parentRect.top &&
+              childRect.bottom < parentRect.bottom;
 
-          const insideY =
-            widget.data.y > so.data.y &&
-            widget.data.y < so.data.y + (so.data.height || 300);
-
-          if (insideX && insideY) {
-            parent = so._id;
+            if (inside) {
+              parentId = w._id; // 🔥 SOLO EL ID
+            }
           }
-          
-          console.log("Parent detectado:", parent);
         });
 
-        widget.parent = parent;
+        widget.parent = parentId;
       }
 
       function renderLayer(widget) {
