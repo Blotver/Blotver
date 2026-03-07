@@ -125,22 +125,21 @@ window.ShoutoutWidget = {
     el.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
     el.style.overflow = "hidden";
 
-    function parseVariables(text, data) {
+    function parseVariables(text, data = {}) {
       const vars = {
-        "{user}": data.user,
-        "{userMention}": "@" + data.user,
-        "{userUrl}": "https://twitch.tv/" + data.user,
-        "{profileUrl}": "https://twitch.tv/" + data.user,
+        "{user}": data.user || "streamer",
+        "{userMention}": "@" + (data.user || "streamer"),
+        "{userUrl}": "https://twitch.tv/" + (data.user || "streamer"),
 
-        "{game}": data.game,
+        "{game}": data.game || "Minecraft",
 
-        "{clipUrl}": data.clipUrl,
-        "{clipTitle}": data.clipTitle,
-        "{clipViews}": data.clipViews,
-        "{clipCreator}": data.clipCreator,
+        "{clipUrl}": data.clipUrl || "",
+        "{clipTitle}": data.clipTitle || "",
+        "{clipViews}": data.clipViews || "",
+        "{clipCreator}": data.clipCreator || "",
 
-        "{channel}": data.channel,
-        "{channelUrl}": "https://twitch.tv/" + data.channel,
+        "{channel}": data.channel || "channel",
+        "{channelUrl}": "https://twitch.tv/" + (data.channel || "channel"),
       };
 
       Object.keys(vars).forEach((key) => {
@@ -253,7 +252,11 @@ padding:6px 12px;
 border-radius:${widget.data.borderRadius || 0}px;
 pointer-events:none;
 ">
-${parseVariables(text)}
+${parseVariables(text, {
+  user: "streamer",
+  game: "Minecraft",
+  channel: "channel",
+})}
 </div>
 
 ${getChildrenHTML()}
