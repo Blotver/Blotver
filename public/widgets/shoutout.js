@@ -1,26 +1,23 @@
 function detectParent(widget) {
+  const others = (window.widgets || []).filter((w) => w._id !== widget._id);
 
-  const others = (window.widgets || []).filter(w => w._id !== widget._id)
-
-  let parent = null
+  let parent = null;
 
   others.forEach((other) => {
-
     const insideX =
       widget.data.x > other.data.x &&
-      widget.data.x < other.data.x + (other.data.width || 400)
+      widget.data.x < other.data.x + (other.data.width || 400);
 
     const insideY =
       widget.data.y > other.data.y &&
-      widget.data.y < other.data.y + (other.data.height || 300)
+      widget.data.y < other.data.y + (other.data.height || 300);
 
     if (insideX && insideY) {
-      parent = other._id
+      parent = other._id;
     }
+  });
 
-  })
-
-  widget.parent = parent
+  widget.parent = parent;
 }
 
 window.ShoutoutWidget = {
@@ -100,18 +97,7 @@ window.ShoutoutWidget = {
       const strokeColor = widget.data.strokeColor || "#000";
 
       el.innerHTML = `
-<div style="
-flex:0 0 auto;
-padding:8px 12px;
-font-weight:700;
-font-size:${widget.data.fontSize || 28}px;
-text-align:center;
-color:${widget.data.textColor || "#ffffff"};
-background:${widget.data.backgroundColor || "rgba(0,0,0,0.4)"};
-">
-${parseVariables(text)}
-</div>
-
+  
 <div class="clip-area" style="
 flex:1;
 position:relative;
@@ -119,16 +105,45 @@ display:flex;
 align-items:center;
 justify-content:center;
 overflow:hidden;
+background:#000;
 ">
 
+<!-- FAKE CLIP PREVIEW -->
 <div style="
+position:absolute;
+width:80%;
+height:70%;
+background:#111;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:rgba(255,255,255,0.4);
 font-size:14px;
-color:rgba(255,255,255,0.6);
 ">
-CLIP PREVIEW AREA
+CLIP PREVIEW
+</div>
+
+<!-- OVERLAY TEXT -->
+<div style="
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+font-weight:700;
+font-size:${widget.data.fontSize || 40}px;
+color:${widget.data.textColor || "#fff"};
+-webkit-text-stroke:${strokeSize}px ${strokeColor};
+background:${widget.data.backgroundColor || "transparent"};
+padding:6px 12px;
+border-radius:${widget.data.borderRadius || 0}px;
+pointer-events:none;
+">
+${parseVariables(text)}
 </div>
 
 ${getChildrenHTML()}
+
 </div>
 `;
     }
@@ -183,7 +198,6 @@ ${getChildrenHTML()}
         widget.data.imgX = x;
         widget.data.imgY = y;
       };
-
     });
     el.updatePreview = updateView;
 
@@ -422,7 +436,6 @@ Decoration Image
       .addEventListener("change", (e) =>
         update({ animationOut: e.target.value }),
       );
-
   },
 };
 

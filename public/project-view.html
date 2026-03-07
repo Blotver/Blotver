@@ -1341,7 +1341,7 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         const projectTitle = document.getElementById("projectNameInput").value;
 
         showSaveToast("Saving", "loading");
-        
+
         console.log("Widgets antes de guardar:", widgets); // 👈 AQUÍ
 
         try {
@@ -1352,6 +1352,10 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
           });
 
           for (let widget of widgets) {
+            if (widget.parent === undefined) {
+              widget.parent = null;
+            }
+
             await fetch(`/api/widgets/${widget._id}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
