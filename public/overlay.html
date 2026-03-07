@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>Overlay</title>
-
     <style>
       body {
         margin: 0;
@@ -139,6 +138,34 @@
         processQueue();
       });
 
+      function parseVariables(text, data) {
+        if (!text) return "";
+
+        const vars = {
+          "{user}": data.user,
+          "{userMention}": "@" + data.user,
+          "{userUrl}": "https://twitch.tv/" + data.user,
+
+          "{game}": data.game,
+
+          "{clipUrl}": data.clipUrl,
+          "{clipTitle}": data.clipTitle,
+          "{clipViews}": data.clipViews,
+          "{clipCreator}": data.clipCreator,
+
+          "{channel}": data.channel,
+          "{channelUrl}": "https://twitch.tv/" + data.channel,
+        };
+
+        Object.keys(vars).forEach((key) => {
+          if (vars[key] !== undefined && vars[key] !== null) {
+            text = text.replaceAll(key, vars[key]);
+          }
+        });
+
+        return text;
+      }
+
       function processQueue() {
         if (playing) return;
         if (queue.length === 0) return;
@@ -199,29 +226,12 @@
         }
 
         // 📝 TEXTO
-        if (data.overlayText) {
-          const text = document.createElement("div");
+        const text = document.createElement("div");
 
-          let textTemplate =
-            data.overlayText || "Sigan a {user} jugando {game}";
-
-          textTemplate = textTemplate
-            .replaceAll("{user}", data.user)
-            .replaceAll("{game}", data.game || "");
-
-          text.innerText = textTemplate;
-
-          text.style.position = "absolute";
-          text.style.top = "40px";
-          text.style.left = "50%";
-          text.style.transform = "translateX(-50%)";
-          text.style.fontSize = "40px";
-          text.style.color = "white";
-          text.style.fontWeight = "bold";
-          text.style.webkitTextStroke = "2px black";
-
-          container.appendChild(text);
-        }
+        const parsedText = parseVariables(
+          data.overlayText || "Sigan a {user} jugando {game}",
+          data,
+        );
 
         wrapper.className = `${data.animationIn || "fade"}-in`;
 

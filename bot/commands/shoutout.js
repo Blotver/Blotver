@@ -98,12 +98,23 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
+
     user: usuario,
     game: gameName,
+
+    channel: channelName,
+
+    clipUrl: clip.url,
+    clipTitle: clip.title,
+    clipViews: clip.view_count,
+    clipCreator: clip.creator_name,
+
     overlayText: matchedWidget.data.overlayText || "",
+
     animationIn: matchedWidget.data.animationIn || "fade",
     animationOut: matchedWidget.data.animationOut || "fade",
     duration: matchedWidget.data.duration || 10,
+
     images: childImages.map((i) => ({
       ...i.data,
       parentX: matchedWidget.data.x,
