@@ -227,7 +227,19 @@
 
         // 📝 TEXTO
         const text = document.createElement("div");
+        text.innerHTML = parsedText;
 
+        text.style.position = "absolute";
+        text.style.top = "20px";
+        text.style.left = "50%";
+        text.style.transform = "translateX(-50%)";
+        text.style.color = "white";
+        text.style.fontSize = "40px";
+        text.style.fontWeight = "bold";
+        text.style.textAlign = "center";
+        text.style.zIndex = "5";
+
+        wrapper.appendChild(text);
         const parsedText = parseVariables(
           data.overlayText || "Sigan a {user} jugando {game}",
           data,

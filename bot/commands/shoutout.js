@@ -73,9 +73,15 @@ module.exports = async function handleShoutout(ctx, widget) {
     matchedWidget.data.textTemplate ||
     "🚀 Shoutout para @{user} jugando {game} 🎮";
 
-  const mensaje = template
-    .replaceAll("{user}", usuario)
-    .replaceAll("{game}", gameName);
+  const mensaje = parseVariables(template, {
+    user: usuario,
+    game: gameName,
+    channel: channelName,
+    clipUrl: clip.url,
+    clipTitle: clip.title,
+    clipViews: clip.view_count,
+    clipCreator: clip.creator_name,
+  });
 
   client.say(channel, mensaje);
 

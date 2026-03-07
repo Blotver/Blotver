@@ -127,23 +127,23 @@ window.ShoutoutWidget = {
 
     function parseVariables(text, data = {}) {
       const vars = {
-        "{user}": data.user || "streamer",
-        "{userMention}": "@" + (data.user || "streamer"),
-        "{userUrl}": "https://twitch.tv/" + (data.user || "streamer"),
+        "{user}": data.user,
+        "{userMention}": "@" + data.user,
+        "{userUrl}": "https://twitch.tv/" + data.user,
 
-        "{game}": data.game || "Minecraft",
+        "{game}": data.game,
 
-        "{clipUrl}": data.clipUrl || "",
-        "{clipTitle}": data.clipTitle || "",
-        "{clipViews}": data.clipViews || "",
-        "{clipCreator}": data.clipCreator || "",
+        "{clipUrl}": data.clipUrl,
+        "{clipTitle}": data.clipTitle,
+        "{clipViews}": data.clipViews,
+        "{clipCreator}": data.clipCreator,
 
-        "{channel}": data.channel || "channel",
-        "{channelUrl}": "https://twitch.tv/" + (data.channel || "channel"),
+        "{channel}": data.channel,
+        "{channelUrl}": "https://twitch.tv/" + data.channel,
       };
 
       Object.keys(vars).forEach((key) => {
-        if (vars[key]) {
+        if (vars[key] !== undefined && vars[key] !== null) {
           text = text.replaceAll(key, vars[key]);
         }
       });
