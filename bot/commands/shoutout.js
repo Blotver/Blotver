@@ -1,3 +1,6 @@
+const parseVariables = require("../utils/parseVariables");
+
+
 module.exports = async function handleShoutout(ctx, widget) {
   const {
     client,
@@ -19,16 +22,7 @@ module.exports = async function handleShoutout(ctx, widget) {
   const userDB = await User.findOne({ login: channelName });
   if (!userDB) return;
 
-  const widgets = await Widget.find({
-    userId: userDB.twitchId,
-    type: "shoutout",
-  });
-
-  const matchedWidget = widgets.find(
-    (w) => w.data.command?.toLowerCase() === command,
-  );
-
-  if (!matchedWidget) return;
+  const matchedWidget = widget;
 
   const esMod = tags.mod || tags.badges?.broadcaster;
   if (!esMod) {
