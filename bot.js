@@ -417,6 +417,12 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: randomUsername,
+
+    x: widget.data.x,
+    y: widget.data.y,
+    width: widget.data.width || 500,
+    height: widget.data.height || 300,
+
     widgets,
     overlayText: widget.data.overlayText || "",
     animationIn: widget.data.animationIn || "fade",

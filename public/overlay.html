@@ -155,8 +155,10 @@
 
         const wrapper = document.createElement("div");
         wrapper.style.position = "absolute";
-        wrapper.style.width = "100%";
-        wrapper.style.height = "100%";
+        wrapper.style.left = (data.x || 200) + "px";
+        wrapper.style.top = (data.y || 200) + "px";
+        wrapper.style.width = (data.width || 500) + "px";
+        wrapper.style.height = (data.height || 300) + "px";
         wrapper.style.overflow = "hidden";
 
         // 🎬 TWITCH EMBED
@@ -178,9 +180,8 @@
 
         // 🎨 IMÁGENES HIJAS
         if (data.images && data.images.length) {
-
           console.log("🖼️ Renderizando imágenes:", data.images);
-          
+
           data.images.forEach((imgData) => {
             const img = document.createElement("img");
 
