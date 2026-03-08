@@ -13,6 +13,7 @@ const axios = require("axios");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
+const { loadUserCommands } = require("./bot/services/commandCache");
 
 // ========================
 // SERVIDOR WEB
@@ -140,6 +141,11 @@ async function syncChannels() {
     console.log("🔄 Sincronizando canales con base de datos...");
 
     const activeUsers = await User.find({ botActive: true });
+
+    for (const user of activeUsers) {
+      await loadUserCommands(user.twitchId);
+    }
+
     const activeChannels = activeUsers.map((u) => `#${u.login}`);
     const currentChannels = client.getChannels();
 
@@ -312,6 +318,8 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
     data: defaultData,
   });
 
+  await loadUserCommands(req.session.user.id);
+
   res.json(widget);
 });
 
@@ -347,6 +355,8 @@ app.put("/api/widgets/:id", isAuthenticated, async (req, res) => {
     { new: true },
   );
 
+  await loadUserCommands(req.session.user.id);
+
   res.json(widget);
 });
 
@@ -365,6 +375,9 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
     _id: req.params.id,
     userId: req.session.user.id,
   });
+  
+  await loadUserCommands(req.session.user.id);
+
   res.json({ success: true });
 });
 
