@@ -5,6 +5,7 @@ module.exports = function parseVariables(text, data = {}) {
     "{userUrl}": "https://twitch.tv/" + data.user,
     "{game}": data.game,
     "{clipUrl}": data.clipUrl,
+    "{url}": data.clipUrl,
     "{clipTitle}": data.clipTitle,
     "{clipViews}": data.clipViews,
     "{clipCreator}": data.clipCreator,

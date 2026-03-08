@@ -226,6 +226,11 @@
         }
 
         // 📝 TEXTO
+        const parsedText = parseVariables(
+          data.overlayText || "Sigan a {user} jugando {game}",
+          data,
+        );
+
         const text = document.createElement("div");
         text.innerHTML = parsedText;
 
@@ -240,11 +245,7 @@
         text.style.zIndex = "5";
 
         wrapper.appendChild(text);
-        const parsedText = parseVariables(
-          data.overlayText || "Sigan a {user} jugando {game}",
-          data,
-        );
-
+        
         wrapper.className = `${data.animationIn || "fade"}-in`;
 
         setTimeout(
