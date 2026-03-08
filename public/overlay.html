@@ -1,266 +1,275 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Overlay</title>
-    <style>
-      body {
-        margin: 0;
-        background: transparent;
-        overflow: hidden;
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Overlay</title>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    #clipContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.6s forwards;
+    }
+
+    .zoom-in {
+      animation: zoomIn 0.6s forwards;
+    }
+
+    .zoom-out {
+      animation: zoomOut 0.6s forwards;
+    }
+
+    .slide-in {
+      animation: slideIn 0.6s forwards;
+    }
+
+    .slide-out {
+      animation: slideOut 0.6s forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
       }
 
-      #clipContainer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
       }
 
-      .fade-in {
-        animation: fadeIn 0.6s forwards;
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
       }
 
-      .fade-out {
-        animation: fadeOut 0.6s forwards;
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes zoomOut {
+      from {
+        transform: scale(1);
+        opacity: 1;
       }
 
-      .zoom-in {
-        animation: zoomIn 0.6s forwards;
+      to {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
       }
 
-      .zoom-out {
-        animation: zoomOut 0.6s forwards;
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateY(0);
+        opacity: 1;
       }
 
-      .slide-in {
-        animation: slideIn 0.6s forwards;
+      to {
+        transform: translateY(50px);
+        opacity: 0;
       }
+    }
+  </style>
+</head>
 
-      .slide-out {
-        animation: slideOut 0.6s forwards;
-      }
+<body>
+  <div id="clipContainer"></div>
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const projectId = window.location.pathname.split("/").pop();
+    const socket = io();
+    const container = document.getElementById("clipContainer");
+
+    let queue = [];
+    let playing = false;
+
+    socket.on("connect", () => {
+      console.log("🟢 Overlay conectado al socket:", socket.id);
+      console.log("📌 Uniéndose al proyecto:", projectId);
+      socket.emit("joinProject", projectId);
+    });
+
+    socket.on("newClip", (data) => {
+      console.log("🎬 DATA RECIBIDA DEL SOCKET:", data);
+
+      queue.push(data);
+      processQueue();
+    });
+
+    function parseVariables(text, data) {
+      if (!text) return "";
+
+      const vars = {
+        "{user}": data.user,
+        "{userMention}": "@" + data.user,
+        "{userUrl}": "https://twitch.tv/" + data.user,
+
+        "{game}": data.game,
+
+        "{clipUrl}": data.clipUrl,
+        "{clipTitle}": data.clipTitle,
+        "{clipViews}": data.clipViews,
+        "{clipCreator}": data.clipCreator,
+
+        "{channel}": data.channel,
+        "{channelUrl}": "https://twitch.tv/" + data.channel,
+      };
+
+      Object.keys(vars).forEach((key) => {
+        if (vars[key] !== undefined && vars[key] !== null) {
+          text = text.replaceAll(key, vars[key]);
         }
-
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes fadeOut {
-        from {
-          opacity: 1;
-        }
-
-        to {
-          opacity: 0;
-        }
-      }
-
-      @keyframes zoomIn {
-        from {
-          transform: scale(0.8);
-          opacity: 0;
-        }
-
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-
-      @keyframes zoomOut {
-        from {
-          transform: scale(1);
-          opacity: 1;
-        }
-
-        to {
-          transform: scale(0.8);
-          opacity: 0;
-        }
-      }
-
-      @keyframes slideIn {
-        from {
-          transform: translateY(50px);
-          opacity: 0;
-        }
-
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideOut {
-        from {
-          transform: translateY(0);
-          opacity: 1;
-        }
-
-        to {
-          transform: translateY(50px);
-          opacity: 0;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="clipContainer"></div>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const projectId = window.location.pathname.split("/").pop();
-      const socket = io();
-      const container = document.getElementById("clipContainer");
-
-      let queue = [];
-      let playing = false;
-
-      socket.on("connect", () => {
-        console.log("🟢 Overlay conectado al socket:", socket.id);
-        console.log("📌 Uniéndose al proyecto:", projectId);
-        socket.emit("joinProject", projectId);
       });
 
-      socket.on("newClip", (data) => {
-        console.log("🎬 DATA RECIBIDA DEL SOCKET:", data);
+      return text;
+    }
 
-        queue.push(data);
+    function processQueue() {
+      if (playing) return;
+      if (queue.length === 0) return;
+
+      const data = queue.shift();
+      playClip(data);
+    }
+
+    function playClip(data) {
+      if (!data.clipId) {
+        playing = false;
         processQueue();
-      });
-
-      function parseVariables(text, data) {
-        if (!text) return "";
-
-        const vars = {
-          "{user}": data.user,
-          "{userMention}": "@" + data.user,
-          "{userUrl}": "https://twitch.tv/" + data.user,
-
-          "{game}": data.game,
-
-          "{clipUrl}": data.clipUrl,
-          "{clipTitle}": data.clipTitle,
-          "{clipViews}": data.clipViews,
-          "{clipCreator}": data.clipCreator,
-
-          "{channel}": data.channel,
-          "{channelUrl}": "https://twitch.tv/" + data.channel,
-        };
-
-        Object.keys(vars).forEach((key) => {
-          if (vars[key] !== undefined && vars[key] !== null) {
-            text = text.replaceAll(key, vars[key]);
-          }
-        });
-
-        return text;
+        return;
       }
 
-      function processQueue() {
-        if (playing) return;
-        if (queue.length === 0) return;
+      playing = true;
+      container.innerHTML = "";
 
-        const data = queue.shift();
-        playClip(data);
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "absolute";
+      wrapper.style.left = (data.x || 200) + "px";
+      wrapper.style.top = (data.y || 200) + "px";
+      wrapper.style.width = (data.width || 500) + "px";
+      wrapper.style.height = (data.height || 300) + "px";
+      wrapper.style.overflow = "hidden";
+
+      // 🎬 TWITCH EMBED
+      const iframe = document.createElement("iframe");
+
+      const parent = window.location.hostname;
+
+      iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${parent}&autoplay=true`;
+      iframe.allow = "autoplay; fullscreen";
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.allowFullscreen = true;
+      iframe.frameBorder = "0";
+      iframe.style.position = "absolute";
+      iframe.style.top = "0";
+      iframe.style.left = "0";
+
+      wrapper.appendChild(iframe);
+
+      container.appendChild(wrapper);
+
+      // 📝 TEXTO
+      const parsedText = parseVariables(
+        data.overlayText && data.overlayText.trim() !== ""
+          ? data.overlayText
+          : "Sigan a {user} jugando {game}",
+        data
+      );
+
+      const text = document.createElement("div");
+      text.innerHTML = parsedText;
+
+      text.style.position = "absolute";
+      text.style.top = "20px";
+      text.style.left = "50%";
+      text.style.transform = "translateX(-50%)";
+      text.style.color = "white";
+      const style = data.overlayStyle || {};
+
+      text.style.fontSize = (style.fontSize || 40) + "px";
+      text.style.color = style.textColor || "#fff";
+      text.style.fontWeight = "bold";
+      text.style.textAlign = style.textAlign || "center";
+
+      if (style.strokeSize) {
+        text.style.webkitTextStroke =
+          style.strokeSize + "px " + (style.strokeColor || "#000");
       }
 
-      function playClip(data) {
-        if (!data.clipId) return;
+      if (style.backgroundColor) {
+        const rgb = hexToRgb(style.backgroundColor);
+        const opacity = style.backgroundOpacity ?? 0.4;
 
-        playing = true;
-        container.innerHTML = "";
-
-        const wrapper = document.createElement("div");
-        wrapper.style.position = "absolute";
-        wrapper.style.left = (data.x || 200) + "px";
-        wrapper.style.top = (data.y || 200) + "px";
-        wrapper.style.width = (data.width || 500) + "px";
-        wrapper.style.height = (data.height || 300) + "px";
-        wrapper.style.overflow = "hidden";
-
-        // 🎬 TWITCH EMBED
-        const iframe = document.createElement("iframe");
-
-        iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
-        iframe.allow = "autoplay; fullscreen";
-        iframe.width = "100%";
-        iframe.height = "100%";
-        iframe.allowFullscreen = true;
-        iframe.frameBorder = "0";
-        iframe.style.position = "absolute";
-        iframe.style.top = "0";
-        iframe.style.left = "0";
-
-        wrapper.appendChild(iframe);
-
-        container.appendChild(wrapper);
-
-        // 🎨 IMÁGENES HIJAS
-        if (data.images && data.images.length) {
-          console.log("🖼️ Renderizando imágenes:", data.images);
-
-          data.images.forEach((imgData) => {
-            const img = document.createElement("img");
-
-            img.src = imgData.url;
-            img.style.position = "absolute";
-            img.style.left = imgData.x - imgData.parentX + "px";
-            img.style.top = imgData.y - imgData.parentY + "px";
-            img.style.width = imgData.width + "px";
-            img.style.height = imgData.height + "px";
-            img.style.objectFit = imgData.objectFit || "cover";
-            img.style.pointerEvents = "none";
-
-            wrapper.appendChild(img);
-          });
-        }
-
-        // 📝 TEXTO
-        const parsedText = parseVariables(
-          data.overlayText || "Sigan a {user} jugando {game}",
-          data,
-        );
-
-        const text = document.createElement("div");
-        text.innerHTML = parsedText;
-
-        text.style.position = "absolute";
-        text.style.top = "20px";
-        text.style.left = "50%";
-        text.style.transform = "translateX(-50%)";
-        text.style.color = "white";
-        text.style.fontSize = "40px";
-        text.style.fontWeight = "bold";
-        text.style.textAlign = "center";
-        text.style.zIndex = "5";
-
-        wrapper.appendChild(text);
-        
-        wrapper.className = `${data.animationIn || "fade"}-in`;
-
-        setTimeout(
-          () => {
-            wrapper.className = `${data.animationOut || "fade"}-out`;
-
-            setTimeout(() => {
-              container.innerHTML = "";
-              playing = false;
-              processQueue();
-            }, 600);
-          },
-          (data.duration || 10) * 1000,
-        );
+        text.style.background = `rgba(${rgb},${opacity})`;
       }
-    </script>
-  </body>
+
+      text.style.borderRadius = (style.borderRadius || 0) + "px";
+      text.style.padding = "6px 12px";
+      text.style.textAlign = "center";
+      text.style.zIndex = "5";
+
+      wrapper.appendChild(text);
+
+      wrapper.className = `${data.animationIn || "fade"}-in`;
+
+      setTimeout(
+        () => {
+          wrapper.className = `${data.animationOut || "fade"}-out`;
+
+          setTimeout(() => {
+            container.innerHTML = "";
+            playing = false;
+            processQueue();
+          }, 600);
+        },
+        (data.duration || 10) * 1000,
+      );
+    }
+  </script>
+</body>
+
 </html>

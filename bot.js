@@ -34,6 +34,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
     },
   }),
 );
@@ -46,6 +47,10 @@ io.on("connection", (socket) => {
     socket.join(projectId);
     console.log("Overlay conectado al proyecto:", projectId);
   });
+});
+
+socket.on("disconnect", () => {
+  console.log("Socket desconectado:", socket.id);
 });
 
 mongoose
@@ -152,7 +157,11 @@ async function syncChannels() {
     for (const channel of activeChannels) {
       if (!currentChannels.includes(channel)) {
         console.log(`👉 Uniéndose a ${channel}`);
-        await client.join(channel);
+        try {
+          await client.join(channel);
+        } catch (err) {
+          console.error("Error join:", err);
+        }
       }
     }
 
@@ -375,7 +384,7 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
     _id: req.params.id,
     userId: req.session.user.id,
   });
-  
+
   await loadUserCommands(req.session.user.id);
 
   res.json({ success: true });

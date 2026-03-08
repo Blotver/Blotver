@@ -219,7 +219,7 @@ window.ImageWidget = {
                     const field = e.target.dataset.field;
                     let value = e.target.type === "range"
                         ? parseFloat(e.target.value)
-                        : parseInt(e.target.value);
+                        : parseInt(e.target.value) || 0;
 
                     // 🔥 ACTUALIZAR EL NUMERITO DEL PANEL
                     if (valueLabel) {
