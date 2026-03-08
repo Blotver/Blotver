@@ -123,7 +123,7 @@ window.ShoutoutWidget = {
     el.style.borderRadius = widget.data.borderRadius + "px";
     el.style.border = "1px solid rgba(255,255,255,0.06)";
     el.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
-    el.style.overflow = "visible";
+    el.style.overflow = "hidden";
 
     function parseVariables(text, data = {}) {
       const vars = {
@@ -217,7 +217,7 @@ position:relative;
 display:flex;
 align-items:center;
 justify-content:center;
-overflow:visible;
+overflow:hidden;
 background:#000;
 ">
 

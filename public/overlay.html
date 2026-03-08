@@ -176,11 +176,7 @@
     }
 
     function playClip(data) {
-      if (!data.clipId) {
-        playing = false;
-        processQueue();
-        return;
-      }
+      if (!data.clipId) return;
 
       playing = true;
       container.innerHTML = "";
@@ -196,9 +192,7 @@
       // 🎬 TWITCH EMBED
       const iframe = document.createElement("iframe");
 
-      const parent = window.location.hostname;
-
-      iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=${parent}&autoplay=true`;
+      iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
       iframe.allow = "autoplay; fullscreen";
       iframe.width = "100%";
       iframe.height = "100%";
@@ -212,12 +206,30 @@
 
       container.appendChild(wrapper);
 
+      // 🎨 IMÁGENES HIJAS
+      if (data.images && data.images.length) {
+        console.log("🖼️ Renderizando imágenes:", data.images);
+
+        data.images.forEach((imgData) => {
+          const img = document.createElement("img");
+
+          img.src = imgData.url;
+          img.style.position = "absolute";
+          img.style.left = imgData.x - imgData.parentX + "px";
+          img.style.top = imgData.y - imgData.parentY + "px";
+          img.style.width = imgData.width + "px";
+          img.style.height = imgData.height + "px";
+          img.style.objectFit = imgData.objectFit || "cover";
+          img.style.pointerEvents = "none";
+
+          wrapper.appendChild(img);
+        });
+      }
+
       // 📝 TEXTO
       const parsedText = parseVariables(
-        data.overlayText && data.overlayText.trim() !== ""
-          ? data.overlayText
-          : "Sigan a {user} jugando {game}",
-        data
+        data.overlayText || "Sigan a {user} jugando {game}",
+        data,
       );
 
       const text = document.createElement("div");
@@ -228,27 +240,8 @@
       text.style.left = "50%";
       text.style.transform = "translateX(-50%)";
       text.style.color = "white";
-      const style = data.overlayStyle || {};
-
-      text.style.fontSize = (style.fontSize || 40) + "px";
-      text.style.color = style.textColor || "#fff";
+      text.style.fontSize = "40px";
       text.style.fontWeight = "bold";
-      text.style.textAlign = style.textAlign || "center";
-
-      if (style.strokeSize) {
-        text.style.webkitTextStroke =
-          style.strokeSize + "px " + (style.strokeColor || "#000");
-      }
-
-      if (style.backgroundColor) {
-        const rgb = hexToRgb(style.backgroundColor);
-        const opacity = style.backgroundOpacity ?? 0.4;
-
-        text.style.background = `rgba(${rgb},${opacity})`;
-      }
-
-      text.style.borderRadius = (style.borderRadius || 0) + "px";
-      text.style.padding = "6px 12px";
       text.style.textAlign = "center";
       text.style.zIndex = "5";
 

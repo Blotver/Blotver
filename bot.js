@@ -34,7 +34,6 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
     },
   }),
 );
@@ -153,11 +152,7 @@ async function syncChannels() {
     for (const channel of activeChannels) {
       if (!currentChannels.includes(channel)) {
         console.log(`👉 Uniéndose a ${channel}`);
-        try {
-          await client.join(channel);
-        } catch (err) {
-          console.error("Error join:", err);
-        }
+        await client.join(channel);
       }
     }
 
@@ -380,7 +375,7 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
     _id: req.params.id,
     userId: req.session.user.id,
   });
-
+  
   await loadUserCommands(req.session.user.id);
 
   res.json({ success: true });
