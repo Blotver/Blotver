@@ -49,10 +49,6 @@ io.on("connection", (socket) => {
   });
 });
 
-socket.on("disconnect", () => {
-  console.log("Socket desconectado:", socket.id);
-});
-
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ Conectado a MongoDB"))
