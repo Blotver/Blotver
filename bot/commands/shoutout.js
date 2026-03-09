@@ -83,11 +83,11 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
-  const childImages = await Widget.find({
-    projectId: matchedWidget.projectId,
-    parent: matchedWidget._id.toString(),
-    type: "image",
-  });
+const childImages = await Widget.find({
+  projectId: matchedWidget.projectId,
+  parent: matchedWidget._id,
+  type: "image",
+});
 
   console.log("🖼️ Child images encontradas:", childImages);
 
@@ -96,11 +96,11 @@ module.exports = async function handleShoutout(ctx, widget) {
     childImages.map((i) => i.data),
   );
 
-  const childTexts = await Widget.find({
-    projectId: matchedWidget.projectId,
-    parent: matchedWidget._id.toString(),
-    type: "text",
-  });
+const childTexts = await Widget.find({
+  projectId: matchedWidget.projectId,
+  parent: matchedWidget._id,
+  type: "text",
+});
 
 
 

@@ -225,7 +225,7 @@
           wrapper.appendChild(img);
         });
       }
-      
+
       // 📝 TEXTOS HIJOS
       if (data.texts && data.texts.length) {
         console.log("📝 Renderizando textos:", data.texts);
@@ -250,22 +250,16 @@
 
           if (textData.strokeSize) {
             txt.style.webkitTextStroke =
-              `${textData.strokeSize}px ${textData.strokeColor || "black"}`;
+              `${textData.strokeSize || 0}px ${textData.strokeColor || "black"}`;
           }
 
           txt.style.pointerEvents = "none";
+          txt.style.zIndex = "10";
 
           wrapper.appendChild(txt);
         });
       }
-
-      // 📝 TEXTO
-      const parsedText = parseVariables(
-        data.overlayText || "Sigan a {user} jugando {game}",
-        data,
-      );
-
-      const text = document.createElement("div");
+      
       text.innerHTML = parsedText;
 
       text.style.position = "absolute";

@@ -375,7 +375,7 @@ app.delete("/api/widgets/:id", isAuthenticated, async (req, res) => {
     _id: req.params.id,
     userId: req.session.user.id,
   });
-  
+
   await loadUserCommands(req.session.user.id);
 
   res.json({ success: true });
@@ -427,6 +427,10 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     projectId: widget.projectId,
   });
 
+  // separar widgets por tipo
+  const images = widgets.filter(w => w.type === "image");
+  const texts = widgets.filter(w => w.type === "text");
+
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
     user: randomUsername,
@@ -436,7 +440,9 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     width: widget.data.width || 500,
     height: widget.data.height || 300,
 
-    widgets,
+    images,
+    texts,
+
     overlayText: widget.data.overlayText || "",
     animationIn: widget.data.animationIn || "fade",
     animationOut: widget.data.animationOut || "fade",
