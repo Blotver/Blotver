@@ -96,6 +96,14 @@ module.exports = async function handleShoutout(ctx, widget) {
     childImages.map((i) => i.data),
   );
 
+  const childTexts = await Widget.find({
+    projectId: matchedWidget.projectId,
+    parent: matchedWidget._id.toString(),
+    type: "text",
+  });
+
+
+
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
 
@@ -117,6 +125,12 @@ module.exports = async function handleShoutout(ctx, widget) {
 
     images: childImages.map((i) => ({
       ...i.data,
+      parentX: matchedWidget.data.x,
+      parentY: matchedWidget.data.y,
+    })),
+
+    texts: childTexts.map((t) => ({
+      ...t.data,
       parentX: matchedWidget.data.x,
       parentY: matchedWidget.data.y,
     })),

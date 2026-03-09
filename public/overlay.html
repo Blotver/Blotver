@@ -225,6 +225,39 @@
           wrapper.appendChild(img);
         });
       }
+      
+      // 📝 TEXTOS HIJOS
+      if (data.texts && data.texts.length) {
+        console.log("📝 Renderizando textos:", data.texts);
+
+        data.texts.forEach((textData) => {
+          const txt = document.createElement("div");
+
+          const parsed = parseVariables(textData.text || "", data);
+          txt.innerHTML = parsed;
+
+          txt.style.position = "absolute";
+          txt.style.left = textData.x - textData.parentX + "px";
+          txt.style.top = textData.y - textData.parentY + "px";
+
+          txt.style.width = (textData.width || 200) + "px";
+          txt.style.height = (textData.height || 50) + "px";
+
+          txt.style.color = textData.textColor || "white";
+          txt.style.fontSize = (textData.fontSize || 30) + "px";
+          txt.style.fontWeight = textData.fontWeight || "bold";
+          txt.style.textAlign = textData.textAlign || "center";
+
+          if (textData.strokeSize) {
+            txt.style.webkitTextStroke =
+              `${textData.strokeSize}px ${textData.strokeColor || "black"}`;
+          }
+
+          txt.style.pointerEvents = "none";
+
+          wrapper.appendChild(txt);
+        });
+      }
 
       // 📝 TEXTO
       const parsedText = parseVariables(
