@@ -423,13 +423,17 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
   console.log("🧪 TEST enviando a:", projectRoom);
 
-  const widgets = await Widget.find({
+  const images = await Widget.find({
     projectId: widget.projectId,
+    parent: widget._id.toString(),
+    type: "image"
   });
 
-  // separar widgets por tipo
-  const images = widgets.filter(w => w.type === "image");
-  const texts = widgets.filter(w => w.type === "text");
+  const texts = await Widget.find({
+    projectId: widget.projectId,
+    parent: widget._id.toString(),
+    type: "text"
+  });
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
@@ -437,8 +441,8 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
 
     x: widget.data.x,
     y: widget.data.y,
-    width: widget.data.width || 500,
-    height: widget.data.height || 300,
+    width: widget.data.width,
+    height: widget.data.height,
 
     images,
     texts,
