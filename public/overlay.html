@@ -259,20 +259,25 @@
           wrapper.appendChild(txt);
         });
       }
-      
-      text.innerHTML = parsedText;
 
-      text.style.position = "absolute";
-      text.style.top = "20px";
-      text.style.left = "50%";
-      text.style.transform = "translateX(-50%)";
-      text.style.color = "white";
-      text.style.fontSize = "40px";
-      text.style.fontWeight = "bold";
-      text.style.textAlign = "center";
-      text.style.zIndex = "5";
+      if (data.overlayText) {
+        const text = document.createElement("div");
 
-      wrapper.appendChild(text);
+        const parsedText = parseVariables(data.overlayText, data);
+        text.innerHTML = parsedText;
+
+        text.style.position = "absolute";
+        text.style.top = "20px";
+        text.style.left = "50%";
+        text.style.transform = "translateX(-50%)";
+        text.style.color = "white";
+        text.style.fontSize = "40px";
+        text.style.fontWeight = "bold";
+        text.style.textAlign = "center";
+        text.style.zIndex = "5";
+
+        wrapper.appendChild(text);
+      }
 
       wrapper.className = `${data.animationIn || "fade"}-in`;
 
