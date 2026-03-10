@@ -275,13 +275,6 @@ padding:6px 12px;
 border-radius:${widget.data.borderRadius || 0}px;
 pointer-events:none;
 ">
-${parseVariables(text, {
-        user: "streamer",
-        game: "Minecraft",
-        channel: "channel",
-        clipTitle: "Epic clutch",
-        clipViews: "1200"
-      })}
 </div>
 
 ${getChildrenHTML()}
@@ -356,6 +349,8 @@ ${getChildrenHTML()}
                             transition"
                             value="${widget.data.duration || 10}">
                     </div>
+                </div>
+
 
                 <!-- ANIMATIONS -->
                 <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
@@ -422,54 +417,6 @@ ${getChildrenHTML()}
       .addEventListener("input", (e) =>
         update({ duration: parseInt(e.target.value) }),
       );
-
-    // TEXT COLOR SYSTEM
-    const colorField = content.querySelector('[data-key="textColor"]');
-
-    if (colorField) {
-      const preview = colorField.querySelector(".color-preview");
-      const hexInput = colorField.querySelector(".color-hex");
-
-      const nativePicker = colorField.querySelector(".color-native");
-
-      preview.addEventListener("click", () => {
-        nativePicker.click();
-      });
-
-      nativePicker.value = widget.data.textColor;
-      hexInput.value = widget.data.textColor;
-      preview.style.background = widget.data.textColor;
-
-      nativePicker.addEventListener("input", (e) => {
-        const color = e.target.value;
-
-        preview.style.background = color;
-        hexInput.value = color;
-
-        update({
-          textColor: color,
-        });
-      });
-
-      preview.style.background = widget.data.textColor;
-
-      // live update
-      hexInput.addEventListener("input", (e) => {
-        let color = e.target.value;
-
-        if (!color.startsWith("#")) {
-          color = "#" + color;
-        }
-
-        if (/^#[0-9A-F]{6}$/i.test(color)) {
-          preview.style.background = color;
-
-          update({
-            textColor: color,
-          });
-        }
-      });
-    }
 
     document
       .getElementById("cfgAnimIn")
