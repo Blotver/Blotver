@@ -4,29 +4,32 @@ function detectParent(widget) {
     (w) => w._id !== widget._id
   );
 
-  let parent = null;
+  let closest = null;
+  let closestDistance = 999999;
 
   for (const other of others) {
 
-    const width = other.data.width || 400;
-    const height = other.data.height || 300;
+    if (other.type !== "shoutout") continue;
 
-    const insideX =
-      widget.data.x >= other.data.x &&
-      widget.data.x <= other.data.x + width;
+    const centerX = other.data.x + (other.data.width || 400) / 2;
+    const centerY = other.data.y + (other.data.height || 300) / 2;
 
-    const insideY =
-      widget.data.y >= other.data.y &&
-      widget.data.y <= other.data.y + height;
+    const dx = widget.data.x - centerX;
+    const dy = widget.data.y - centerY;
 
-    if (insideX && insideY) {
-      parent = other._id;
-      break;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closest = other;
     }
-
   }
 
-  widget.parent = parent;
+  if (closestDistance < 800) {
+    widget.parent = closest._id;
+  } else {
+    widget.parent = null;
+  }
 }
 
 function hexToRgb(hex) {
@@ -112,6 +115,8 @@ window.ShoutoutWidget = {
       (w) => w.parent === widget._id,
     );
 
+    console.log("Children del shoutout:", children);
+    
     const el = document.createElement("div");
 
     el.style.width = widget.data.width + "px";

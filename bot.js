@@ -444,8 +444,17 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     width: widget.data.width,
     height: widget.data.height,
 
-    images,
-    texts,
+    images: images.map(i => ({
+      ...i.data,
+      parentX: widget.data.x,
+      parentY: widget.data.y
+    })),
+
+    texts: texts.map(t => ({
+      ...t.data,
+      parentX: widget.data.x,
+      parentY: widget.data.y
+    })),
 
     overlayText: widget.data.overlayText || "",
     animationIn: widget.data.animationIn || "fade",
