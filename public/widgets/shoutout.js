@@ -101,20 +101,9 @@ window.ShoutoutWidget = {
     textTemplate: "Sigan a {user} jugando {game}",
 
     duration: 30,
-    overlayText: "",
     animationIn: "fade",
     animationOut: "fade",
-
-    fontSize: 20,
-    textColor: "#ffffff",
-    strokeColor: "#000000",
-    strokeSize: 2,
-    backgroundColor: "#000000",
-    backgroundOpacity: 0.4,
     borderRadius: 12,
-
-    textAlign: "center",
-    textPosition: "top",
     maxWidth: "80%",
   },
 
@@ -434,18 +423,6 @@ ${getChildrenHTML()}
         update({ duration: parseInt(e.target.value) }),
       );
 
-    document
-      .getElementById("cfgOverlay")
-      .addEventListener("input", (e) =>
-        update({ overlayText: e.target.value }),
-      );
-
-    document
-      .getElementById("cfgFontSize")
-      .addEventListener("input", (e) =>
-        update({ fontSize: parseInt(e.target.value) }),
-      );
-
     // TEXT COLOR SYSTEM
     const colorField = content.querySelector('[data-key="textColor"]');
 
@@ -495,22 +472,6 @@ ${getChildrenHTML()}
     }
 
     document
-      .getElementById("cfgBgColor")
-      .addEventListener("input", (e) =>
-        update({ backgroundColor: e.target.value }),
-      );
-
-    document.getElementById("cfgStrokeColor").addEventListener("input", (e) => {
-      update({ strokeColor: e.target.value });
-    });
-
-    document
-      .getElementById("cfgStrokeSize")
-      .addEventListener("input", (e) =>
-        update({ strokeSize: parseInt(e.target.value) }),
-      );
-
-    document
       .getElementById("cfgAnimIn")
       .addEventListener("change", (e) =>
         update({ animationIn: e.target.value }),
@@ -520,16 +481,6 @@ ${getChildrenHTML()}
       .getElementById("cfgAnimOut")
       .addEventListener("change", (e) =>
         update({ animationOut: e.target.value }),
-      );
-
-    document
-      .getElementById("cfgTextAlign")
-      .addEventListener("change", (e) => update({ textAlign: e.target.value }));
-
-    document
-      .getElementById("cfgTextPosition")
-      .addEventListener("change", (e) =>
-        update({ textPosition: e.target.value }),
       );
   },
 };
