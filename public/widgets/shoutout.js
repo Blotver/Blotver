@@ -1,21 +1,30 @@
 function detectParent(widget) {
-  const others = (window.widgets || []).filter((w) => w._id !== widget._id);
+
+  const others = (window.widgets || []).filter(
+    (w) => w._id !== widget._id
+  );
 
   let parent = null;
 
-  others.forEach((other) => {
+  for (const other of others) {
+
+    const width = other.data.width || 400;
+    const height = other.data.height || 300;
+
     const insideX =
-      widget.data.x > other.data.x &&
-      widget.data.x < other.data.x + (other.data.width || 400);
+      widget.data.x >= other.data.x &&
+      widget.data.x <= other.data.x + width;
 
     const insideY =
-      widget.data.y > other.data.y &&
-      widget.data.y < other.data.y + (other.data.height || 300);
+      widget.data.y >= other.data.y &&
+      widget.data.y <= other.data.y + height;
 
     if (insideX && insideY) {
       parent = other._id;
+      break;
     }
-  });
+
+  }
 
   widget.parent = parent;
 }
@@ -84,6 +93,10 @@ window.ShoutoutWidget = {
   defaultData: {
     x: 100,
     y: 100,
+
+    width: 900,
+    height: 500,
+
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
 
@@ -115,8 +128,9 @@ window.ShoutoutWidget = {
 
     const el = document.createElement("div");
 
-    el.style.width = "100%";
-    el.style.height = "100%";
+    el.style.width = widget.data.width + "px";
+    el.style.height = widget.data.height + "px";
+
     el.style.display = "flex";
     el.style.flexDirection = "column";
     el.style.background = "#0f0f0f";
@@ -253,10 +267,10 @@ border-radius:${widget.data.borderRadius || 0}px;
 pointer-events:none;
 ">
 ${parseVariables(text, {
-  user: "streamer",
-  game: "Minecraft",
-  channel: "channel",
-})}
+        user: "streamer",
+        game: "Minecraft",
+        channel: "channel",
+      })}
 </div>
 
 ${getChildrenHTML()}
