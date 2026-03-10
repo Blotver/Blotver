@@ -792,7 +792,7 @@
       function renderWidget(widget, level = 0) {
         const el = document.createElement("div");
         el.dataset.widgetId = widget._id;
-        
+
         const widgetDef = window.WidgetRegistry[widget.type];
 
         if (widgetDef && widgetDef.renderCanvas) {
@@ -951,6 +951,8 @@
                 if (selectedWidget && selectedWidget._id === widgetId) {
                   selectedWidget.data = widget.data;
                 }
+
+                detectParent(widget);
 
                 markAsChanged();
               },
@@ -1434,6 +1436,39 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
           }),
         });
       }
+    }
+
+    function detectParent(widget) {
+      const margin = 5; // tolerancia
+
+      const childLeft = widget.data.x;
+      const childTop = widget.data.y;
+      const childRight = childLeft + (widget.data.width || 0);
+      const childBottom = childTop + (widget.data.height || 0);
+
+      let newParent = null;
+
+      widgets.forEach((w) => {
+        if (w._id === widget._id) return;
+        if (w.type !== "shoutout") return;
+
+        const parentLeft = w.data.x;
+        const parentTop = w.data.y;
+        const parentRight = parentLeft + (w.data.width || 0);
+        const parentBottom = parentTop + (w.data.height || 0);
+
+        const inside =
+          childLeft >= parentLeft - margin &&
+          childTop >= parentTop - margin &&
+          childRight <= parentRight + margin &&
+          childBottom <= parentBottom + margin;
+
+        if (inside) {
+          newParent = w._id;
+        }
+      });
+
+      widget.parent = newParent;
     }
 
     function updateActiveLayer(id) {
