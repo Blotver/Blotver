@@ -224,7 +224,7 @@ position:relative;
 display:flex;
 align-items:center;
 justify-content:center;
-overflow:hidden;
+overflow:visible;
 background:#000;
 ">
 
