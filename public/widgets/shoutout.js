@@ -105,9 +105,6 @@ window.ShoutoutWidget = {
     animationIn: "fade",
     animationOut: "fade",
 
-    imgX: 20,
-    imgY: 60,
-
     fontSize: 20,
     textColor: "#ffffff",
     strokeColor: "#000000",
@@ -134,6 +131,8 @@ window.ShoutoutWidget = {
     el.style.display = "flex";
     el.style.flexDirection = "column";
     el.style.background = "#0f0f0f";
+    el.style.outline = "1px dashed rgba(255,255,255,0.15)";
+    el.style.outlineOffset = "-1px";
     el.style.borderRadius = widget.data.borderRadius + "px";
     el.style.border = "1px solid rgba(255,255,255,0.06)";
     el.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
@@ -240,15 +239,36 @@ background:#000;
 position:absolute;
 width:80%;
 height:70%;
-background:#111;
+background:linear-gradient(135deg,#111,#222);
 border-radius:12px;
-display:flex;
-align-items:center;
-justify-content:center;
-color:rgba(255,255,255,0.4);
-font-size:14px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.6);
 ">
-CLIP PREVIEW
+
+<div style="
+position:absolute;
+top:8px;
+left:8px;
+background:rgba(0,0,0,0.7);
+color:white;
+font-size:11px;
+padding:3px 6px;
+border-radius:4px;
+">
+TWITCH CLIP
+</div>
+
+<div style="
+position:absolute;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+color:rgba(255,255,255,0.6);
+font-size:13px;
+">
+Preview Clip Area
+</div>
+
 </div>
 
 <!-- OVERLAY TEXT -->
@@ -270,6 +290,8 @@ ${parseVariables(text, {
         user: "streamer",
         game: "Minecraft",
         channel: "channel",
+        clipTitle: "Epic clutch",
+        clipViews: "1200"
       })}
 </div>
 
@@ -279,35 +301,7 @@ ${getChildrenHTML()}
 `;
     }
     updateView();
-    requestAnimationFrame(() => {
-      const img = el.querySelector(".clip-image");
-      if (!img) return;
 
-      let dragging = false;
-      let startX, startY;
-
-      img.onmousedown = null;
-
-      img.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        dragging = true;
-        startX = e.clientX - (widget.data.imgX || 0);
-        startY = e.clientY - (widget.data.imgY || 0);
-      });
-
-      document.onmousemove = (e) => {
-        if (!dragging) return;
-
-        const x = e.clientX - startX;
-        const y = e.clientY - startY;
-
-        img.style.left = x + "px";
-        img.style.top = y + "px";
-
-        widget.data.imgX = x;
-        widget.data.imgY = y;
-      };
-    });
     el.updatePreview = updateView;
 
     return el;
@@ -374,100 +368,6 @@ ${getChildrenHTML()}
                             value="${widget.data.duration || 10}">
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Overlay Text
-                        </label>
-                        <div>
-        <label class="block text-xs font-medium text-gray-400 mb-2">
-            Font Size
-        </label>
-        <input type="number" id="cfgFontSize"
-            class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200"
-            value="${widget.data.fontSize || 40}">
-    </div>
-
-    <div>
-        <label class="block text-xs font-medium text-gray-400 mb-2">
-            Text Color
-        </label>
-       <div class="color-field" data-key="textColor">
-  <div class="color-preview"></div>
-  <input type="color" class="color-native" style="display:none">
-  <input class="color-hex"
-style="
-background:#111;
-border:1px solid #333;
-border-radius:6px;
-padding:6px 8px;
-color:white;
-width:90px;
-font-size:12px;
-"
-value="${widget.data.textColor}">
-</div>
-    </div>
-
-    <div>
-        <label class="block text-xs font-medium text-gray-400 mb-2">
-            Stroke Color
-        </label>
-        <input type="color" id="cfgStrokeColor"
-            value="${widget.data.strokeColor || "#000000"}">
-    </div>
-
-    <div>
-        <label class="block text-xs font-medium text-gray-400 mb-2">
-            Stroke Size
-        </label>
-        <input type="number" id="cfgStrokeSize"
-            value="${widget.data.strokeSize || 2}">
-    </div>
-
-    <div>
-        <label class="block text-xs font-medium text-gray-400 mb-2">
-            Background Color
-        </label>
-        <input type="color" id="cfgBgColor"
-    value="${widget.data.backgroundColor || "#000000"}">
-    </div>
-                        <input id="cfgOverlay"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition"
-                            value="${widget.data.overlayText || ""}">
-                    </div>
-
-                </div>
-<div>
-<label class="block text-xs font-medium text-gray-400 mb-2">
-Text Align
-</label>
-
-<select id="cfgTextAlign"
-class="w-full bg-gray-900 border border-gray-700
-rounded-lg px-3 py-2.5 text-sm text-gray-200">
-<option value="left">Left</option>
-<option value="center">Center</option>
-<option value="right">Right</option>
-</select>
-</div>
-
-<div>
-<label class="block text-xs font-medium text-gray-400 mb-2">
-Text Position
-</label>
-
-<select id="cfgTextPosition"
-class="w-full bg-gray-900 border border-gray-700
-rounded-lg px-3 py-2.5 text-sm text-gray-200">
-<option value="top">Top</option>
-<option value="center">Center</option>
-<option value="bottom">Bottom</option>
-</select>
-</div>
                 <!-- ANIMATIONS -->
                 <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
 
@@ -516,12 +416,6 @@ rounded-lg px-3 py-2.5 text-sm text-gray-200">
 
     document.getElementById("cfgAnimOut").value =
       widget.data.animationOut || "fade";
-
-    document.getElementById("cfgTextAlign").value =
-      widget.data.textAlign || "center";
-
-    document.getElementById("cfgTextPosition").value =
-      widget.data.textPosition || "top";
 
     // Listeners
     document
