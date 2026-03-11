@@ -1,36 +1,4 @@
-function detectParent(widget) {
 
-  const others = (window.widgets || []).filter(
-    (w) => w._id !== widget._id
-  );
-
-  let closest = null;
-  let closestDistance = 999999;
-
-  for (const other of others) {
-
-    if (other.type !== "shoutout") continue;
-
-    const centerX = other.data.x + (other.data.width || 400) / 2;
-    const centerY = other.data.y + (other.data.height || 300) / 2;
-
-    const dx = widget.data.x - centerX;
-    const dy = widget.data.y - centerY;
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closest = other;
-    }
-  }
-
-  if (closestDistance < 800) {
-    widget.parent = closest._id;
-  } else {
-    widget.parent = null;
-  }
-}
 
 function hexToRgb(hex) {
   if (!hex) return "0,0,0";

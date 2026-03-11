@@ -859,15 +859,6 @@
                   selectedWidget.data.y = top;
                 }
 
-                // 🔥 Detectar nuevo parent
-                const oldParent = widget.parent;
-                detectParent(widget);
-
-                // 🔥 Si cambió el parent, marcar cambios
-                if (oldParent !== widget.parent) {
-                  console.log("Nuevo parent:", widget.parent);
-                }
-
                 markAsChanged();
               },
             },
@@ -951,8 +942,6 @@
                 if (selectedWidget && selectedWidget._id === widgetId) {
                   selectedWidget.data = widget.data;
                 }
-
-                detectParent(widget);
 
                 markAsChanged();
               },
@@ -1126,9 +1115,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       showSaveToast("Saving", "loading");
 
       console.log("Widgets antes de guardar:", widgets);
-
-      // 🔥 NUEVO
-      widgets.forEach(w => detectParent(w));
 
       try {
         await fetch(`/api/projects/${currentProject._id}`, {
@@ -1605,33 +1591,6 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       sidebar.classList.add("translate-y-full");
       document.getElementById("sidebarOverlay").classList.add("hidden");
       document.body.classList.remove("overflow-hidden");
-    }
-
-    function detectParent(widget) {
-
-      const others = (window.widgets || []).filter(
-        (w) => w._id !== widget._id && w.type === "shoutout"
-      );
-
-      let parent = null;
-
-      for (const other of others) {
-
-        const x1 = other.data.x;
-        const y1 = other.data.y;
-        const x2 = x1 + (other.data.width || 400);
-        const y2 = y1 + (other.data.height || 300);
-
-        const wx = widget.data.x;
-        const wy = widget.data.y;
-
-        if (wx >= x1 && wx <= x2 && wy >= y1 && wy <= y2) {
-          parent = other._id;
-          break;
-        }
-      }
-
-      widget.parent = parent;
     }
 
     function renderLayer(widget) {
