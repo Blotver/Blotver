@@ -183,6 +183,7 @@
 
       const wrapper = document.createElement("div");
       wrapper.style.position = "absolute";
+      wrapper.style.position = "visible";
       wrapper.style.left = (data.x || 200) + "px";
       wrapper.style.top = (data.y || 200) + "px";
       wrapper.style.width = (data.width || 500) + "px";
@@ -237,8 +238,8 @@
           txt.innerHTML = parsed;
 
           txt.style.position = "absolute";
-          txt.style.left = textData.x - textData.x + "px";
-          txt.style.top = textData.y - textData.y + "px";
+          txt.style.left = textData.x - data.x + "px";
+          txt.style.top = textData.y - data.y + "px";
 
           txt.style.width = (textData.width || 200) + "px";
           txt.style.height = (textData.height || 50) + "px";
