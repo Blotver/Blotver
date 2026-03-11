@@ -83,11 +83,11 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
-const childImages = await Widget.find({
-  projectId: matchedWidget.projectId,
-  parent: matchedWidget._id,
-  type: "image",
-});
+  const childImages = await Widget.find({
+    projectId: matchedWidget.projectId,
+    parent: matchedWidget._id,
+    type: "image",
+  });
 
   console.log("🖼️ Child images encontradas:", childImages);
 
@@ -96,16 +96,21 @@ const childImages = await Widget.find({
     childImages.map((i) => i.data),
   );
 
-const childTexts = await Widget.find({
-  projectId: matchedWidget.projectId,
-  parent: matchedWidget._id,
-  type: "text",
-});
+  const childTexts = await Widget.find({
+    projectId: matchedWidget.projectId,
+    parent: matchedWidget._id,
+    type: "text",
+  });
 
 
 
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
+
+    x: matchedWidget.data.x,
+    y: matchedWidget.data.y,
+    width: matchedWidget.data.width,
+    height: matchedWidget.data.height,
 
     user: usuario,
     game: gameName,
@@ -123,16 +128,7 @@ const childTexts = await Widget.find({
     animationOut: matchedWidget.data.animationOut || "fade",
     duration: matchedWidget.data.duration || 10,
 
-    images: childImages.map((i) => ({
-      ...i.data,
-      parentX: matchedWidget.data.x,
-      parentY: matchedWidget.data.y,
-    })),
-
-    texts: childTexts.map((t) => ({
-      ...t.data,
-      parentX: matchedWidget.data.x,
-      parentY: matchedWidget.data.y,
-    })),
+    images: childImages.map(img => img.data),
+    texts: childTexts.map(txt => txt.data)
   });
 };
