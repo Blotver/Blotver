@@ -217,8 +217,8 @@
           img.src = imgData.url;
 
           img.style.position = "absolute";
-          img.style.left = imgData.x + "px";
-          img.style.top = imgData.y + "px";
+          img.style.left = (imgData.x - data.x) + "px";
+          img.style.top = (imgData.y - data.y) + "px";
 
           img.style.width = imgData.width + "px";
           img.style.height = imgData.height + "px";
@@ -244,8 +244,8 @@
           txt.innerHTML = parsed;
 
           txt.style.position = "absolute";
-          txt.style.left = textData.x + "px";
-          txt.style.top = textData.y + "px";
+          txt.style.left = (textData.x - data.x) + "px";
+          txt.style.top = (textData.y - data.y) + "px";
 
           txt.style.width = (textData.width || 200) + "px";
           txt.style.height = (textData.height || 50) + "px";
@@ -276,7 +276,7 @@
         text.style.textAlign = "center";
         text.style.zIndex = "5";
 
-        wrapper.appendChild(txt)
+        wrapper.appendChild(text)
       }
 
       wrapper.className = `${data.animationIn || "fade"}-in`;
