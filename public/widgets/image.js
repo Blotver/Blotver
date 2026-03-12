@@ -2,10 +2,11 @@ window.ImageWidget = {
     type: "image",
 
     defaultData: {
-        x: 100,
-        y: 100,
-        width: 300,
-        height: 300,
+        x: 0.2,
+        y: 0.2,
+        width: 0.15,
+        height: 0.15,
+
         url: "",
         visible: true,
 

@@ -1,11 +1,11 @@
 window.TextWidget = {
   type: "text",
 
-  defaultData: {
-    x: 100,
-    y: 100,
-    width: 300,
-    height: 80,
+defaultData: {
+    x: 0.2,
+    y: 0.2,
+    width: 0.2,
+    height: 0.1,
 
     text: "Sample Text",
 

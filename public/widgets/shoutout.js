@@ -141,8 +141,8 @@ window.ShoutoutWidget = {
         position:absolute;
         left:${(child.data.x - widget.data.x) * canvasW}px;
         top:${(child.data.y - widget.data.y) * canvasH}px;
-        width:${child.data.width}px;
-        height:${child.data.height}px;
+        width:${child.data.width * canvasW}px;
+        height:${child.data.height * canvasH}px;
         object-fit:${child.data.objectFit || "cover"};
         pointer-events:none;
       ">
@@ -206,7 +206,7 @@ position:absolute;
 width:100%;
 height:100%;
 background:linear-gradient(135deg,#111,#222);
-border-radius:12px;
+border-radius:${widget.data.borderRadius}px;
 overflow:hidden;
 box-shadow:0 10px 30px rgba(0,0,0,0.6);
 ">

@@ -226,8 +226,8 @@
           img.style.zIndex = "5";
 
           img.style.position = "absolute";
-          img.style.left = imgData.x + "px";
-          img.style.top = imgData.y + "px";
+          img.style.left = (imgData.x - data.x) * screenW + "px";
+          img.style.top = (imgData.y - data.y) * screenH + "px";
 
           img.style.width = imgData.width + "px";
           img.style.height = imgData.height + "px";
@@ -255,8 +255,8 @@
           txt.style.zIndex = "6";
 
           txt.style.position = "absolute";
-          txt.style.left = textData.x + "px";
-          txt.style.top = textData.y + "px";
+          txt.style.left = (textData.x - data.x) * screenW + "px";
+          txt.style.top = (textData.y - data.y) * screenH + "px";
 
           txt.style.width = (textData.width || 200) + "px";
           txt.style.height = (textData.height || 50) + "px";
