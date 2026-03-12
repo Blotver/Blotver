@@ -1,5 +1,8 @@
 const parseVariables = require("../utils/parseVariables");
 
+const userCache = new Map();
+const clipCache = new Map();
+const cooldowns = new Map();
 
 module.exports = async function handleShoutout(ctx, widget) {
   const {
@@ -39,6 +42,15 @@ module.exports = async function handleShoutout(ctx, widget) {
   }
 
   const usuario = args[1].replace("@", "").toLowerCase();
+
+  const key = channel + ":so";
+
+  if (cooldowns.has(key)) {
+    const remaining = cooldowns.get(key) - Date.now();
+    if (remaining > 0) return;
+  }
+
+  cooldowns.set(key, Date.now() + 10000);
 
   const userId = await getUserId(usuario, userDB);
   if (!userId) {
@@ -83,13 +95,6 @@ module.exports = async function handleShoutout(ctx, widget) {
 
   console.log("🚀 Enviando clip al proyecto:", projectRoom);
 
-  console.log("🖼️ Child images encontradas:", childImages);
-
-  console.log(
-    "📦 Enviando images al overlay:",
-    childImages.map((i) => i.data),
-  );
-
   const childImages = await Widget.find({
     projectId: matchedWidget.projectId,
     type: "image",
@@ -99,7 +104,14 @@ module.exports = async function handleShoutout(ctx, widget) {
     projectId: matchedWidget.projectId,
     type: "text",
   });
-  
+
+  console.log("🖼️ Child images encontradas:", childImages);
+
+  console.log(
+    "📦 Enviando images al overlay:",
+    childImages.map((i) => i.data),
+  );
+
   io.to(projectRoom).emit("newClip", {
     clipId: clip.id,
 

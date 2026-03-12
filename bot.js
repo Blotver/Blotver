@@ -14,7 +14,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const { loadUserCommands } = require("./bot/services/commandCache");
-
+const twitchCache = new Map();
 // ========================
 // SERVIDOR WEB
 // ========================
@@ -31,15 +31,22 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000
     },
   }),
 );
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  transports: ["websocket"],
+  cors: {
+    origin: "*"
+  }
+});
 
 io.on("connection", (socket) => {
   socket.on("joinProject", (projectId) => {
@@ -409,6 +416,10 @@ app.post("/api/widgets/:id/test", isAuthenticated, async (req, res) => {
     randomUsers[Math.floor(Math.random() * randomUsers.length)];
 
   const userId = await getUserId(randomUsername, userDB);
+
+  if (twitchCache.has(randomUsername)) {
+    return twitchCache.get(randomUsername);
+  }
 
   if (!userId) {
     return res.json({ error: "No test user found" });
