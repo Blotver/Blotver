@@ -62,16 +62,10 @@ window.ShoutoutWidget = {
   type: "shoutout",
 
   defaultData: {
-    x: 100,
-    y: 100,
-
-    width: 900,
-    height: 500,
-
-    clipWidth: 700,
-    clipHeight: 350,
-    clipX: 100,
-    clipY: 70,
+    x: 0.1,
+    y: 0.1,
+    width: 0.45,
+    height: 0.30,
 
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
@@ -92,8 +86,13 @@ window.ShoutoutWidget = {
 
     const el = document.createElement("div");
 
-    el.style.width = widget.data.width + "px";
-    el.style.height = widget.data.height + "px";
+    const canvas = document.getElementById("canvas");
+
+    const canvasW = canvas.clientWidth;
+    const canvasH = canvas.clientHeight;
+
+    el.style.width = widget.data.width * canvasW + "px";
+    el.style.height = widget.data.height * canvasH + "px";
 
     el.style.display = "flex";
     el.style.flexDirection = "column";
@@ -140,8 +139,8 @@ window.ShoutoutWidget = {
       <img src="${child.data.url}"
       style="
         position:absolute;
-        left:${child.data.x - widget.data.x}px;
-        top:${child.data.y - widget.data.y}px;
+        left:${(child.data.x - widget.data.x) * canvasW}px;
+        top:${(child.data.y - widget.data.y) * canvasH}px;
         width:${child.data.width}px;
         height:${child.data.height}px;
         object-fit:${child.data.objectFit || "cover"};
@@ -204,10 +203,8 @@ background:#000;
 <!-- FAKE CLIP PREVIEW -->
 <div style="
 position:absolute;
-width:${widget.data.clipWidth}px;
-height:${widget.data.clipHeight}px;
-left:${widget.data.clipX}px;
-top:${widget.data.clipY}px;
+width:100%;
+height:100%;
 background:linear-gradient(135deg,#111,#222);
 border-radius:12px;
 overflow:hidden;

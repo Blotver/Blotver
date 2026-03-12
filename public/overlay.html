@@ -15,8 +15,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 80%;
-      height: 70%;
+      width: 100%;
+      height: 100%;
       overflow: visible;
     }
 
@@ -185,10 +185,13 @@
 
       const wrapper = document.createElement("div");
       wrapper.style.position = "absolute";
-      wrapper.style.left = (data.x || 200) + "px";
-      wrapper.style.top = (data.y || 200) + "px";
-      wrapper.style.width = (data.width || 500) + "px";
-      wrapper.style.height = (data.height || 300) + "px";
+      const screenW = window.innerWidth;
+      const screenH = window.innerHeight;
+
+      wrapper.style.left = (data.x * screenW) + "px";
+      wrapper.style.top = (data.y * screenH) + "px";
+      wrapper.style.width = (data.width * screenW) + "px";
+      wrapper.style.height = (data.height * screenH) + "px";
       wrapper.style.overflow = "visible";
       wrapper.style.pointerEvents = "none";
 

@@ -804,19 +804,24 @@
         }
 
         el.className = "absolute cursor-move select-none";
-        el.style.left = (widget.data.x || 100) + "px";
-        el.style.top = (widget.data.y || 100) + "px";
+        const canvas = document.getElementById("canvas");
+
+        const canvasWidth = canvas.clientWidth;
+        const canvasHeight = canvas.clientHeight;
+
+        el.style.left = (widget.data.x * canvasWidth) + "px";
+        el.style.top = (widget.data.y * canvasHeight) + "px";
         el.style.color = widget.data.color ?? "#000";
         el.style.fontSize = (widget.data.fontSize || 32) + "px";
         el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
         el.classList.add("draggable-resizable");
 
         if (widget.data.width) {
-          el.style.width = widget.data.width + "px";
+          el.style.width = (widget.data.width * canvasWidth) + "px";
         }
 
         if (widget.data.height) {
-          el.style.height = widget.data.height + "px";
+          el.style.height = (widget.data.height * canvasHeight) + "px";
         }
 
         if (widget.data.visible === false) {
@@ -851,15 +856,20 @@
                 const widget = widgets.find((w) => w._id === widgetId);
                 if (!widget) return;
 
+                const canvas = document.getElementById("canvas");
+
+                const canvasWidth = canvas.clientWidth;
+                const canvasHeight = canvas.clientHeight;
+
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
 
-                widget.data.x = left;
-                widget.data.y = top;
+                widget.data.x = left / canvasWidth;
+                widget.data.y = top / canvasHeight;
 
                 if (selectedWidget && selectedWidget._id === widgetId) {
-                  selectedWidget.data.x = left;
-                  selectedWidget.data.y = top;
+                  selectedWidget.data.x = left / canvasWidth;
+                  selectedWidget.data.y = top / canvasHeight;
                 }
 
                 markAsChanged();
@@ -929,6 +939,11 @@
                 const widget = widgets.find((w) => w._id === widgetId);
                 if (!widget) return;
 
+                const canvas = document.getElementById("canvas");
+
+                const canvasWidth = canvas.clientWidth;
+                const canvasHeight = canvas.clientHeight;
+
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
                 const width = parseFloat(target.style.width);
@@ -936,10 +951,10 @@
 
                 widget.data = {
                   ...widget.data,
-                  x: left,
-                  y: top,
-                  width,
-                  height,
+                  x: left / canvasWidth,
+                  y: top / canvasHeight,
+                  width: width / canvasWidth,
+                  height: height / canvasHeight,
                 };
 
                 if (selectedWidget && selectedWidget._id === widgetId) {
@@ -1448,8 +1463,10 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       const widgetDef = window.WidgetRegistry[type];
 
       const defaultData = widgetDef?.defaultData || {
-        x: 100,
-        y: 100,
+        x: 0.1,
+        y: 0.1,
+        width: 0.3,
+        height: 0.2,
         visible: true,
         zIndex: widgets.length,
       };
