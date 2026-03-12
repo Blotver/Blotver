@@ -68,6 +68,11 @@ window.ShoutoutWidget = {
     width: 900,
     height: 500,
 
+    clipWidth: 700,
+    clipHeight: 350,
+    clipX: 100,
+    clipY: 70,
+
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
 
@@ -84,7 +89,7 @@ window.ShoutoutWidget = {
     );
 
     console.log("Children del shoutout:", children);
-    
+
     const el = document.createElement("div");
 
     el.style.width = widget.data.width + "px";
@@ -199,8 +204,10 @@ background:#000;
 <!-- FAKE CLIP PREVIEW -->
 <div style="
 position:absolute;
-width:80%;
-height:70%;
+width:${widget.data.clipWidth}px;
+height:${widget.data.clipHeight}px;
+left:${widget.data.clipX}px;
+top:${widget.data.clipY}px;
 background:linear-gradient(135deg,#111,#222);
 border-radius:12px;
 overflow:hidden;
