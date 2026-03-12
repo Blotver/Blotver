@@ -564,7 +564,10 @@
 
     const overlayURL = window.location.origin + "/overlay/" + projectId;
 
-    const socket = io();
+    const socket = io({
+      transports: ["websocket"]
+    });
+
     socket.emit("joinProject", projectId);
 
     socket.on("connect", () => {

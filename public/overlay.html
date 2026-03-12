@@ -120,7 +120,9 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const projectId = window.location.pathname.split("/").pop();
-    const socket = io();
+    const socket = io({
+      transports: ["websocket"]
+    });
     const container = document.getElementById("clipContainer");
 
     let queue = [];
@@ -188,6 +190,7 @@
       wrapper.style.width = (data.width || 500) + "px";
       wrapper.style.height = (data.height || 300) + "px";
       wrapper.style.overflow = "visible";
+      wrapper.style.pointerEvents = "none";
 
       // 🎬 TWITCH EMBED
       const iframe = document.createElement("iframe");
@@ -201,6 +204,7 @@
       iframe.style.position = "absolute";
       iframe.style.top = "0";
       iframe.style.left = "0";
+      iframe.style.zIndex = "1";
 
       wrapper.appendChild(iframe);
 
@@ -216,6 +220,8 @@
 
           img.src = imgData.url;
 
+          img.style.zIndex = "5";
+
           img.style.position = "absolute";
           img.style.left = imgData.x + "px";
           img.style.top = imgData.y + "px";
@@ -226,7 +232,7 @@
           img.style.objectFit = imgData.objectFit || "cover";
           img.style.pointerEvents = "none";
 
-          container.appendChild(img);
+          wrapper.appendChild(img); // 👈 CAMBIO
 
         });
       }
@@ -243,11 +249,11 @@
 
           txt.innerHTML = parsed;
 
+          txt.style.zIndex = "6";
+
           txt.style.position = "absolute";
           txt.style.left = textData.x + "px";
           txt.style.top = textData.y + "px";
-
-
 
           txt.style.width = (textData.width || 200) + "px";
           txt.style.height = (textData.height || 50) + "px";
@@ -257,7 +263,8 @@
           txt.style.fontWeight = textData.fontWeight || "bold";
           txt.style.textAlign = textData.textAlign || "center";
 
-          container.appendChild(txt);
+          wrapper.appendChild(txt); // 👈 CAMBIO
+
         });
       }
 
