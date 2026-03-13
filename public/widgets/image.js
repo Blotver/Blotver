@@ -1,3 +1,5 @@
+//blotver\public\widgets\image.js
+
 window.ImageWidget = {
     type: "image",
 

@@ -939,6 +939,13 @@
                 widget.data.height = height / canvasHeight;
                 widget.data.x = left / canvasWidth;
                 widget.data.y = top / canvasHeight;
+
+                // 🔥 actualizar preview interno del widget
+                const child = target.firstChild;
+
+                if (child && typeof child.updatePreview === "function") {
+                  child.updatePreview();
+                }
               },
 
               end(event) {

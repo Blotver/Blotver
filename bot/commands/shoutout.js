@@ -1,3 +1,5 @@
+//blotver\bot\commands\shoutout.js
+
 const parseVariables = require("../utils/parseVariables");
 
 const userCache = new Map();

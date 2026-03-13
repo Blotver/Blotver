@@ -1,4 +1,4 @@
-
+//blotver\public\widgets\shoutout.js
 
 function hexToRgb(hex) {
   if (!hex) return "0,0,0";
@@ -154,6 +154,15 @@ window.ShoutoutWidget = {
     }
 
     function updateView() {
+
+      const canvas = document.getElementById("canvas");
+
+      const canvasW = canvas.clientWidth;
+      const canvasH = canvas.clientHeight;
+
+      el.style.width = widget.data.width * canvasW + "px";
+      el.style.height = widget.data.height * canvasH + "px";
+      
       const text =
         widget.data.overlayText ||
         widget.data.textTemplate ||
