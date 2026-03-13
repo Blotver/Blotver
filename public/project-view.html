@@ -930,6 +930,15 @@
                 target.style.top = top + "px";
                 target.style.width = width + "px";
                 target.style.height = height + "px";
+
+                const canvas = document.getElementById("canvas");
+                const canvasWidth = canvas.clientWidth;
+                const canvasHeight = canvas.clientHeight;
+
+                widget.data.width = width / canvasWidth;
+                widget.data.height = height / canvasHeight;
+                widget.data.x = left / canvasWidth;
+                widget.data.y = top / canvasHeight;
               },
 
               end(event) {
@@ -1343,17 +1352,19 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       }
 
       // ===== 2️⃣ Actualizar posición y tamaño =====
+      const canvas = document.getElementById("canvas");
+
       if (updates.x !== undefined)
-        selectedElement.style.left = updates.x + "px";
+        selectedElement.style.left = (updates.x * canvas.clientWidth) + "px";
 
       if (updates.y !== undefined)
-        selectedElement.style.top = updates.y + "px";
+        selectedElement.style.top = (updates.y * canvas.clientHeight) + "px";
 
       if (updates.width !== undefined)
-        selectedElement.style.width = updates.width + "px";
+        selectedElement.style.width = (updates.width * canvas.clientWidth) + "px";
 
       if (updates.height !== undefined)
-        selectedElement.style.height = updates.height + "px";
+        selectedElement.style.height = (updates.height * canvas.clientHeight) + "px";
 
       // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
       const widgetDef = window.WidgetRegistry[selectedWidget.type];
@@ -1362,6 +1373,8 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
         selectedElement.innerHTML = "";
         const rendered = widgetDef.renderCanvas(selectedWidget);
         selectedElement.appendChild(rendered);
+
+        addResizeHandles(selectedElement);
       }
 
       // ===== 4️⃣ Sincronizar panel =====
