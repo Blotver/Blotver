@@ -1865,6 +1865,36 @@ video {
   transition-duration: 150ms;
 }
 
+/* COLOR PICKER */
+
+.color-picker-wrapper{
+display:flex;
+align-items:center;
+gap:10px;
+background:#0f172a;
+border:1px solid #1e293b;
+border-radius:8px;
+padding:6px;
+}
+
+.color-preview{
+width:26px;
+height:26px;
+border-radius:6px;
+cursor:pointer;
+border:2px solid #334155;
+}
+
+.color-input{
+background:transparent;
+border:none;
+color:#e2e8f0;
+font-size:13px;
+width:80px;
+outline:none;
+font-family:monospace;
+}
+
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

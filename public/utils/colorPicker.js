@@ -1,42 +1,70 @@
-window.createColorPicker = function(container, initialColor, onChange){
+window.createColorPicker = function(container, initialColor, onChange) {
 
-const el = document.createElement("div");
+  const wrapper = document.createElement("div");
+  wrapper.className = "color-picker-wrapper";
 
-container.appendChild(el);
+  const preview = document.createElement("div");
+  preview.className = "color-preview";
 
-const pickr = Pickr.create({
+  const input = document.createElement("input");
+  input.className = "color-input";
+  input.value = initialColor || "#ffffff";
 
-el: el,
+  preview.style.background = input.value;
 
-theme: "monolith",
+  wrapper.appendChild(preview);
+  wrapper.appendChild(input);
 
-default: initialColor || "#ffffff",
+  container.appendChild(wrapper);
 
-components: {
+  const pickr = Pickr.create({
 
-preview: true,
-opacity: true,
-hue: true,
+    el: preview,
 
-interaction: {
-hex: true,
-rgba: true,
-input: true,
-save: true
-}
+    theme: "nano",
 
-}
+    default: input.value,
 
-});
+    useAsButton: true,
 
-pickr.on("save", (color) => {
+    components: {
 
-const hex = color.toHEXA().toString();
+      preview: true,
+      opacity: true,
+      hue: true,
 
-onChange(hex);
+      interaction: {
 
-pickr.hide();
+        hex: true,
+        rgba: true,
+        input: true,
+        save: true
 
-});
+      }
+
+    }
+
+  });
+
+  pickr.on("save", (color) => {
+
+    const hex = color.toHEXA().toString();
+
+    preview.style.background = hex;
+    input.value = hex;
+
+    onChange(hex);
+
+    pickr.hide();
+
+  });
+
+  input.addEventListener("input", () => {
+
+    preview.style.background = input.value;
+
+    onChange(input.value);
+
+  });
 
 };
