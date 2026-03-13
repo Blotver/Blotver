@@ -281,7 +281,7 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
   if (req.body.data) {
     defaultData = req.body.data;
   } else {
-    defaultData = { x: 100, y: 100 };
+defaultData = { x: 0.1, y: 0.1 };
 
     if (widgetType === "text") {
       defaultData = {
@@ -296,8 +296,8 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
       defaultData = {
         ...defaultData,
         url: "",
-        width: 200,
-        height: 200,
+width: 0.2,
+height: 0.2
       };
     }
 
