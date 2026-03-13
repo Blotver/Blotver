@@ -23,41 +23,6 @@ function hexToRgb(hex) {
   return `${r},${g},${b}`;
 }
 
-// Inject color picker styles
-if (!document.getElementById("color-picker-styles")) {
-  const style = document.createElement("style");
-  style.id = "color-picker-styles";
-
-  style.textContent = `
-.color-field{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.color-preview{
-width:32px;
-height:32px;
-border-radius:6px;
-border:1px solid rgba(255,255,255,0.2);
-cursor:pointer;
-box-shadow:0 0 0 1px rgba(0,0,0,0.5) inset;
-}
-
-.color-picker{
-position:absolute;
-width:240px;
-background:#1a1a1a;
-border-radius:10px;
-padding:12px;
-box-shadow:0 10px 30px rgba(0,0,0,0.5);
-z-index:9999;
-}
-`;
-
-  document.head.appendChild(style);
-}
-
 window.ShoutoutWidget = {
   type: "shoutout",
 
@@ -162,7 +127,7 @@ window.ShoutoutWidget = {
 
       el.style.width = widget.data.width * canvasW + "px";
       el.style.height = widget.data.height * canvasH + "px";
-      
+
       const text =
         widget.data.overlayText ||
         widget.data.textTemplate ||
