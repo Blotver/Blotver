@@ -55,7 +55,9 @@ window.createColorPicker = function (container, initialColor, onChange) {
 
     const rect = preview.getBoundingClientRect();
 
-    panel.style.position = "absolute";
+    panel.style.position = "fixed";
+    panel.style.zIndex = "999999";
+
     panel.style.top = rect.bottom + 6 + "px";
     panel.style.left = rect.left + "px";
 
