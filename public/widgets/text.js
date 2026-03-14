@@ -120,7 +120,7 @@ window.TextWidget = {
 
   renderConfig(widget, container, update) {
 
-container.innerHTML = `
+    container.innerHTML = `
 
 <div class="space-y-6 text-sm text-gray-300">
 
@@ -220,7 +220,7 @@ Color
 </label>
 
 <label class="flex items-center gap-2 text-xs">
-<input type="checkbox" data-field="gradient" ${widget.data.gradient ? "checked":""}>
+<input type="checkbox" data-field="gradient" ${widget.data.gradient ? "checked" : ""}>
 Gradient
 </label>
 
@@ -271,7 +271,7 @@ Glow / Shadow
 </label>
 
 <label class="flex items-center gap-2 text-xs">
-<input type="checkbox" data-field="textShadow" ${widget.data.textShadow ? "checked":""}>
+<input type="checkbox" data-field="textShadow" ${widget.data.textShadow ? "checked" : ""}>
 Enable Glow
 </label>
 
@@ -293,59 +293,59 @@ class="w-full"
 </div>
 `;
 
-container.querySelectorAll("[data-field]").forEach(input => {
+    container.querySelectorAll("[data-field]").forEach(input => {
 
-input.addEventListener("input", e => {
+      input.addEventListener("input", e => {
 
-const field = e.target.dataset.field;
+        const field = e.target.dataset.field;
 
-let value;
+        let value;
 
-if (input.type === "checkbox") value = input.checked;
-else value = e.target.value;
+        if (input.type === "checkbox") value = input.checked;
+        else value = e.target.value;
 
-if (input.type === "number" || input.type === "range")
-value = parseFloat(value);
+        if (input.type === "number" || input.type === "range")
+          value = parseFloat(value);
 
-update({[field]:value});
+        update({ [field]: value });
 
-});
+      });
 
-});
+    });
 
 
 
-createColorPicker(
-container.querySelector("#textColorPicker"),
-widget.data.textColor,
-color => update({textColor:color})
-);
+    createColorPicker(
+      container.querySelector("#textColorPicker"),
+      widget.data.textColor,
+      color => update({ textColor: color })
+    );
 
-createColorPicker(
-container.querySelector("#gradientColor1"),
-widget.data.gradientColor1,
-color => update({gradientColor1:color})
-);
+    createColorPicker(
+      container.querySelector("#gradientColor1"),
+      widget.data.gradientColor1,
+      color => update({ gradientColor1: color })
+    );
 
-createColorPicker(
-container.querySelector("#gradientColor2"),
-widget.data.gradientColor2,
-color => update({gradientColor2:color})
-);
+    createColorPicker(
+      container.querySelector("#gradientColor2"),
+      widget.data.gradientColor2,
+      color => update({ gradientColor2: color })
+    );
 
-createColorPicker(
-container.querySelector("#strokeColorPicker"),
-widget.data.strokeColor,
-color => update({strokeColor:color})
-);
+    createColorPicker(
+      container.querySelector("#strokeColorPicker"),
+      widget.data.strokeColor,
+      color => update({ strokeColor: color })
+    );
 
-createColorPicker(
-container.querySelector("#shadowColorPicker"),
-widget.data.shadowColor,
-color => update({shadowColor:color})
-);
+    createColorPicker(
+      container.querySelector("#shadowColorPicker"),
+      widget.data.shadowColor,
+      color => update({ shadowColor: color })
+    );
 
-}
+  }
 
 };
 

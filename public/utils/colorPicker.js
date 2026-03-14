@@ -1,91 +1,164 @@
-window.createColorPicker = function (container, initialColor, onChange) {
+window.createColorPicker = function(container, initialColor, onChange){
 
-  const preview = document.createElement("div");
-  preview.className = "color-preview";
+let hue = 0;
+let sat = 1;
+let val = 1;
 
-  preview.style.background = initialColor || "#ffffff";
+const preview = document.createElement("div");
+preview.className="color-preview";
+preview.style.background=initialColor||"#ffffff";
 
-  container.appendChild(preview);
+container.appendChild(preview);
 
-  const pickr = Pickr.create({
+let panel=null;
 
-    el: preview,
+preview.onclick=()=>{
 
-    theme: "monolith",
+if(panel){
+panel.remove();
+panel=null;
+return;
+}
 
-    default: initialColor || "#ffffff",
+panel=document.createElement("div");
+panel.className="color-picker-panel";
 
-    useAsButton: true,
+panel.innerHTML=`
 
-    position: "bottom-middle",
+<div class="color-sat">
+<div class="white"></div>
+<div class="black"></div>
+<div class="color-cursor"></div>
+</div>
 
-    components: {
+<div class="color-hue"></div>
 
-      preview: true,
+<div class="color-bottom">
+<input class="color-input" value="${initialColor||"#ffffff"}">
+<button class="color-clear">CLEAR</button>
+</div>
 
-      opacity: true,
+`;
 
-      hue: true,
+container.appendChild(panel);
 
-      palette: true,
+const satBox=panel.querySelector(".color-sat");
+const cursor=panel.querySelector(".color-cursor");
+const hueBar=panel.querySelector(".color-hue");
+const input=panel.querySelector(".color-input");
 
-      interaction: {
+function hsvToHex(h,s,v){
 
-        hex: true,
-        rgba: true,
-        input: true,
-        clear: false,
-        save: false
+let f=(n,k=(n+h/60)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0);
 
-      }
+let r=Math.round(f(5)*255);
+let g=Math.round(f(3)*255);
+let b=Math.round(f(1)*255);
 
-    }
+return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("");
 
-  });
+}
 
-  pickr.on("change", (color) => {
+function updateColor(){
 
-    const hex = color.toHEXA().toString();
+const hex=hsvToHex(hue,sat,val);
 
-    preview.style.background = hex;
+preview.style.background=hex;
 
-    onChange(hex);
+input.value=hex;
 
-  });
+onChange(hex);
 
-  pickr.on("init", instance => {
+}
 
-    const palette = document.createElement("div");
-    palette.className = "color-palette";
+satBox.addEventListener("mousedown",e=>{
 
-    const colors = [
-      "#ffffff",
-      "#ffd166",
-      "#f59e0b",
-      "#6366f1",
-      "#ec4899",
-      "#ef4444"
-    ];
+function move(ev){
 
-    colors.forEach(c => {
+const rect=satBox.getBoundingClientRect();
 
-      const sw = document.createElement("div");
-      sw.className = "color-swatch";
-      sw.style.background = c;
+let x=(ev.clientX-rect.left)/rect.width;
+let y=(ev.clientY-rect.top)/rect.height;
 
-      sw.onclick = () => {
+x=Math.max(0,Math.min(1,x));
+y=Math.max(0,Math.min(1,y));
 
-        instance.setColor(c);
-        onChange(c);
+sat=x;
+val=1-y;
 
-      };
+cursor.style.left=(x*100)+"%";
+cursor.style.top=(y*100)+"%";
 
-      palette.appendChild(sw);
+updateColor();
 
-    });
+}
 
-    instance.getRoot().app.appendChild(palette);
+move(e);
 
-  });
+window.addEventListener("mousemove",move);
+window.addEventListener("mouseup",()=>{
+
+window.removeEventListener("mousemove",move);
+
+},{once:true});
+
+});
+
+hueBar.addEventListener("mousedown",e=>{
+
+function move(ev){
+
+const rect=hueBar.getBoundingClientRect();
+
+let x=(ev.clientX-rect.left)/rect.width;
+
+x=Math.max(0,Math.min(1,x));
+
+hue=360*x;
+
+satBox.style.background=`hsl(${hue},100%,50%)`;
+
+updateColor();
+
+}
+
+move(e);
+
+window.addEventListener("mousemove",move);
+window.addEventListener("mouseup",()=>{
+
+window.removeEventListener("mousemove",move);
+
+},{once:true});
+
+});
+
+input.addEventListener("input",()=>{
+
+preview.style.background=input.value;
+onChange(input.value);
+
+});
+
+panel.querySelector(".color-clear").onclick=()=>{
+
+preview.style.background="transparent";
+input.value="";
+onChange("");
+
+};
+
+};
+
+document.addEventListener("click",e=>{
+
+if(panel && !container.contains(e.target)){
+
+panel.remove();
+panel=null;
+
+}
+
+});
 
 };
