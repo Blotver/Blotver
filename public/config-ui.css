@@ -82,3 +82,36 @@ height:1px;
 background:#1e293b;
 margin:4px 0;
 }
+
+.color-mode{
+display:flex;
+gap:10px;
+}
+
+.mode-btn{
+
+display:flex;
+align-items:center;
+gap:6px;
+
+padding:6px 10px;
+
+border:1px solid #374151;
+background:#111827;
+
+border-radius:8px;
+
+cursor:pointer;
+font-size:12px;
+
+transition:.15s;
+}
+
+.mode-btn:hover{
+border-color:#6b7280;
+}
+
+.mode-btn.active{
+border-color:#a855f7;
+background:#1f1330;
+}

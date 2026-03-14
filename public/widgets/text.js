@@ -120,7 +120,7 @@ window.TextWidget = {
 
   renderConfig(widget, container, update) {
 
-container.innerHTML = `
+    container.innerHTML = `
 
 <div class="config-root">
 
@@ -225,17 +225,35 @@ Color
 Mode
 </label>
 
-<div class="flex gap-4 text-xs">
+<div class="color-mode">
 
-<label class="flex items-center gap-2">
-<input type="radio" name="colorMode" value="solid">
-Solid
-</label>
+<button class="mode-btn active" data-mode="solid">
 
-<label class="flex items-center gap-2">
-<input type="radio" name="colorMode" value="gradient">
-Gradient
-</label>
+<svg width="16" height="16" viewBox="0 0 24 24">
+<rect x="4" y="4" width="16" height="16" fill="white"/>
+</svg>
+
+<span>Solid</span>
+
+</button>
+
+
+<button class="mode-btn" data-mode="gradient">
+
+<svg width="16" height="16" viewBox="0 0 24 24">
+<defs>
+<linearGradient id="g">
+<stop offset="0%" stop-color="#fff"/>
+<stop offset="100%" stop-color="#ff00ff"/>
+</linearGradient>
+</defs>
+
+<rect x="4" y="4" width="16" height="16" fill="url(#g)"/>
+</svg>
+
+<span>Gradient</span>
+
+</button>
 
 </div>
 
@@ -426,5 +444,22 @@ class="w-full"
   }
 
 };
+
+container.querySelectorAll(".mode-btn").forEach(btn => {
+
+  btn.addEventListener("click", () => {
+
+    const mode = btn.dataset.mode;
+
+    update({ gradient: mode === "gradient" });
+
+    container.querySelectorAll(".mode-btn")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+  });
+
+});
 
 registerWidget(window.TextWidget);
