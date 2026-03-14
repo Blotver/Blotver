@@ -215,20 +215,55 @@ class="w-full"
 <!-- COLOR -->
 <div class="space-y-3 border-t border-gray-800 pt-4">
 
-<label class="text-xs uppercase text-gray-500 tracking-wider">
-Color
+<div class="space-y-4">
+
+<label class="text-xs text-gray-400">
+Mode
 </label>
 
-<label class="flex items-center gap-2 text-xs">
-<input type="checkbox" data-field="gradient" ${widget.data.gradient ? "checked" : ""}>
+<div class="flex gap-4 text-xs">
+
+<label class="flex items-center gap-2">
+<input type="radio" name="colorMode" value="solid">
+Solid
+</label>
+
+<label class="flex items-center gap-2">
+<input type="radio" name="colorMode" value="gradient">
 Gradient
+</label>
+
+</div>
+
+
+<div id="solidColorBlock">
+
+<label class="text-xs text-gray-400">
+Text Color
 </label>
 
 <div id="textColorPicker"></div>
 
+</div>
+
+
+<div id="gradientBlock">
+
+<label class="text-xs text-gray-400">
+Gradient Start
+</label>
+
 <div id="gradientColor1"></div>
 
+<label class="text-xs text-gray-400 mt-2 block">
+Gradient End
+</label>
+
 <div id="gradientColor2"></div>
+
+</div>
+
+</div>
 
 <select data-field="gradientDirection"
 class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
@@ -313,7 +348,41 @@ class="w-full"
 
     });
 
+    const solidBlock = container.querySelector("#solidColorBlock");
+    const gradientBlock = container.querySelector("#gradientBlock");
 
+    function updateMode() {
+
+      if (widget.data.gradient) {
+
+        solidBlock.style.display = "none";
+        gradientBlock.style.display = "block";
+
+      } else {
+
+        solidBlock.style.display = "block";
+        gradientBlock.style.display = "none";
+
+      }
+
+    }
+
+    updateMode();
+
+    container.querySelectorAll("input[name=colorMode]").forEach(r => {
+
+      r.checked = widget.data.gradient
+        ? r.value === "gradient"
+        : r.value === "solid";
+
+      r.addEventListener("change", e => {
+
+        update({ gradient: e.target.value === "gradient" });
+        updateMode();
+
+      });
+
+    });
 
     createColorPicker(
       container.querySelector("#textColorPicker"),
