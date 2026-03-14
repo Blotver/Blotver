@@ -1,164 +1,168 @@
-window.createColorPicker = function(container, initialColor, onChange){
+window.createColorPicker = function (container, initialColor, onChange) {
 
-let hue = 0;
-let sat = 1;
-let val = 1;
+  let hue = 0;
+  let sat = 1;
+  let val = 1;
 
-const preview = document.createElement("div");
-preview.className="color-preview";
-preview.style.background=initialColor||"#ffffff";
+  const startColor = initialColor || "#ffffff";
 
-container.appendChild(preview);
+  const wrapper = document.createElement("div");
+  wrapper.className = "color-field";
 
-let panel=null;
+  const preview = document.createElement("div");
+  preview.className = "color-preview";
 
-preview.onclick=()=>{
+  const value = document.createElement("div");
+  value.className = "color-value";
 
-if(panel){
-panel.remove();
-panel=null;
-return;
-}
+  preview.style.background = startColor;
+  value.textContent = startColor;
 
-panel=document.createElement("div");
-panel.className="color-picker-panel";
+  wrapper.appendChild(preview);
+  wrapper.appendChild(value);
 
-panel.innerHTML=`
+  container.appendChild(wrapper);
 
-<div class="color-sat">
-<div class="white"></div>
-<div class="black"></div>
-<div class="color-cursor"></div>
-</div>
+  let panel = null;
 
-<div class="color-hue"></div>
+  preview.onclick = () => {
 
-<div class="color-bottom">
-<input class="color-input" value="${initialColor||"#ffffff"}">
-<button class="color-clear">CLEAR</button>
-</div>
+    if (panel) {
+      panel.remove();
+      panel = null;
+      return;
+    }
 
-`;
+    panel = document.createElement("div");
+    panel.className = "color-picker-panel";
 
-container.appendChild(panel);
+    panel.innerHTML = `
+      <div class="color-sat">
+        <div class="white"></div>
+        <div class="black"></div>
+        <div class="color-cursor"></div>
+      </div>
 
-const satBox=panel.querySelector(".color-sat");
-const cursor=panel.querySelector(".color-cursor");
-const hueBar=panel.querySelector(".color-hue");
-const input=panel.querySelector(".color-input");
+      <div class="color-hue"></div>
 
-function hsvToHex(h,s,v){
+      <div class="color-bottom">
+        <input class="color-input" value="${startColor}">
+        <button class="color-clear">CLEAR</button>
+      </div>
+    `;
 
-let f=(n,k=(n+h/60)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0);
+    document.body.appendChild(panel);
 
-let r=Math.round(f(5)*255);
-let g=Math.round(f(3)*255);
-let b=Math.round(f(1)*255);
+    const rect = preview.getBoundingClientRect();
 
-return "#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("");
+    panel.style.position = "absolute";
+    panel.style.top = rect.bottom + 6 + "px";
+    panel.style.left = rect.left + "px";
 
-}
+    const satBox = panel.querySelector(".color-sat");
+    const cursor = panel.querySelector(".color-cursor");
+    const hueBar = panel.querySelector(".color-hue");
+    const input = panel.querySelector(".color-input");
 
-function updateColor(){
+    function hsvToHex(h, s, v) {
 
-const hex=hsvToHex(hue,sat,val);
+      let f = (n, k = (n + h / 60) % 6) =>
+        v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
 
-preview.style.background=hex;
+      let r = Math.round(f(5) * 255);
+      let g = Math.round(f(3) * 255);
+      let b = Math.round(f(1) * 255);
 
-input.value=hex;
+      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("");
 
-onChange(hex);
+    }
 
-}
+    function setColor(hex) {
+      preview.style.background = hex;
+      value.textContent = hex;
+      input.value = hex;
+      onChange(hex);
+    }
 
-satBox.addEventListener("mousedown",e=>{
+    function updateColor() {
+      const hex = hsvToHex(hue, sat, val);
+      setColor(hex);
+    }
 
-function move(ev){
+    satBox.addEventListener("mousedown", e => {
 
-const rect=satBox.getBoundingClientRect();
+      function move(ev) {
 
-let x=(ev.clientX-rect.left)/rect.width;
-let y=(ev.clientY-rect.top)/rect.height;
+        const rect = satBox.getBoundingClientRect();
 
-x=Math.max(0,Math.min(1,x));
-y=Math.max(0,Math.min(1,y));
+        let x = (ev.clientX - rect.left) / rect.width;
+        let y = (ev.clientY - rect.top) / rect.height;
 
-sat=x;
-val=1-y;
+        x = Math.max(0, Math.min(1, x));
+        y = Math.max(0, Math.min(1, y));
 
-cursor.style.left=(x*100)+"%";
-cursor.style.top=(y*100)+"%";
+        sat = x;
+        val = 1 - y;
 
-updateColor();
+        cursor.style.left = (x * 100) + "%";
+        cursor.style.top = (y * 100) + "%";
 
-}
+        updateColor();
 
-move(e);
+      }
 
-window.addEventListener("mousemove",move);
-window.addEventListener("mouseup",()=>{
+      move(e);
 
-window.removeEventListener("mousemove",move);
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", () => {
+        window.removeEventListener("mousemove", move);
+      }, { once: true });
 
-},{once:true});
+    });
 
-});
+    hueBar.addEventListener("mousedown", e => {
 
-hueBar.addEventListener("mousedown",e=>{
+      function move(ev) {
 
-function move(ev){
+        const rect = hueBar.getBoundingClientRect();
 
-const rect=hueBar.getBoundingClientRect();
+        let x = (ev.clientX - rect.left) / rect.width;
+        x = Math.max(0, Math.min(1, x));
 
-let x=(ev.clientX-rect.left)/rect.width;
+        hue = 360 * x;
 
-x=Math.max(0,Math.min(1,x));
+        satBox.style.background = `hsl(${hue},100%,50%)`;
 
-hue=360*x;
+        updateColor();
 
-satBox.style.background=`hsl(${hue},100%,50%)`;
+      }
 
-updateColor();
+      move(e);
 
-}
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", () => {
+        window.removeEventListener("mousemove", move);
+      }, { once: true });
 
-move(e);
+    });
 
-window.addEventListener("mousemove",move);
-window.addEventListener("mouseup",()=>{
+    input.addEventListener("input", () => {
+      setColor(input.value);
+    });
 
-window.removeEventListener("mousemove",move);
+    panel.querySelector(".color-clear").onclick = () => {
+      setColor("");
+    };
 
-},{once:true});
+  };
 
-});
+  document.addEventListener("click", e => {
 
-input.addEventListener("input",()=>{
+    if (panel && !container.contains(e.target) && !panel.contains(e.target)) {
+      panel.remove();
+      panel = null;
+    }
 
-preview.style.background=input.value;
-onChange(input.value);
-
-});
-
-panel.querySelector(".color-clear").onclick=()=>{
-
-preview.style.background="transparent";
-input.value="";
-onChange("");
-
-};
-
-};
-
-document.addEventListener("click",e=>{
-
-if(panel && !container.contains(e.target)){
-
-panel.remove();
-panel=null;
-
-}
-
-});
+  });
 
 };
