@@ -1,44 +1,41 @@
-window.createColorPicker = function(container, initialColor, onChange) {
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "color-picker-wrapper";
+window.createColorPicker = function (container, initialColor, onChange) {
 
   const preview = document.createElement("div");
   preview.className = "color-preview";
 
-  const input = document.createElement("input");
-  input.className = "color-input";
-  input.value = initialColor || "#ffffff";
+  preview.style.background = initialColor || "#ffffff";
 
-  preview.style.background = input.value;
-
-  wrapper.appendChild(preview);
-  wrapper.appendChild(input);
-
-  container.appendChild(wrapper);
+  container.appendChild(preview);
 
   const pickr = Pickr.create({
 
     el: preview,
 
-    theme: "nano",
+    theme: "monolith",
 
-    default: input.value,
+    default: initialColor || "#ffffff",
 
     useAsButton: true,
+
+    position: "bottom-middle",
 
     components: {
 
       preview: true,
+
       opacity: true,
+
       hue: true,
+
+      palette: true,
 
       interaction: {
 
         hex: true,
         rgba: true,
         input: true,
-        save: true
+        clear: false,
+        save: false
 
       }
 
@@ -46,24 +43,48 @@ window.createColorPicker = function(container, initialColor, onChange) {
 
   });
 
-  pickr.on("save", (color) => {
+  pickr.on("change", (color) => {
 
     const hex = color.toHEXA().toString();
 
     preview.style.background = hex;
-    input.value = hex;
 
     onChange(hex);
 
-    pickr.hide();
-
   });
 
-  input.addEventListener("input", () => {
+  pickr.on("init", instance => {
 
-    preview.style.background = input.value;
+    const palette = document.createElement("div");
+    palette.className = "color-palette";
 
-    onChange(input.value);
+    const colors = [
+      "#ffffff",
+      "#ffd166",
+      "#f59e0b",
+      "#6366f1",
+      "#ec4899",
+      "#ef4444"
+    ];
+
+    colors.forEach(c => {
+
+      const sw = document.createElement("div");
+      sw.className = "color-swatch";
+      sw.style.background = c;
+
+      sw.onclick = () => {
+
+        instance.setColor(c);
+        onChange(c);
+
+      };
+
+      palette.appendChild(sw);
+
+    });
+
+    instance.getRoot().app.appendChild(palette);
 
   });
 
