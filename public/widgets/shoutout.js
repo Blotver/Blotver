@@ -240,109 +240,90 @@ ${getChildrenHTML()}
   },
 
   renderConfig(widget, content, update) {
-    content.innerHTML = `
-            
-            <div class="space-y-6">
+content.innerHTML = `
 
-                <!-- BASIC SETTINGS -->
-                <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+<div class="config-root">
 
-                    <h3 class="text-xs uppercase tracking-wider text-gray-500">
-                        Basic
-                    </h3>
+<!-- BASIC -->
+<div class="config-card">
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Command
-                        </label>
-                        <input id="cfgCommand"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            placeholder-gray-500
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition"
-                            value="${widget.data.command || ""}">
-                    </div>
+<div class="config-title">
+Basic
+</div>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Text Template
-                        </label>
-                        <input id="cfgTemplate"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition"
-                            value="${widget.data.textTemplate || ""}">
-                    </div>
+<label class="config-label">
+Command
+</label>
 
-                </div>
+<input
+id="cfgCommand"
+class="config-input"
+value="${widget.data.command || ""}"
+>
 
-                <!-- DISPLAY SETTINGS -->
-                <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+<label class="config-label">
+Text Template
+</label>
 
-                    <h3 class="text-xs uppercase tracking-wider text-gray-500">
-                        Display
-                    </h3>
+<input
+id="cfgTemplate"
+class="config-input"
+value="${widget.data.textTemplate || ""}"
+>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Duration (seconds)
-                        </label>
-                        <input type="number" id="cfgDuration"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition"
-                            value="${widget.data.duration || 10}">
-                    </div>
-                </div>
+</div>
 
 
-                <!-- ANIMATIONS -->
-                <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-4 space-y-4">
+<!-- DISPLAY -->
+<div class="config-card">
 
-                    <h3 class="text-xs uppercase tracking-wider text-gray-500">
-                        Animations
-                    </h3>
+<div class="config-title">
+Display
+</div>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Animation In
-                        </label>
-                        <select id="cfgAnimIn"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition">
-                            <option value="fade">Fade</option>
-                            <option value="slide">Slide</option>
-                        </select>
-                    </div>
+<label class="config-label">
+Duration (seconds)
+</label>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-2">
-                            Animation Out
-                        </label>
-                        <select id="cfgAnimOut"
-                            class="w-full bg-gray-900 border border-gray-700
-                            rounded-lg px-3 py-2.5 text-sm text-gray-200
-                            focus:outline-none focus:ring-2
-                            focus:ring-purple-500/50 focus:border-purple-500
-                            transition">
-                            <option value="fade">Fade</option>
-                            <option value="slide">Slide</option>
-                        </select>
-                    </div>
+<input
+type="number"
+id="cfgDuration"
+class="config-input"
+value="${widget.data.duration || 10}"
+>
 
-                </div>
+</div>
 
-            </div>
-        `;
+
+<!-- ANIMATIONS -->
+<div class="config-card">
+
+<div class="config-title">
+Animations
+</div>
+
+<label class="config-label">
+Animation In
+</label>
+
+<select id="cfgAnimIn" class="config-input">
+<option value="fade">Fade</option>
+<option value="slide">Slide</option>
+</select>
+
+<label class="config-label">
+Animation Out
+</label>
+
+<select id="cfgAnimOut" class="config-input">
+<option value="fade">Fade</option>
+<option value="slide">Slide</option>
+</select>
+
+</div>
+
+</div>
+`;
 
     // Set current selected values
     document.getElementById("cfgAnimIn").value =

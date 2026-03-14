@@ -120,44 +120,43 @@ window.TextWidget = {
 
   renderConfig(widget, container, update) {
 
-    container.innerHTML = `
+container.innerHTML = `
 
-<div class="space-y-6 text-sm text-gray-300">
-
+<div class="config-root">
 
 <!-- CONTENT -->
-<div>
+<div class="config-card">
 
-<label class="text-xs uppercase text-gray-500 tracking-wider">
+<div class="config-title">
 Content
-</label>
+</div>
 
 <input
 data-field="text"
 value="${widget.data.text}"
-class="mt-2 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2"
+class="config-input"
 />
 
 </div>
 
 
-
 <!-- TYPOGRAPHY -->
-<div class="space-y-3 border-t border-gray-800 pt-4">
+<div class="config-card">
 
-<label class="text-xs uppercase text-gray-500 tracking-wider">
+<div class="config-title">
 Typography
-</label>
+</div>
 
-<input type="number"
+<input
+type="number"
 data-field="fontSize"
 value="${widget.data.fontSize}"
-class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2"
+class="config-input"
 />
 
-
-<select data-field="fontFamily"
-class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+<select
+data-field="fontFamily"
+class="config-input">
 
 <option>Inter</option>
 <option>Montserrat</option>
@@ -170,8 +169,9 @@ class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
 </select>
 
 
-<select data-field="fontWeight"
-class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+<select
+data-field="fontWeight"
+class="config-input">
 
 <option value="300">Light</option>
 <option value="400">Regular</option>
@@ -182,11 +182,12 @@ class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
 </select>
 
 
-<label class="text-xs text-gray-500">
+<label class="config-label">
 Letter Spacing
 </label>
 
-<input type="range"
+<input
+type="range"
 min="-2"
 max="20"
 step="0.5"
@@ -195,11 +196,13 @@ value="${widget.data.letterSpacing}"
 class="w-full"
 />
 
-<label class="text-xs text-gray-500">
+
+<label class="config-label">
 Line Height
 </label>
 
-<input type="range"
+<input
+type="range"
 min="0.6"
 max="3"
 step="0.1"
@@ -211,13 +214,14 @@ class="w-full"
 </div>
 
 
-
 <!-- COLOR -->
-<div class="space-y-3 border-t border-gray-800 pt-4">
+<div class="config-card">
 
-<div class="space-y-4">
+<div class="config-title">
+Color
+</div>
 
-<label class="text-xs text-gray-400">
+<label class="config-label">
 Mode
 </label>
 
@@ -238,7 +242,7 @@ Gradient
 
 <div id="solidColorBlock">
 
-<label class="text-xs text-gray-400">
+<label class="config-label">
 Text Color
 </label>
 
@@ -249,13 +253,13 @@ Text Color
 
 <div id="gradientBlock">
 
-<label class="text-xs text-gray-400">
+<label class="config-label">
 Gradient Start
 </label>
 
 <div id="gradientColor1"></div>
 
-<label class="text-xs text-gray-400 mt-2 block">
+<label class="config-label">
 Gradient End
 </label>
 
@@ -263,10 +267,10 @@ Gradient End
 
 </div>
 
-</div>
 
-<select data-field="gradientDirection"
-class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+<select
+data-field="gradientDirection"
+class="config-input">
 
 <option value="to right">Left → Right</option>
 <option value="to left">Right → Left</option>
@@ -278,18 +282,18 @@ class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
 </div>
 
 
-
 <!-- STROKE -->
-<div class="space-y-3 border-t border-gray-800 pt-4">
+<div class="config-card">
 
-<label class="text-xs uppercase text-gray-500 tracking-wider">
+<div class="config-title">
 Stroke
-</label>
+</div>
 
-<input type="number"
+<input
+type="number"
 data-field="strokeSize"
 value="${widget.data.strokeSize}"
-class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2"
+class="config-input"
 />
 
 <div id="strokeColorPicker"></div>
@@ -297,24 +301,30 @@ class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2"
 </div>
 
 
-
 <!-- SHADOW -->
-<div class="space-y-3 border-t border-gray-800 pt-4">
+<div class="config-card">
 
-<label class="text-xs uppercase text-gray-500 tracking-wider">
+<div class="config-title">
 Glow / Shadow
-</label>
+</div>
 
 <label class="flex items-center gap-2 text-xs">
-<input type="checkbox" data-field="textShadow" ${widget.data.textShadow ? "checked" : ""}>
+<input
+type="checkbox"
+data-field="textShadow"
+${widget.data.textShadow ? "checked" : ""}
+>
 Enable Glow
 </label>
 
 <div id="shadowColorPicker"></div>
 
-<label class="text-xs text-gray-500">Blur</label>
+<label class="config-label">
+Blur
+</label>
 
-<input type="range"
+<input
+type="range"
 min="0"
 max="80"
 data-field="shadowBlur"
@@ -323,7 +333,6 @@ class="w-full"
 />
 
 </div>
-
 
 </div>
 `;
