@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Project Editor</title>
   <link rel="icon" type="image/png" href="/logo/BlotverFavicon.png" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
-  <link href="/colorpicker.css" rel="stylesheet">
-  <link href="/config-ui.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" />
+  <link href="css/colorpicker.css" rel="stylesheet">
+  <link href="css/config-ui.css" rel="stylesheet">
   <link href="/styles.css" rel="stylesheet" />
 
   <style>
@@ -557,7 +557,8 @@
 
   <script src="/widgets/registry.js"></script>
   <script src="/widgets/shoutout.js"></script>
-  <script src="/utils/colorPicker.js"></script>
+  <script src="js/colorPicker.js"></script>
+  <script src="js/configCollapse.js"></script>
   <script src="/widgets/image.js"></script>
   <script src="/widgets/text.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
@@ -1338,6 +1339,10 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
 
       if (widgetDef && widgetDef.renderConfig) {
         widgetDef.renderConfig(widget, content, updateSelectedWidget);
+
+        if (typeof enableConfigCollapse === "function") {
+          enableConfigCollapse(content);
+        }
       }
 
       if (window.innerWidth < 768) {

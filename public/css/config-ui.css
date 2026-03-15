@@ -1,0 +1,438 @@
+/* ============================= */
+/* ROOT */
+/* ============================= */
+
+.config-root {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 6px 4px 12px 4px;
+}
+
+
+/* ============================= */
+/* CARDS */
+/* ============================= */
+
+.config-card {
+
+    background:
+        linear-gradient(180deg,
+            rgba(17, 24, 39, 0.85),
+            rgba(2, 6, 23, 0.95));
+
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    border-radius: 16px;
+
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+    transition: all .2s ease;
+
+}
+
+.config-card:hover {
+
+    border-color: rgba(168, 85, 247, 0.35);
+
+    box-shadow:
+        0 14px 40px rgba(0, 0, 0, 0.55),
+        0 0 25px rgba(168, 85, 247, 0.05);
+
+}
+
+
+/* ============================= */
+/* TITLES */
+/* ============================= */
+
+.config-title {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.config-title::after{
+  content:"▾";
+  font-size:12px;
+  opacity:.6;
+  transition:transform .2s;
+}
+
+.config-title.collapsed::after{
+  transform:rotate(-90deg);
+}
+
+.config-body{
+  transition:all .2s ease;
+}
+
+/* ============================= */
+/* ROWS */
+/* ============================= */
+
+.config-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+/* ============================= */
+/* LABEL */
+/* ============================= */
+
+.config-label {
+
+    font-size: 12px;
+
+    color: #9ca3af;
+
+    font-weight: 500;
+
+}
+
+
+/* ============================= */
+/* INPUT */
+/* ============================= */
+
+.config-input {
+
+    width: 100%;
+
+    background: #020617;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    border-radius: 10px;
+
+    padding: 9px 11px;
+
+    font-size: 13px;
+
+    color: #e5e7eb;
+
+    transition: all .15s ease;
+
+}
+
+.config-input:hover {
+    border-color: #374151;
+}
+
+.config-input:focus {
+
+    outline: none;
+
+    border-color: #8b5cf6;
+
+    box-shadow:
+        0 0 0 1px #8b5cf6,
+        0 0 10px rgba(139, 92, 246, 0.25);
+
+}
+
+
+/* ============================= */
+/* SLIDER */
+/* ============================= */
+
+.config-slider {
+
+    width: 100%;
+
+    height: 6px;
+
+    border-radius: 10px;
+
+    background: #1e293b;
+
+    appearance: none;
+
+    cursor: pointer;
+
+}
+
+.config-slider::-webkit-slider-thumb {
+
+    appearance: none;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg,
+            #8b5cf6,
+            #a855f7);
+
+    box-shadow:
+        0 0 10px rgba(168, 85, 247, 0.5);
+
+    cursor: pointer;
+
+    transition: transform .1s ease;
+
+}
+
+.config-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+
+/* ============================= */
+/* DIVIDER */
+/* ============================= */
+
+.config-divider {
+
+    height: 1px;
+
+    background: rgba(255, 255, 255, 0.05);
+
+    margin: 4px 0;
+
+}
+
+
+/* ============================= */
+/* MODE SWITCH */
+/* ============================= */
+
+.mode-switch {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 6px;
+
+}
+
+
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
+.mode-btn,
+.glow-btn {
+
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 9px 10px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    background: #020617;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: #cbd5f5;
+
+    cursor: pointer;
+
+    transition: all .18s ease;
+
+}
+
+.mode-btn:hover,
+.glow-btn:hover {
+
+    background: #0b1220;
+
+    border-color: #374151;
+
+}
+
+
+/* ============================= */
+/* ACTIVE BUTTON */
+/* ============================= */
+
+.mode-btn.active,
+.glow-btn.active {
+
+    background: linear-gradient(135deg,
+            #7c3aed,
+            #9333ea);
+
+    border-color: #a78bfa;
+
+    color: white;
+
+    box-shadow:
+        0 0 12px rgba(168, 85, 247, 0.45);
+
+}
+
+
+/* ============================= */
+/* COLOR PICKER WRAPPER */
+/* ============================= */
+
+.color-field {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: #020617;
+
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    border-radius: 12px;
+
+    padding: 6px 10px;
+
+    transition: all .15s;
+
+}
+
+.color-field:hover {
+
+    border-color: #374151;
+
+}
+
+.color-preview {
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: 6px;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    cursor: pointer;
+
+}
+
+.color-hex {
+
+    flex: 1;
+
+    background: transparent;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 12px;
+
+    color: #e5e7eb;
+
+}
+
+
+/* ============================= */
+/* SCROLL */
+/* ============================= */
+
+.config-root::-webkit-scrollbar {
+    width: 6px;
+}
+
+.config-root::-webkit-scrollbar-thumb {
+
+    background: #374151;
+
+    border-radius: 10px;
+
+}
+
+.config-root::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+}
+
+/* ============================= */
+/* Image  */
+/* ============================= */
+
+.config-image-preview{
+
+width:100%;
+height:110px;
+
+object-fit:cover;
+
+border-radius:10px;
+border:1px solid #374151;
+
+}
+
+.config-image-placeholder{
+
+height:110px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border:1px dashed #374151;
+border-radius:10px;
+
+font-size:12px;
+color:#6b7280;
+
+}
+
+.config-size-grid{
+
+display:grid;
+grid-template-columns:1fr 1fr auto;
+gap:8px;
+
+}
+
+.ratio-btn{
+
+padding:8px 10px;
+
+border-radius:10px;
+border:1px solid #374151;
+
+background:#020617;
+color:#9ca3af;
+
+font-size:12px;
+
+cursor:pointer;
+
+}
+
+.ratio-btn.active{
+
+background:#7c3aed;
+border-color:#a78bfa;
+color:white;
+
+}
