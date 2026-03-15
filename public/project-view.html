@@ -1431,21 +1431,16 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       });
 
       panel.querySelectorAll("[data-fit]").forEach((btn) => {
+
         const active = btn.dataset.fit === selectedWidget.data.objectFit;
-        btn.className =
-          "flex-1 py-2 rounded-md border text-xs capitalize " +
-          (active
-            ? "bg-gray-700 border-gray-600 text-white"
-            : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+
+        btn.classList.toggle("active", active);
+
       });
 
       const lockBtn = panel.querySelector("#lockRatio");
       if (lockBtn) {
-        lockBtn.className =
-          "flex items-center justify-center w-10 h-10 transition-colors duration-150 rounded-md border " +
-          (selectedWidget.data.lockRatio
-            ? "bg-gray-600 border-gray-500 text-white"
-            : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white");
+        lockBtn.classList.toggle("active", selectedWidget.data.lockRatio);
       }
 
       // ===== 5️⃣ Marcar cambios =====
