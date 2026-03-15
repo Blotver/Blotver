@@ -315,7 +315,13 @@ class="config-slider"
 
                     const fit = btn.dataset.fit
 
-                    widget.data.objectFit = fit
+                    // quitar active a todos
+                    container
+                        .querySelectorAll("[data-fit]")
+                        .forEach(b => b.classList.remove("active"))
+
+                    // activar el presionado
+                    btn.classList.add("active")
 
                     update({
                         objectFit: fit
@@ -324,7 +330,6 @@ class="config-slider"
                 })
 
             })
-
         /* ============================= */
         /* RATIO LOCK */
         /* ============================= */
