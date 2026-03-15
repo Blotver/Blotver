@@ -95,27 +95,41 @@ window.ShoutoutWidget = {
       return text;
     }
 
+    function norm(v) {
+      if (v > 1) return v / 100
+      return v
+    }
+
     function getChildrenHTML() {
-      let html = "";
 
-      children.forEach((child) => {
+      let html = ""
+
+      children.forEach(child => {
+
         if (child.type === "image" && child.data.url) {
-          html += `
-      <img src="${child.data.url}"
-      style="
-        position:absolute;
-        left:${(child.data.x - widget.data.x) * canvasW}px;
-        top:${(child.data.y - widget.data.y) * canvasH}px;
-        width:${child.data.width * canvasW}px;
-        height:${child.data.height * canvasH}px;
-        object-fit:${child.data.objectFit || "cover"};
-        pointer-events:none;
-      ">
-      `;
-        }
-      });
 
-      return html;
+          const cx = norm(child.data.x)
+          const cy = norm(child.data.y)
+          const cw = norm(child.data.width)
+          const ch = norm(child.data.height)
+
+          html += `
+<img src="${child.data.url}"
+style="
+position:absolute;
+left:${(cx - widget.data.x) * canvasW}px;
+top:${(cy - widget.data.y) * canvasH}px;
+width:${cw * canvasW}px;
+height:${ch * canvasH}px;
+object-fit:${child.data.objectFit || "cover"};
+pointer-events:none;
+">
+`
+        }
+
+      })
+
+      return html
     }
 
     function updateView() {
@@ -240,7 +254,7 @@ ${getChildrenHTML()}
   },
 
   renderConfig(widget, content, update) {
-content.innerHTML = `
+    content.innerHTML = `
 
 <div class="config-root">
 
