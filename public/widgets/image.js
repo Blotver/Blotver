@@ -117,7 +117,7 @@ Size
 <input
 type="number"
 data-field="width"
-value="${Math.round(d.width * 100)}"
+value="${(d.width * 100).toFixed(0)}"
 class="config-input"
 />
 
@@ -313,6 +313,12 @@ class="config-slider"
 
                 btn.addEventListener("click", () => {
 
+                    container
+                        .querySelectorAll("[data-fit]")
+                        .forEach(b => b.classList.remove("active"))
+
+                    btn.classList.add("active")
+
                     update({
                         objectFit: btn.dataset.fit
                     })
@@ -320,7 +326,6 @@ class="config-slider"
                 })
 
             })
-
 
         /* ============================= */
         /* RATIO LOCK */

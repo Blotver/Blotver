@@ -720,13 +720,13 @@
             const centerY = (canvasHeight - newHeight) / 2;
 
             if (selectedWidget.type === "image") {
-updateSelectedWidget({
-  url: data.url,
-  width: newWidth / canvasWidth,
-  height: newHeight / canvasHeight,
-  x: centerX / canvasWidth,
-  y: centerY / canvasHeight,
-});
+              updateSelectedWidget({
+                url: data.url,
+                width: newWidth / canvasWidth,
+                height: newHeight / canvasHeight,
+                x: centerX / canvasWidth,
+                y: centerY / canvasHeight,
+              });
             } else if (selectedWidget.type === "shoutout") {
               updateSelectedWidget({
                 imageUrl: data.url,
