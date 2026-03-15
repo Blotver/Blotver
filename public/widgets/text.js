@@ -1,83 +1,83 @@
 window.TextWidget = {
 
-type:"text",
+  type: "text",
 
-defaultData:{
+  defaultData: {
 
-x:0.2,
-y:0.2,
-width:0.2,
-height:0.1,
+    x: 0.2,
+    y: 0.2,
+    width: 0.2,
+    height: 0.1,
 
-text:"Sample Text",
+    text: "Sample Text",
 
-fontSize:40,
-fontWeight:"700",
-fontFamily:"Inter",
-letterSpacing:0,
-lineHeight:1,
+    fontSize: 40,
+    fontWeight: "700",
+    fontFamily: "Inter",
+    letterSpacing: 0,
+    lineHeight: 1,
 
-textColor:"#ffffff",
+    textColor: "#ffffff",
 
-gradient:false,
-gradientColor1:"#ffffff",
-gradientColor2:"#ff00ff",
-gradientDirection:"to right",
+    gradient: false,
+    gradientColor1: "#ffffff",
+    gradientColor2: "#ff00ff",
+    gradientDirection: "to right",
 
-strokeSize:0,
-strokeColor:"#000000",
+    strokeSize: 0,
+    strokeColor: "#000000",
 
-textShadow:false,
-shadowColor:"#000000",
-shadowBlur:10,
+    textShadow: false,
+    shadowColor: "#000000",
+    shadowBlur: 10,
 
-backgroundColor:"#000000",
-backgroundOpacity:0,
+    backgroundColor: "#000000",
+    backgroundOpacity: 0,
 
-borderRadius:0,
+    borderRadius: 0,
 
-textAlign:"center",
+    textAlign: "center",
 
-paddingX:10,
-paddingY:6
+    paddingX: 10,
+    paddingY: 6
 
-},
+  },
 
-renderCanvas(widget){
+  renderCanvas(widget) {
 
-const el=document.createElement("div")
-const d=widget.data
+    const el = document.createElement("div")
+    const d = widget.data
 
-function hexToRgb(hex){
+    function hexToRgb(hex) {
 
-hex=hex.replace("#","")
-const bigint=parseInt(hex,16)
+      hex = hex.replace("#", "")
+      const bigint = parseInt(hex, 16)
 
-const r=(bigint>>16)&255
-const g=(bigint>>8)&255
-const b=bigint&255
+      const r = (bigint >> 16) & 255
+      const g = (bigint >> 8) & 255
+      const b = bigint & 255
 
-return `${r},${g},${b}`
+      return `${r},${g},${b}`
 
-}
+    }
 
-el.style.width="100%"
-el.style.height="100%"
-el.style.display="flex"
-el.style.alignItems="center"
+    el.style.width = "100%"
+    el.style.height = "100%"
+    el.style.display = "flex"
+    el.style.alignItems = "center"
 
-if(d.textAlign==="left") el.style.justifyContent="flex-start"
-else if(d.textAlign==="right") el.style.justifyContent="flex-end"
-else el.style.justifyContent="center"
+    if (d.textAlign === "left") el.style.justifyContent = "flex-start"
+    else if (d.textAlign === "right") el.style.justifyContent = "flex-end"
+    else el.style.justifyContent = "center"
 
-el.style.padding=`${d.paddingY}px ${d.paddingX}px`
+    el.style.padding = `${d.paddingY}px ${d.paddingX}px`
 
-const rgb=hexToRgb(d.backgroundColor)
+    const rgb = hexToRgb(d.backgroundColor)
 
-el.style.background=`rgba(${rgb},${d.backgroundOpacity})`
-el.style.borderRadius=d.borderRadius+"px"
+    el.style.background = `rgba(${rgb},${d.backgroundOpacity})`
+    el.style.borderRadius = d.borderRadius + "px"
 
-let textStyle=`
+    let textStyle = `
 font-size:${d.fontSize}px;
 font-weight:${d.fontWeight};
 font-family:${d.fontFamily},sans-serif;
@@ -88,35 +88,35 @@ text-align:${d.textAlign};
 white-space:nowrap;
 `
 
-if(d.gradient){
+    if (d.gradient) {
 
-textStyle+=`
+      textStyle += `
 background:linear-gradient(${d.gradientDirection},${d.gradientColor1},${d.gradientColor2});
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 `
 
-}else{
+    } else {
 
-textStyle+=`color:${d.textColor};`
+      textStyle += `color:${d.textColor};`
 
-}
+    }
 
-if(d.textShadow){
+    if (d.textShadow) {
 
-textStyle+=`text-shadow:0 0 ${d.shadowBlur}px ${d.shadowColor};`
+      textStyle += `text-shadow:0 0 ${d.shadowBlur}px ${d.shadowColor};`
 
-}
+    }
 
-el.innerHTML=`<div style="${textStyle}">${d.text}</div>`
+    el.innerHTML = `<div style="${textStyle}">${d.text}</div>`
 
-return el
+    return el
 
-},
+  },
 
-renderConfig(widget,container,update){
+  renderConfig(widget, container, update) {
 
-container.innerHTML=`
+    container.innerHTML = `
 
 <div class="config-root">
 
@@ -219,13 +219,17 @@ class="w-full"
 Fill
 </div>
 
-<div class="mode-switch">
+<div class="mode-switch flex gap-2">
 
-<button class="mode-btn ${!widget.data.gradient?"active":""}" data-mode="solid">
+<button
+class="mode-btn flex-1 ${!widget.data.gradient ? "active" : ""}"
+data-mode="solid">
 Solid
 </button>
 
-<button class="mode-btn ${widget.data.gradient?"active":""}" data-mode="gradient">
+<button
+class="mode-btn flex-1 ${widget.data.gradient ? "active" : ""}"
+data-mode="gradient">
 Gradient
 </button>
 
@@ -245,17 +249,23 @@ Text Color
 
 <div id="gradientBlock">
 
-<label class="config-label">
-Gradient Start
-</label>
+<div class="grid grid-cols-2 gap-2">
 
+<div>
+<label class="config-label">
+Start
+</label>
 <div id="gradientColor1"></div>
+</div>
 
+<div>
 <label class="config-label">
-Gradient End
+End
 </label>
-
 <div id="gradientColor2"></div>
+</div>
+
+</div>
 
 <label class="config-label">
 Direction
@@ -299,23 +309,31 @@ class="config-input"
 
 
 <!-- EFFECTS -->
+<!-- EFFECTS -->
 <div class="config-card">
 
 <div class="config-title">
 Glow / Shadow
 </div>
 
-<label class="flex items-center gap-2 text-xs">
+<div class="mode-switch flex gap-2">
 
-<input
-type="checkbox"
-data-field="textShadow"
-${widget.data.textShadow?"checked":""}
->
+<button
+class="glow-btn flex-1 ${!widget.data.textShadow ? "active" : ""}"
+data-glow="off">
+Off
+</button>
 
-Enable Glow
+<button
+class="glow-btn flex-1 ${widget.data.textShadow ? "active" : ""}"
+data-glow="on">
+Glow
+</button>
 
-</label>
+</div>
+
+
+<div id="glowControls">
 
 <div id="shadowColorPicker"></div>
 
@@ -331,6 +349,8 @@ data-field="shadowBlur"
 value="${widget.data.shadowBlur}"
 class="w-full"
 />
+
+</div>
 
 </div>
 
@@ -374,139 +394,143 @@ class="w-full"
 
 </div>
 
-
-
-<!-- SPACING -->
-<div class="config-card">
-
-<div class="config-title">
-Padding
-</div>
-
-<label class="config-label">
-X
-</label>
-
-<input
-type="number"
-data-field="paddingX"
-value="${widget.data.paddingX}"
-class="config-input"
-/>
-
-<label class="config-label">
-Y
-</label>
-
-<input
-type="number"
-data-field="paddingY"
-value="${widget.data.paddingY}"
-class="config-input"
-/>
-
-</div>
-
 </div>
 `
 
-container.querySelectorAll("[data-field]").forEach(input=>{
+    container.querySelectorAll("[data-field]").forEach(input => {
 
-input.addEventListener("input",e=>{
+      input.addEventListener("input", e => {
 
-const field=e.target.dataset.field
+        const field = e.target.dataset.field
 
-let value
+        let value
 
-if(input.type==="checkbox") value=input.checked
-else value=e.target.value
+        if (input.type === "checkbox") value = input.checked
+        else value = e.target.value
 
-if(input.type==="number"||input.type==="range")
-value=parseFloat(value)
+        if (input.type === "number" || input.type === "range")
+          value = parseFloat(value)
 
-update({[field]:value})
+        update({ [field]: value })
 
-})
+      })
 
-})
+    })
 
-const solidBlock=container.querySelector("#solidBlock")
-const gradientBlock=container.querySelector("#gradientBlock")
+    const solidBlock = container.querySelector("#solidBlock")
+    const gradientBlock = container.querySelector("#gradientBlock")
 
-function updateMode(){
+    function updateMode() {
 
-if(widget.data.gradient){
+      if (widget.data.gradient) {
 
-solidBlock.style.display="none"
-gradientBlock.style.display="block"
+        solidBlock.style.display = "none"
+        gradientBlock.style.display = "block"
 
-}else{
+      } else {
 
-solidBlock.style.display="block"
-gradientBlock.style.display="none"
+        solidBlock.style.display = "block"
+        gradientBlock.style.display = "none"
 
-}
+      }
 
-}
+    }
 
-updateMode()
+    updateMode()
 
-container.querySelectorAll(".mode-btn").forEach(btn=>{
+    container.querySelectorAll(".mode-btn").forEach(btn => {
 
-btn.addEventListener("click",()=>{
+      btn.addEventListener("click", () => {
 
-const mode=btn.dataset.mode
+        const mode = btn.dataset.mode
 
-update({gradient:mode==="gradient"})
+        update({ gradient: mode === "gradient" })
 
-container.querySelectorAll(".mode-btn")
-.forEach(b=>b.classList.remove("active"))
+        container.querySelectorAll(".mode-btn")
+          .forEach(b => b.classList.remove("active"))
 
-btn.classList.add("active")
+        btn.classList.add("active")
 
-updateMode()
+        updateMode()
 
-})
+      })
 
-})
+    })
 
-createColorPicker(
-container.querySelector("#textColorPicker"),
-widget.data.textColor,
-c=>update({textColor:c})
-)
+    const glowControls = container.querySelector("#glowControls")
 
-createColorPicker(
-container.querySelector("#gradientColor1"),
-widget.data.gradientColor1,
-c=>update({gradientColor1:c})
-)
+    function updateGlow() {
 
-createColorPicker(
-container.querySelector("#gradientColor2"),
-widget.data.gradientColor2,
-c=>update({gradientColor2:c})
-)
+      if (widget.data.textShadow) {
 
-createColorPicker(
-container.querySelector("#strokeColorPicker"),
-widget.data.strokeColor,
-c=>update({strokeColor:c})
-)
+        glowControls.style.display = "block"
 
-createColorPicker(
-container.querySelector("#shadowColorPicker"),
-widget.data.shadowColor,
-c=>update({shadowColor:c})
-)
+      } else {
 
-createColorPicker(
-container.querySelector("#bgColorPicker"),
-widget.data.backgroundColor,
-c=>update({backgroundColor:c})
-)
+        glowControls.style.display = "none"
 
-}
+      }
+
+    }
+
+    updateGlow()
+
+    container.querySelectorAll(".glow-btn").forEach(btn => {
+
+      btn.addEventListener("click", () => {
+
+        const enabled = btn.dataset.glow === "on"
+
+        update({ textShadow: enabled })
+
+        container.querySelectorAll(".glow-btn")
+          .forEach(b => b.classList.remove("active"))
+
+        btn.classList.add("active")
+
+        updateGlow()
+
+      })
+
+    })
+
+    createColorPicker(
+      container.querySelector("#textColorPicker"),
+      widget.data.textColor,
+      c => update({ textColor: c })
+    )
+
+    createColorPicker(
+      container.querySelector("#gradientColor1"),
+      widget.data.gradientColor1,
+      c => update({ gradientColor1: c })
+    )
+
+    createColorPicker(
+      container.querySelector("#gradientColor2"),
+      widget.data.gradientColor2,
+      c => update({ gradientColor2: c })
+    )
+
+    createColorPicker(
+      container.querySelector("#strokeColorPicker"),
+      widget.data.strokeColor,
+      c => update({ strokeColor: c })
+    )
+
+    createColorPicker(
+      container.querySelector("#shadowColorPicker"),
+      widget.data.shadowColor,
+      c => update({ shadowColor: c })
+    )
+
+    createColorPicker(
+      container.querySelector("#bgColorPicker"),
+      widget.data.backgroundColor,
+      c => update({ backgroundColor: c })
+    )
+
+  }
 
 }
 
