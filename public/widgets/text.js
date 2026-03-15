@@ -441,25 +441,26 @@ class="w-full"
       color => update({ shadowColor: color })
     );
 
+    container.querySelectorAll(".mode-btn").forEach(btn => {
+
+      btn.addEventListener("click", () => {
+
+        const mode = btn.dataset.mode;
+
+        update({ gradient: mode === "gradient" });
+
+        container.querySelectorAll(".mode-btn")
+          .forEach(b => b.classList.remove("active"));
+
+        btn.classList.add("active");
+
+      });
+
+    });
+
   }
 
 };
 
-container.querySelectorAll(".mode-btn").forEach(btn => {
-
-  btn.addEventListener("click", () => {
-
-    const mode = btn.dataset.mode;
-
-    update({ gradient: mode === "gradient" });
-
-    container.querySelectorAll(".mode-btn")
-      .forEach(b => b.classList.remove("active"));
-
-    btn.classList.add("active");
-
-  });
-
-});
 
 registerWidget(window.TextWidget);
