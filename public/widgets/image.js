@@ -117,7 +117,7 @@ Size
 <input
 type="number"
 data-field="width"
-value="${(d.width * 100).toFixed(0)}"
+value="${Math.round(d.width * 100)}"
 class="config-input"
 />
 
@@ -313,14 +313,12 @@ class="config-slider"
 
                 btn.addEventListener("click", () => {
 
-                    container
-                        .querySelectorAll("[data-fit]")
-                        .forEach(b => b.classList.remove("active"))
+                    const fit = btn.dataset.fit
 
-                    btn.classList.add("active")
+                    widget.data.objectFit = fit
 
                     update({
-                        objectFit: btn.dataset.fit
+                        objectFit: fit
                     })
 
                 })
