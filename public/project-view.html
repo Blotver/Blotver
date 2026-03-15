@@ -1386,12 +1386,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
       const widgetDef = window.WidgetRegistry[selectedWidget.type];
 
-      if (widgetDef && widgetDef.renderCanvas) {
+      // 🔥 SOLO re-render si cambia la imagen
+      if (widgetDef && widgetDef.renderCanvas && updates.url !== undefined) {
+
         selectedElement.innerHTML = "";
         const rendered = widgetDef.renderCanvas(selectedWidget);
         selectedElement.appendChild(rendered);
 
         addResizeHandles(selectedElement);
+
       }
 
       // ===== 4️⃣ Sincronizar panel =====
