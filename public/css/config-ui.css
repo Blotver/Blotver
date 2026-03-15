@@ -437,3 +437,47 @@
     color: white;
 
 }
+
+/* ============================= */
+/* BUTTON NORMALIZATION */
+/* ============================= */
+
+.mode-btn,
+.glow-btn,
+.ratio-btn {
+
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+
+}
+
+.mode-btn:focus,
+.glow-btn:focus,
+.ratio-btn:focus {
+
+    outline: none;
+    box-shadow: none;
+
+}
+
+.mode-btn:active,
+.glow-btn:active,
+.ratio-btn:active {
+
+    transform: scale(0.98);
+
+}
+
+.config-input {
+
+    appearance: textfield;
+
+}
+
+.config-input::-webkit-inner-spin-button,
+.config-input::-webkit-outer-spin-button {
+
+    opacity: 0.6;
+
+}
