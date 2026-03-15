@@ -25,6 +25,30 @@ window.ImageWidget = {
     },
 
     /* ============================= */
+    /* APPLY STYLES (GLOBAL) */
+    /* ============================= */
+
+    applyStyles(widget) {
+
+        const d = widget.data
+        const img = widget._img
+
+        if (!img) return
+
+        img.style.objectFit = d.objectFit || "cover"
+        img.style.borderRadius = (d.borderRadius || 0) + "px"
+        img.style.opacity = d.opacity ?? 1
+
+        img.style.boxShadow =
+            d.shadow
+                ? `0 10px 30px rgba(0,0,0,${d.shadow / 100})`
+                : "none"
+
+        if (d.url && img.src !== d.url)
+            img.src = d.url
+    },
+
+    /* ============================= */
     /* CANVAS RENDER */
     /* ============================= */
 
@@ -38,20 +62,14 @@ window.ImageWidget = {
 
         const img = document.createElement("img")
 
-        if (d.url) img.src = d.url
+        widget._img = img
 
         img.style.width = "100%"
         img.style.height = "100%"
-        img.style.objectFit = d.objectFit || "cover"
-        img.style.borderRadius = (d.borderRadius || 0) + "px"
-        img.style.opacity = d.opacity ?? 1
-
-        img.style.boxShadow =
-            d.shadow
-                ? `0 10px 30px rgba(0,0,0,${d.shadow / 100})`
-                : "none"
-
         img.draggable = false
+
+        if (d.url)
+            img.src = d.url
 
         img.onload = () => {
 
@@ -65,6 +83,8 @@ window.ImageWidget = {
         }
 
         wrapper.appendChild(img)
+
+        this.applyStyles(widget)
 
         return wrapper
 
@@ -93,9 +113,7 @@ Image
 
 ${d.url
                 ? `<img src="${d.url}" class="config-image-preview"/>`
-                : `<div class="config-image-placeholder">
-No image
-</div>`
+                : `<div class="config-image-placeholder">No image</div>`
             }
 
 </div>
@@ -240,7 +258,8 @@ class="config-slider"
         /* IMAGE MODAL */
         /* ============================= */
 
-        container.querySelector("#changeImage")
+        container
+            .querySelector("#changeImage")
             ?.addEventListener("click", openImageModal)
 
 
@@ -298,6 +317,8 @@ class="config-slider"
 
                     }
 
+                    window.ImageWidget.applyStyles(widget)
+
                 })
 
             })
@@ -315,21 +336,23 @@ class="config-slider"
 
                     const fit = btn.dataset.fit
 
-                    // quitar active a todos
                     container
                         .querySelectorAll("[data-fit]")
                         .forEach(b => b.classList.remove("active"))
 
-                    // activar el presionado
                     btn.classList.add("active")
 
                     update({
                         objectFit: fit
                     })
 
+                    window.ImageWidget.applyStyles(widget)
+
                 })
 
             })
+
+
         /* ============================= */
         /* RATIO LOCK */
         /* ============================= */
