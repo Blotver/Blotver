@@ -1399,10 +1399,25 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       if (!panel) return;
 
       panel.querySelectorAll("input[data-field]").forEach((input) => {
+
         const field = input.dataset.field;
+
         if (selectedWidget.data[field] !== undefined) {
-          input.value = selectedWidget.data[field];
+
+          let value = selectedWidget.data[field];
+
+          if (
+            field === "width" ||
+            field === "height" ||
+            field === "x" ||
+            field === "y"
+          ) {
+            value = Math.round(value * 100);
+          }
+
+          input.value = value;
         }
+
       });
 
       panel.querySelectorAll("input[type='range']").forEach((range) => {
