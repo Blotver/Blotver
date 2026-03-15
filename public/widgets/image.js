@@ -117,14 +117,14 @@ Size
 <input
 type="number"
 data-field="width"
-value="${d.width}"
+value="${Math.round(d.width * 100)}"
 class="config-input"
 />
 
 <input
 type="number"
 data-field="height"
-value="${d.height}"
+value="${Math.round(d.height * 100)}"
 class="config-input"
 />
 
@@ -261,7 +261,7 @@ class="config-slider"
                     if (input.type === "range")
                         value = parseFloat(e.target.value)
                     else
-                        value = parseFloat(e.target.value) || 0
+                        value = (parseFloat(e.target.value) || 0) / 100
 
 
                     /* LOCK RATIO */
