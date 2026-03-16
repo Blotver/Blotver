@@ -184,6 +184,8 @@
       container.innerHTML = "";
 
       const wrapper = document.createElement("div");
+      wrapper.style.opacity = "0"
+      wrapper.style.transition = "opacity 0.3s ease"
       wrapper.style.position = "absolute";
       const screenW = window.innerWidth;
       const screenH = window.innerHeight;
@@ -197,6 +199,9 @@
 
       // 🎬 TWITCH EMBED
       const iframe = document.createElement("iframe");
+      iframe.onload = () => {
+        wrapper.style.opacity = "1"
+      }
 
       iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
       iframe.allow = "autoplay; fullscreen";
