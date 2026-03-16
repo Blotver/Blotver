@@ -39,8 +39,9 @@ window.TextWidget = {
     textAlign: "center",
 
     paddingX: 10,
-    paddingY: 6
+    paddingY: 6,
 
+    animation: "none"
   },
 
   renderCanvas(widget) {
@@ -50,6 +51,8 @@ window.TextWidget = {
 
     function hexToRgb(hex) {
 
+      if (!hex) return "0,0,0"
+
       hex = hex.replace("#", "")
       const bigint = parseInt(hex, 16)
 
@@ -58,11 +61,11 @@ window.TextWidget = {
       const b = bigint & 255
 
       return `${r},${g},${b}`
-
     }
 
     el.style.width = "100%"
     el.style.height = "100%"
+
     el.style.display = "flex"
     el.style.alignItems = "center"
 
@@ -78,6 +81,7 @@ window.TextWidget = {
     el.style.borderRadius = d.borderRadius + "px"
 
     let textStyle = `
+display:inline-block;
 font-size:${d.fontSize}px;
 font-weight:${d.fontWeight};
 font-family:${d.fontFamily},sans-serif;
@@ -108,7 +112,19 @@ background:linear-gradient(${d.gradientDirection},${d.gradientColor1},${d.gradie
 
     }
 
-    el.innerHTML = `<div style="${textStyle}">${d.text}</div>`
+    const inner = document.createElement("div")
+
+    inner.className = "text-inner"
+
+    if (d.animation && d.animation !== "none") {
+      inner.classList.add("anim-" + d.animation)
+    }
+
+    inner.style.cssText = textStyle
+
+    inner.textContent = d.text
+
+    el.appendChild(inner)
 
     return el
 
@@ -134,7 +150,6 @@ class="config-input"
 />
 
 </div>
-
 
 
 <!-- TYPOGRAPHY -->
@@ -209,7 +224,6 @@ class="w-full"
 />
 
 </div>
-
 
 
 <!-- FILL -->
@@ -287,7 +301,6 @@ class="config-input">
 </div>
 
 
-
 <!-- STROKE -->
 <div class="config-card">
 
@@ -307,8 +320,6 @@ class="config-input"
 </div>
 
 
-
-<!-- EFFECTS -->
 <!-- EFFECTS -->
 <div class="config-card">
 
@@ -354,7 +365,26 @@ class="w-full"
 
 </div>
 
+<!-- ANIMATION -->
+<div class="config-card">
 
+<div class="config-title">
+Animation
+</div>
+
+<select
+data-field="animation"
+class="config-input">
+
+<option value="none">None</option>
+<option value="shake">Shake</option>
+<option value="bounce">Bounce</option>
+<option value="glow">Glow Pulse</option>
+<option value="wave">Wave</option>
+
+</select>
+
+</div>
 
 <!-- BACKGROUND -->
 <div class="config-card">
@@ -399,7 +429,9 @@ class="w-full"
 
     container.querySelectorAll("[data-field]").forEach(input => {
 
-      input.addEventListener("input", e => {
+      const event = input.tagName === "SELECT" ? "change" : "input"
+
+      input.addEventListener(event, e => {
 
         const field = e.target.dataset.field
 
@@ -462,13 +494,9 @@ class="w-full"
     function updateGlow() {
 
       if (widget.data.textShadow) {
-
         glowControls.style.display = "block"
-
       } else {
-
         glowControls.style.display = "none"
-
       }
 
     }

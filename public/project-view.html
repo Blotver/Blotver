@@ -1419,14 +1419,15 @@ d="M6 7h12M9 7v12m6-12v12M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z" />
       if (updates.height !== undefined)
         selectedElement.style.height = (updates.height * canvas.clientHeight) + "px";
 
-      // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET (CLAVE) =====
+      // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET =====
       const widgetDef = window.WidgetRegistry[selectedWidget.type];
 
-      // 🔥 SOLO re-render si cambia la imagen
-      if (widgetDef && widgetDef.renderCanvas && updates.url !== undefined) {
+      if (widgetDef && widgetDef.renderCanvas) {
 
         selectedElement.innerHTML = "";
+
         const rendered = widgetDef.renderCanvas(selectedWidget);
+
         selectedElement.appendChild(rendered);
 
         addResizeHandles(selectedElement);
