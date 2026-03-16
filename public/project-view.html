@@ -164,6 +164,22 @@
       transform: rotate(180deg);
     }
 
+    .layer-drop-indicator {
+      height: 2px;
+      background: #8b5cf6;
+      margin: 4px 0;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    #layersPanel>div {
+      cursor: grab;
+    }
+
+    #layersPanel>div:active {
+      cursor: grabbing;
+    }
+
     .widget-option {
       display: flex;
       align-items: center;
@@ -819,7 +835,7 @@
         el.style.top = (widget.data.y * canvasHeight) + "px";
         el.style.color = widget.data.color ?? "#000";
         el.style.fontSize = (widget.data.fontSize || 32) + "px";
-        el.style.zIndex = widget.data.zIndex ?? widgets.indexOf(widget);
+        el.style.zIndex = widget.data?.zIndex ?? 0;
         el.classList.add("draggable-resizable");
 
         if (widget.data.width) {
@@ -1006,6 +1022,22 @@
 
         layerItem.addEventListener("dragover", (e) => {
           e.preventDefault();
+
+          let indicator = document.querySelector(".layer-drop-indicator");
+
+          if (!indicator) {
+            indicator = document.createElement("div");
+            indicator.className = "layer-drop-indicator";
+          }
+
+          const rect = layerItem.getBoundingClientRect();
+          const offset = e.clientY - rect.top;
+
+          if (offset < rect.height / 2) {
+            layerItem.parentNode.insertBefore(indicator, layerItem);
+          } else {
+            layerItem.parentNode.insertBefore(indicator, layerItem.nextSibling);
+          }
         });
 
         layerItem.addEventListener("drop", async (e) => {
@@ -1021,6 +1053,10 @@
 
           const moved = widgets.splice(fromIndex, 1)[0];
           widgets.splice(toIndex, 0, moved);
+
+          document
+            .querySelectorAll(".layer-drop-indicator")
+            .forEach((el) => el.remove());
 
           await updateLayerOrder();
 

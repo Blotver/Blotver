@@ -11,7 +11,7 @@ window.TextWidget = {
 
     text: "Sample Text",
 
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: "700",
     fontFamily: "Inter",
     letterSpacing: 0,
