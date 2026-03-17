@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" />
   <link href="/css/colorpicker.css" rel="stylesheet">
   <link href="/css/config-ui.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/animations.css">
   <link href="/styles.css" rel="stylesheet" />
 
   <style>
@@ -303,91 +304,6 @@
         z-index: 1300;
       }
     }
-
-    .anim-shake {
-      display: inline-block;
-      animation: shake 0.6s infinite;
-    }
-
-    @keyframes shake {
-      0% {
-        transform: translateX(0)
-      }
-
-      25% {
-        transform: translateX(-2px)
-      }
-
-      50% {
-        transform: translateX(2px)
-      }
-
-      75% {
-        transform: translateX(-2px)
-      }
-
-      100% {
-        transform: translateX(0)
-      }
-    }
-
-    .anim-bounce {
-      display: inline-block;
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0)
-      }
-
-      50% {
-        transform: translateY(-8px)
-      }
-    }
-
-    .anim-glow {
-      animation: glow 1.5s infinite alternate;
-    }
-
-    @keyframes glow {
-      from {
-        filter: drop-shadow(0 0 2px white)
-      }
-
-      to {
-        filter: drop-shadow(0 0 10px white)
-      }
-    }
-
-    .anim-wave {
-      display: inline-block;
-      animation: wave 1.2s infinite;
-    }
-
-    @keyframes wave {
-      0% {
-        transform: rotate(0deg)
-      }
-
-      25% {
-        transform: rotate(3deg)
-      }
-
-      50% {
-        transform: rotate(-3deg)
-      }
-
-      75% {
-        transform: rotate(3deg)
-      }
-
-      100% {
-        transform: rotate(0deg)
-      }
-    }
   </style>
 </head>
 
@@ -662,6 +578,7 @@
   <script src="/js/configCollapse.js"></script>
   <script src="/widgets/image.js"></script>
   <script src="/widgets/text.js"></script>
+  <script src="/js/styleEngine.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
