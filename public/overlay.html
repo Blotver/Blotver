@@ -344,6 +344,10 @@
 
           txt.innerHTML = parsed;
 
+          if (textData.animation && textData.animation !== "none") {
+            txt.classList.add("anim-" + textData.animation);
+          }
+
           txt.style.zIndex = "6";
 
           txt.style.position = "absolute";
