@@ -357,10 +357,7 @@
           txt.style.width = (textData.width * screenW) + "px";
           txt.style.height = (textData.height * screenH) + "px";
 
-          txt.style.color = textData.textColor || "white";
-          txt.style.fontSize = (textData.fontSize || 30) + "px";
-          txt.style.fontWeight = textData.fontWeight || "bold";
-          txt.style.textAlign = textData.textAlign || "center";
+          StyleEngine.applyText(txt, textData)
 
           wrapper.appendChild(txt); // 👈 CAMBIO
 

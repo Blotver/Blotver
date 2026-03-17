@@ -120,7 +120,8 @@ background:linear-gradient(${d.gradientDirection},${d.gradientColor1},${d.gradie
       inner.classList.add("anim-" + d.animation)
     }
 
-    inner.style.cssText = textStyle
+    StyleEngine.applyText(inner, d)
+    StyleEngine.applyTextContainer(el, d)
 
     inner.textContent = d.text
 

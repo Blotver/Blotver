@@ -30,22 +30,8 @@ window.ImageWidget = {
 
     applyStyles(widget) {
 
-        const d = widget.data
-        const img = widget._img
+        StyleEngine.applyImage(widget._img, widget.data)
 
-        if (!img) return
-
-        img.style.objectFit = d.objectFit || "cover"
-        img.style.borderRadius = (d.borderRadius || 0) + "px"
-        img.style.opacity = d.opacity ?? 1
-
-        img.style.boxShadow =
-            d.shadow
-                ? `0 10px 30px rgba(0,0,0,${d.shadow / 100})`
-                : "none"
-
-        if (d.url && img.src !== d.url)
-            img.src = d.url
     },
 
     /* ============================= */
