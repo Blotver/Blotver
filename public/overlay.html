@@ -44,7 +44,6 @@
     .slide-out {
       animation: slideOut 0.6s forwards;
     }
-
   </style>
 </head>
 
@@ -155,61 +154,46 @@
 
       // 🎨 IMÁGENES HIJAS
       if (data.images && data.images.length) {
-        console.log("🖼️ Renderizando imágenes:", data.images);
 
         data.images.forEach((imgData) => {
 
-          const img = document.createElement("img");
+          const img = StyleEngine.createImage(imgData)
 
-          img.src = imgData.url;
+          img.style.zIndex = "5"
 
-          img.style.zIndex = "5";
+          img.style.position = "absolute"
+          img.style.left = (imgData.x - data.x) * screenW + "px"
+          img.style.top = (imgData.y - data.y) * screenH + "px"
 
-          img.style.position = "absolute";
-          img.style.left = (imgData.x - data.x) * screenW + "px";
-          img.style.top = (imgData.y - data.y) * screenH + "px";
+          img.style.width = (imgData.width * screenW) + "px"
+          img.style.height = (imgData.height * screenH) + "px"
 
-          img.style.width = (imgData.width * screenW) + "px";
-          img.style.height = (imgData.height * screenH) + "px";
+          wrapper.appendChild(img)
 
-          img.style.objectFit = imgData.objectFit || "cover";
-          img.style.pointerEvents = "none";
-
-          wrapper.appendChild(img); // 👈 CAMBIO
-
-        });
+        })
       }
 
       // 📝 TEXTOS HIJOS
       if (data.texts && data.texts.length) {
-        console.log("📝 Renderizando textos:", data.texts);
 
         data.texts.forEach((textData) => {
 
-          const txt = document.createElement("div");
+          const parsed = parseVariables(textData.text || "", data)
 
-          const parsed = parseVariables(textData.text || "", data);
+          const txtEl = StyleEngine.createText(textData, parsed)
 
-          txt.innerHTML = parsed;
+          txtEl.style.position = "absolute"
+          txtEl.style.left = (textData.x - data.x) * screenW + "px"
+          txtEl.style.top = (textData.y - data.y) * screenH + "px"
 
-          if (textData.animation && textData.animation !== "none") {
-            txt.classList.add("anim-" + textData.animation);
-          }
+          txtEl.style.width = (textData.width * screenW) + "px"
+          txtEl.style.height = (textData.height * screenH) + "px"
 
-          txt.style.zIndex = "6";
+          txtEl.style.zIndex = "6"
 
-          txt.style.position = "absolute";
-          txt.style.left = (textData.x - data.x) * screenW + "px";
-          txt.style.top = (textData.y - data.y) * screenH + "px";
+          wrapper.appendChild(txtEl)
 
-          txt.style.width = (textData.width * screenW) + "px";
-          txt.style.height = (textData.height * screenH) + "px";
-
-          StyleEngine.applyText(txt, textData)
-
-          wrapper.appendChild(txt); // 👈 CAMBIO
-
-        });
+        })
       }
 
       if (data.overlayText) {

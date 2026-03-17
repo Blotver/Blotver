@@ -1,5 +1,8 @@
 window.StyleEngine = {
 
+  // -------------------------
+  // UTILS
+  // -------------------------
   hexToRgb(hex){
 
     if(!hex) return "0,0,0"
@@ -14,7 +17,9 @@ window.StyleEngine = {
     return `${r},${g},${b}`
   },
 
-
+  // -------------------------
+  // TEXT STYLES
+  // -------------------------
   applyText(el,d){
 
     if(!el || !d) return
@@ -52,7 +57,6 @@ window.StyleEngine = {
 
   },
 
-
   applyTextContainer(el,d){
 
     const rgb = this.hexToRgb(d.backgroundColor)
@@ -68,7 +72,9 @@ window.StyleEngine = {
 
   },
 
-
+  // -------------------------
+  // IMAGE STYLES
+  // -------------------------
   applyImage(img,d){
 
     img.style.objectFit = d.objectFit || "cover"
@@ -87,6 +93,57 @@ window.StyleEngine = {
     if(d.url && img.src !== d.url)
       img.src = d.url
 
+  },
+
+  // -------------------------
+  // 🔥 RENDERERS (LO NUEVO)
+  // -------------------------
+
+  createText(d, content){
+
+    const container = document.createElement("div")
+    const inner = document.createElement("div")
+
+    inner.innerHTML = content || ""
+
+    // layout
+    container.style.display = "flex"
+    container.style.alignItems = "center"
+
+    if (d.textAlign === "left")
+      container.style.justifyContent = "flex-start"
+    else if (d.textAlign === "right")
+      container.style.justifyContent = "flex-end"
+    else
+      container.style.justifyContent = "center"
+
+    // estilos
+    this.applyText(inner, d)
+    this.applyTextContainer(container, d)
+
+    // fixes importantes
+    inner.style.whiteSpace = "nowrap"
+    inner.style.display = "inline-block"
+
+    // animación
+    if (d.animation && d.animation !== "none") {
+      inner.classList.add("anim-" + d.animation)
+    }
+
+    container.appendChild(inner)
+
+    return container
+  },
+
+  createImage(d){
+
+    const img = document.createElement("img")
+
+    this.applyImage(img, d)
+
+    img.style.pointerEvents = "none"
+
+    return img
   }
 
 }
