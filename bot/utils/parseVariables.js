@@ -1,3 +1,5 @@
+// blotver\bot\utils\parseVariables.js
+
 module.exports = function parseVariables(text, data = {}) {
   const vars = {
     "{user}": data.user,

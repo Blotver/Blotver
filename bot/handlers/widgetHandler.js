@@ -1,3 +1,5 @@
+// blotver\bot\handlers\widgetHandler.js
+
 const commands = require("../registry/commandRegistry");
 const { getUserCommand } = require("../services/commandCache");
 

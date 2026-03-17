@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>Overlay</title>
   <link rel="stylesheet" href="/css/animations.css">
+
   <style>
     body {
       margin: 0;
@@ -12,69 +13,52 @@
       overflow: hidden;
     }
 
-    #clipContainer {
+    #root {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       overflow: visible;
     }
 
-    .fade-in {
-      animation: fadeIn 0.6s forwards;
-    }
+    .fade-in { animation: fadeIn 0.6s forwards; }
+    .fade-out { animation: fadeOut 0.6s forwards; }
 
-    .fade-out {
-      animation: fadeOut 0.6s forwards;
-    }
+    .zoom-in { animation: zoomIn 0.6s forwards; }
+    .zoom-out { animation: zoomOut 0.6s forwards; }
 
-    .zoom-in {
-      animation: zoomIn 0.6s forwards;
-    }
-
-    .zoom-out {
-      animation: zoomOut 0.6s forwards;
-    }
-
-    .slide-in {
-      animation: slideIn 0.6s forwards;
-    }
-
-    .slide-out {
-      animation: slideOut 0.6s forwards;
-    }
+    .slide-in { animation: slideIn 0.6s forwards; }
+    .slide-out { animation: slideOut 0.6s forwards; }
   </style>
 </head>
 
 <body>
-  <div id="clipContainer"></div>
+  <div id="root"></div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/styleEngine.js"></script>
+
   <script>
     const projectId = window.location.pathname.split("/").pop();
-    const socket = io({
-      transports: ["websocket"]
-    });
-    const container = document.getElementById("clipContainer");
+    const socket = io({ transports: ["websocket"] });
+
+    const root = document.getElementById("root");
 
     let queue = [];
     let playing = false;
 
+    // 🔌 CONNECT
     socket.on("connect", () => {
-      console.log("🟢 Overlay conectado al socket:", socket.id);
-      console.log("📌 Uniéndose al proyecto:", projectId);
+      console.log("🟢 Overlay conectado:", socket.id);
       socket.emit("joinProject", projectId);
     });
 
+    // 🎬 EVENTO NUEVO CLIP
     socket.on("newClip", (data) => {
-      console.log("🎬 DATA RECIBIDA DEL SOCKET:", data);
-
+      console.log("🎬 NEW CLIP:", data);
       queue.push(data);
       processQueue();
     });
 
+    // 🔁 VARIABLES
     function parseVariables(text, data) {
       if (!text) return "";
 
@@ -95,7 +79,7 @@
       };
 
       Object.keys(vars).forEach((key) => {
-        if (vars[key] !== undefined && vars[key] !== null) {
+        if (vars[key] != null) {
           text = text.replaceAll(key, vars[key]);
         }
       });
@@ -103,6 +87,7 @@
       return text;
     }
 
+    // 🔁 COLA
     function processQueue() {
       if (playing) return;
       if (queue.length === 0) return;
@@ -111,126 +96,122 @@
       playClip(data);
     }
 
+    // 🧱 RENDER HIJOS (FULL MODULAR)
+    function renderChildren(parent, data) {
+      if (!data.children) return;
+
+      data.children.forEach(child => {
+        const el = document.createElement("div");
+
+        el.style.position = "absolute";
+        el.style.left = (child.x * 100) + "%";
+        el.style.top = (child.y * 100) + "%";
+        el.style.width = (child.width * 100) + "%";
+        el.style.height = (child.height * 100) + "%";
+
+        // 👇 tipo de widget hijo
+        if (child.type === "text") {
+
+          el.innerHTML = parseVariables(child.text, data);
+
+          StyleEngine.applyText(el, child);
+          StyleEngine.applyTextContainer(el, child);
+
+        }
+
+        if (child.type === "image") {
+
+          const img = document.createElement("img");
+          img.style.width = "100%";
+          img.style.height = "100%";
+
+          StyleEngine.applyImage(img, child);
+
+          el.appendChild(img);
+        }
+
+        parent.appendChild(el);
+      });
+    }
+
+    // 🎬 PLAY
     function playClip(data) {
       if (!data.clipId) return;
 
       playing = true;
-      container.innerHTML = "";
+      root.innerHTML = "";
 
       const wrapper = document.createElement("div");
-      wrapper.style.opacity = "0"
-      wrapper.style.transition = "opacity 0.3s ease"
-      wrapper.style.position = "absolute";
+
       const screenW = window.innerWidth;
       const screenH = window.innerHeight;
 
+      wrapper.style.position = "absolute";
       wrapper.style.left = (data.x * screenW) + "px";
       wrapper.style.top = (data.y * screenH) + "px";
       wrapper.style.width = (data.width * screenW) + "px";
       wrapper.style.height = (data.height * screenH) + "px";
-      wrapper.style.overflow = "visible";
       wrapper.style.pointerEvents = "none";
+      wrapper.style.opacity = "0";
+      wrapper.style.transition = "opacity 0.3s ease";
 
-      // 🎬 TWITCH EMBED
+      // 🎥 CLIP
       const iframe = document.createElement("iframe");
-      iframe.onload = () => {
-        wrapper.style.opacity = "1"
-      }
 
       iframe.src = `https://clips.twitch.tv/embed?clip=${data.clipId}&parent=blotver.onrender.com&autoplay=true`;
       iframe.allow = "autoplay; fullscreen";
       iframe.width = "100%";
       iframe.height = "100%";
-      iframe.allowFullscreen = true;
       iframe.frameBorder = "0";
+
       iframe.style.position = "absolute";
-      iframe.style.top = "0";
-      iframe.style.left = "0";
+      iframe.style.inset = "0";
       iframe.style.zIndex = "1";
+
+      iframe.onload = () => {
+        wrapper.style.opacity = "1";
+      };
 
       wrapper.appendChild(iframe);
 
-      container.appendChild(wrapper);
-
-      // 🎨 IMÁGENES HIJAS
-      if (data.images && data.images.length) {
-
-        data.images.forEach((imgData) => {
-
-          const img = StyleEngine.createImage(imgData)
-
-          img.style.zIndex = "5"
-
-          img.style.position = "absolute"
-          img.style.left = (imgData.x - data.x) * screenW + "px"
-          img.style.top = (imgData.y - data.y) * screenH + "px"
-
-          img.style.width = (imgData.width * screenW) + "px"
-          img.style.height = (imgData.height * screenH) + "px"
-
-          wrapper.appendChild(img)
-
-        })
-      }
-
-      // 📝 TEXTOS HIJOS
-      if (data.texts && data.texts.length) {
-
-        data.texts.forEach((textData) => {
-
-          const parsed = parseVariables(textData.text || "", data)
-
-          const txtEl = StyleEngine.createText(textData, parsed)
-
-          txtEl.style.position = "absolute"
-          txtEl.style.left = (textData.x - data.x) * screenW + "px"
-          txtEl.style.top = (textData.y - data.y) * screenH + "px"
-
-          txtEl.style.width = (textData.width * screenW) + "px"
-          txtEl.style.height = (textData.height * screenH) + "px"
-
-          txtEl.style.zIndex = "6"
-
-          wrapper.appendChild(txtEl)
-
-        })
-      }
-
+      // 🧠 TEXTO PRINCIPAL (opcional)
       if (data.overlayText) {
+
         const text = document.createElement("div");
 
-        const parsedText = parseVariables(data.overlayText, data);
-        text.innerHTML = parsedText;
+        text.innerHTML = parseVariables(data.overlayText, data);
 
         text.style.position = "absolute";
         text.style.top = "20px";
         text.style.left = "50%";
         text.style.transform = "translateX(-50%)";
-        text.style.color = "white";
-        text.style.fontSize = "40px";
-        text.style.fontWeight = "bold";
-        text.style.textAlign = "center";
         text.style.zIndex = "5";
 
-        wrapper.appendChild(text)
+        StyleEngine.applyText(text, data);
+        StyleEngine.applyTextContainer(text, data);
+
+        wrapper.appendChild(text);
       }
 
+      // 🧱 HIJOS (LO IMPORTANTE)
+      renderChildren(wrapper, data);
+
+      root.appendChild(wrapper);
+
+      // 🎞 ANIMACIÓN
       wrapper.className = `${data.animationIn || "fade"}-in`;
 
-      setTimeout(
-        () => {
-          wrapper.className = `${data.animationOut || "fade"}-out`;
+      setTimeout(() => {
+        wrapper.className = `${data.animationOut || "fade"}-out`;
 
-          setTimeout(() => {
-            container.innerHTML = "";
-            playing = false;
-            processQueue();
-          }, 600);
-        },
-        (data.duration || 10) * 1000,
-      );
+        setTimeout(() => {
+          root.innerHTML = "";
+          playing = false;
+          processQueue();
+        }, 600);
+
+      }, (data.duration || 10) * 1000);
     }
   </script>
 </body>
-
 </html>

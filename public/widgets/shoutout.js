@@ -1,28 +1,3 @@
-//blotver\public\widgets\shoutout.js
-
-function hexToRgb(hex) {
-  if (!hex) return "0,0,0";
-
-  hex = hex.replace("#", "");
-
-  if (hex.length === 3) {
-    hex = hex
-      .split("")
-      .map((c) => c + c)
-      .join("");
-  }
-
-  if (hex.length !== 6) return "0,0,0";
-
-  const bigint = parseInt(hex, 16);
-
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-
-  return `${r},${g},${b}`;
-}
-
 window.ShoutoutWidget = {
   type: "shoutout",
 
@@ -43,338 +18,108 @@ window.ShoutoutWidget = {
   },
 
   renderCanvas(widget) {
-    const children = (window.widgets || []).filter(
-      (w) => w.parent === widget._id,
-    );
 
-    console.log("Children del shoutout:", children);
+    const el = document.createElement("div")
+    const canvas = document.getElementById("canvas")
 
-    const el = document.createElement("div");
+    const canvasW = canvas.clientWidth
+    const canvasH = canvas.clientHeight
 
-    const canvas = document.getElementById("canvas");
+    el.style.width = widget.data.width * canvasW + "px"
+    el.style.height = widget.data.height * canvasH + "px"
 
-    const canvasW = canvas.clientWidth;
-    const canvasH = canvas.clientHeight;
+    el.style.display = "flex"
+    el.style.flexDirection = "column"
+    el.style.background = "#0f0f0f"
+    el.style.borderRadius = widget.data.borderRadius + "px"
+    el.style.overflow = "hidden"
+    el.style.position = "relative"
 
-    el.style.width = widget.data.width * canvasW + "px";
-    el.style.height = widget.data.height * canvasH + "px";
+    // 🎬 PREVIEW AREA
+    const clipArea = document.createElement("div")
+    clipArea.style.flex = "1"
+    clipArea.style.position = "relative"
+    clipArea.style.background = "#000"
 
-    el.style.display = "flex";
-    el.style.flexDirection = "column";
-    el.style.background = "#0f0f0f";
-    el.style.outline = "1px dashed rgba(255,255,255,0.15)";
-    el.style.outlineOffset = "-1px";
-    el.style.borderRadius = widget.data.borderRadius + "px";
-    el.style.border = "1px solid rgba(255,255,255,0.06)";
-    el.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
-    el.style.overflow = "hidden";
+    clipArea.innerHTML = `
+      <div style="
+        position:absolute;
+        inset:0;
+        background:linear-gradient(135deg,#111,#222);
+        border-radius:${widget.data.borderRadius}px;
+      "></div>
 
-    function parseVariables(text, data = {}) {
-      const vars = {
-        "{user}": data.user,
-        "{userMention}": "@" + data.user,
-        "{userUrl}": "https://twitch.tv/" + data.user,
+      <div style="
+        position:absolute;
+        top:8px;
+        left:8px;
+        background:rgba(0,0,0,0.7);
+        color:white;
+        font-size:11px;
+        padding:3px 6px;
+        border-radius:4px;
+      ">TWITCH CLIP</div>
 
-        "{game}": data.game,
+      <div style="
+        position:absolute;
+        bottom:10px;
+        left:50%;
+        transform:translateX(-50%);
+        color:rgba(255,255,255,0.6);
+        font-size:13px;
+      ">Preview Clip Area</div>
+    `
 
-        "{clipUrl}": data.clipUrl,
-        "{clipTitle}": data.clipTitle,
-        "{clipViews}": data.clipViews,
-        "{clipCreator}": data.clipCreator,
+    el.appendChild(clipArea)
 
-        "{channel}": data.channel,
-        "{channelUrl}": "https://twitch.tv/" + data.channel,
-      };
+    // 🧩 CHILDREN (🔥 NUEVO)
+    const children = (window.widgets || [])
+      .filter(w => w.parent === widget._id)
 
-      Object.keys(vars).forEach((key) => {
-        if (vars[key] !== undefined && vars[key] !== null) {
-          text = text.replaceAll(key, vars[key]);
-        }
-      });
+    Renderer.renderChildren(
+      el,
+      widget.data,
+      children,
+      canvasW,
+      canvasH
+    )
 
-      return text;
-    }
-
-    function norm(v) {
-      if (v > 1) return v / 100
-      return v
-    }
-
-    function getChildrenHTML() {
-
-      let html = ""
-
-      children.forEach(child => {
-
-        if (child.type === "image" && child.data.url) {
-
-          const cx = norm(child.data.x)
-          const cy = norm(child.data.y)
-          const cw = norm(child.data.width)
-          const ch = norm(child.data.height)
-
-          html += `
-<img src="${child.data.url}"
-style="
-position:absolute;
-left:${(cx - widget.data.x) * canvasW}px;
-top:${(cy - widget.data.y) * canvasH}px;
-width:${cw * canvasW}px;
-height:${ch * canvasH}px;
-object-fit:${child.data.objectFit || "cover"};
-pointer-events:none;
-">
-`
-        }
-
-      })
-
-      return html
-    }
-
-    function updateView() {
-
-      const canvas = document.getElementById("canvas");
-
-      const canvasW = canvas.clientWidth;
-      const canvasH = canvas.clientHeight;
-
-      el.style.width = widget.data.width * canvasW + "px";
-      el.style.height = widget.data.height * canvasH + "px";
-
-      const text =
-        widget.data.overlayText ||
-        widget.data.textTemplate ||
-        "Sigan a {user} jugando {game}";
-
-      const strokeSize = widget.data.strokeSize || 2;
-      const strokeColor = widget.data.strokeColor || "#000";
-      const textPosition = widget.data.textPosition || "top";
-
-      let positionStyle = "";
-
-      if (textPosition === "top") {
-        positionStyle = `
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  `;
-      }
-
-      if (textPosition === "center") {
-        positionStyle = `
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  `;
-      }
-
-      if (textPosition === "bottom") {
-        positionStyle = `
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  `;
-      }
-      el.innerHTML = `
-  
-<div class="clip-area" style="
-flex:1;
-position:relative;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:visible;
-background:#000;
-">
-
-<!-- FAKE CLIP PREVIEW -->
-<div style="
-position:absolute;
-inset:0;
-background:linear-gradient(135deg,#111,#222);
-border-radius:${widget.data.borderRadius}px;
-overflow:hidden;
-box-shadow:0 10px 30px rgba(0,0,0,0.6);
-">
-
-<div style="
-position:absolute;
-top:8px;
-left:8px;
-background:rgba(0,0,0,0.7);
-color:white;
-font-size:11px;
-padding:3px 6px;
-border-radius:4px;
-">
-TWITCH CLIP
-</div>
-
-<div style="
-position:absolute;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
-color:rgba(255,255,255,0.6);
-font-size:13px;
-">
-Preview Clip Area
-</div>
-
-</div>
-
-<!-- OVERLAY TEXT -->
-<div style="
-position:absolute;
-${positionStyle}
-text-align:${widget.data.textAlign || "center"};
-max-width:${widget.data.maxWidth || "80%"};
-font-weight:700;
-font-size:${widget.data.fontSize || 40}px;
-color:${widget.data.textColor || "#fff"};
--webkit-text-stroke:${strokeSize}px ${strokeColor};
-background: rgba(${hexToRgb(widget.data.backgroundColor)}, ${widget.data.backgroundOpacity});
-padding:6px 12px;
-border-radius:${widget.data.borderRadius || 0}px;
-pointer-events:none;
-">
-</div>
-
-${getChildrenHTML()}
-
-</div>
-`;
-    }
-    updateView();
-
-    el.updatePreview = updateView;
-
-    return el;
+    return el
   },
 
   renderConfig(widget, content, update) {
     content.innerHTML = `
-
 <div class="config-root">
 
-<!-- BASIC -->
 <div class="config-card">
+<div class="config-title">Basic</div>
 
-<div class="config-title">
-Basic
+<label class="config-label">Command</label>
+<input id="cfgCommand" class="config-input" value="${widget.data.command || ""}">
+
+<label class="config-label">Text Template</label>
+<input id="cfgTemplate" class="config-input" value="${widget.data.textTemplate || ""}">
 </div>
 
-<label class="config-label">
-Command
-</label>
-
-<input
-id="cfgCommand"
-class="config-input"
-value="${widget.data.command || ""}"
->
-
-<label class="config-label">
-Text Template
-</label>
-
-<input
-id="cfgTemplate"
-class="config-input"
-value="${widget.data.textTemplate || ""}"
->
-
-</div>
-
-
-<!-- DISPLAY -->
 <div class="config-card">
+<div class="config-title">Display</div>
 
-<div class="config-title">
-Display
-</div>
-
-<label class="config-label">
-Duration (seconds)
-</label>
-
-<input
-type="number"
-id="cfgDuration"
-class="config-input"
-value="${widget.data.duration || 10}"
->
-
-</div>
-
-
-<!-- ANIMATIONS -->
-<div class="config-card">
-
-<div class="config-title">
-Animations
-</div>
-
-<label class="config-label">
-Animation In
-</label>
-
-<select id="cfgAnimIn" class="config-input">
-<option value="fade">Fade</option>
-<option value="slide">Slide</option>
-</select>
-
-<label class="config-label">
-Animation Out
-</label>
-
-<select id="cfgAnimOut" class="config-input">
-<option value="fade">Fade</option>
-<option value="slide">Slide</option>
-</select>
-
+<label class="config-label">Duration</label>
+<input type="number" id="cfgDuration" class="config-input" value="${widget.data.duration || 10}">
 </div>
 
 </div>
-`;
+`
 
-    // Set current selected values
-    document.getElementById("cfgAnimIn").value =
-      widget.data.animationIn || "fade";
+    document.getElementById("cfgCommand")
+      .addEventListener("input", e => update({command:e.target.value}))
 
-    document.getElementById("cfgAnimOut").value =
-      widget.data.animationOut || "fade";
+    document.getElementById("cfgTemplate")
+      .addEventListener("input", e => update({textTemplate:e.target.value}))
 
-    // Listeners
-    document
-      .getElementById("cfgCommand")
-      .addEventListener("input", (e) => update({ command: e.target.value }));
+    document.getElementById("cfgDuration")
+      .addEventListener("input", e => update({duration:parseInt(e.target.value)}))
+  }
+}
 
-    document
-      .getElementById("cfgTemplate")
-      .addEventListener("input", (e) =>
-        update({ textTemplate: e.target.value }),
-      );
-
-    document
-      .getElementById("cfgDuration")
-      .addEventListener("input", (e) =>
-        update({ duration: parseInt(e.target.value) }),
-      );
-
-    document
-      .getElementById("cfgAnimIn")
-      .addEventListener("change", (e) =>
-        update({ animationIn: e.target.value }),
-      );
-
-    document
-      .getElementById("cfgAnimOut")
-      .addEventListener("change", (e) =>
-        update({ animationOut: e.target.value }),
-      );
-  },
-};
-
-registerWidget(window.ShoutoutWidget);
+registerWidget(window.ShoutoutWidget)
