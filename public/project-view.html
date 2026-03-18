@@ -395,7 +395,7 @@
 
           <!-- DELETE BUTTON -->
           <button class="delete-btn absolute right-2 opacity-0 group-hover:opacity-100 transition"
-            onclick="deleteWidget('ID_DEL_WIDGET')">
+            onclick="deleteSelectedWidget()">
             <!-- SVG Trash -->
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-400 hover:text-red-500 transition"
               fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -572,10 +572,10 @@
     </div>
   </div>
 
-  <script src="/js/editor/editorRenderer.js"></script>
-  <script src="/js/editor/editorLayers.js"></script>
   <script src="/js/core/registry.js"></script>
   <script src="/js/core/renderer.js"></script>
+  <script src="/js/editor/editorRenderer.js"></script>
+  <script src="/js/editor/editorLayers.js"></script>
   <script src="/widgets/shoutout.js"></script>
   <script src="/js/colorPicker.js"></script>
   <script src="/js/configCollapse.js"></script>
@@ -816,10 +816,23 @@
         }
       });
 
-      renderLayers(widgets, (widget) => {
-        selectWidget(widget)
+      EditorLayers.render({
+        widgets,
+        onSelect: (widget) => {
+          const element = document.querySelector(`[data-widget-id="${widget._id}"]`)
+          if (element) selectWidget(widget, element)
+        },
+        onToggleVisibility: (widget) => {
+          const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
+          if (el) {
+            el.style.display = widget.data.visible === false ? "none" : "block"
+          }
+          markAsChanged()
+        },
+        onRename: (widget) => {
+          markAsChanged()
+        }
       })
-
       // 🔥 APLICAR INTERACT DESPUES
       applyInteractions();
 
@@ -1038,17 +1051,14 @@
 
     function selectWidget(widget, element) {
       if (selectedElement) {
-        selectedElement.style.border = "none";
-        selectedElement
-          .querySelectorAll(".resize-handle")
-          .forEach((h) => h.remove());
+        selectedElement.classList.remove("selected-widget")
+        selectedElement.querySelectorAll(".resize-handle").forEach(h => h.remove())
       }
 
-      selectedWidget = widget;
-      selectedElement = element;
+      selectedWidget = widget
+      selectedElement = element
 
-      element.style.border = "2px solid #3b82f6";
-      element.style.boxSizing = "border-box";
+      element.classList.add("selected-widget")
 
       openConfig(widget);
       addResizeHandles(element);
@@ -1077,7 +1087,7 @@
 
     function showLayers() {
       if (selectedElement) {
-        selectedElement.style.border = "none";
+        selectedElement.classList.remove("selected-widget")
         selectedElement
           .querySelectorAll(".resize-handle")
           .forEach((h) => h.remove());
@@ -1414,22 +1424,6 @@
       document.body.classList.remove("overflow-hidden");
     }
 
-    EditorLayers.render({
-      widgets,
-      onSelect: (widget, el) => {
-        selectWidget(widget, el)
-      },
-      onToggleVisibility: (widget) => {
-        const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
-        if (el) {
-          el.style.display = widget.data.visible === false ? "none" : "block"
-        }
-        markAsChanged()
-      },
-      onRename: (widget) => {
-        markAsChanged()
-      }
-    })
   </script>
 </body>
 
