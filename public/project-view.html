@@ -90,6 +90,11 @@
       background: #1f2937;
     }
 
+    .layer-item.drag-over {
+      border: 1px dashed #8b5cf6;
+      background: rgba(139, 92, 246, 0.1);
+    }
+
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -819,8 +824,8 @@
       EditorLayers.render({
         widgets,
         onSelect: (widget) => {
-          const element = document.querySelector(`[data-widget-id="${widget._id}"]`)
-          if (element) selectWidget(widget, element)
+          const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
+          if (el) selectWidget(widget, el)
         },
         onToggleVisibility: (widget) => {
           const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
@@ -829,9 +834,10 @@
           }
           markAsChanged()
         },
-        onRename: (widget) => {
+        onRename: () => {
           markAsChanged()
-        }
+        },
+        onReorder: reorderWidgets
       })
       // 🔥 APLICAR INTERACT DESPUES
       applyInteractions();
