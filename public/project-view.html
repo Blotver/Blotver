@@ -573,6 +573,7 @@
   </div>
 
   <script src="/js/editor/editorRenderer.js"></script>
+  <script src="/js/editor/editorLayers.js"></script>
   <script src="/js/core/registry.js"></script>
   <script src="/js/core/renderer.js"></script>
   <script src="/widgets/shoutout.js"></script>
@@ -1413,42 +1414,22 @@
       document.body.classList.remove("overflow-hidden");
     }
 
-    function renderLayers(widgets) {
-
-      const panel = document.getElementById("layersPanel")
-      if (!panel) return
-
-      panel.innerHTML = ""
-
-      function createItem(widget, level = 0) {
-
-        const item = document.createElement("div")
-
-        item.className = "layer-item"
-        item.style.paddingLeft = (level * 12) + "px"
-        item.dataset.id = widget._id
-
-        item.innerText = widget.type
-
-        item.addEventListener("click", (e) => {
-          e.stopPropagation()
-
-          const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
-          if (el) {
-            selectWidget(widget, el)
-          }
-        })
-
-        panel.appendChild(item)
-
-        const children = widgets.filter(w => w.parent === widget._id)
-        children.forEach(child => createItem(child, level + 1))
+    EditorLayers.render({
+      widgets,
+      onSelect: (widget, el) => {
+        selectWidget(widget, el)
+      },
+      onToggleVisibility: (widget) => {
+        const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
+        if (el) {
+          el.style.display = widget.data.visible === false ? "none" : "block"
+        }
+        markAsChanged()
+      },
+      onRename: (widget) => {
+        markAsChanged()
       }
-
-      const roots = widgets.filter(w => !w.parent)
-      roots.forEach(w => createItem(w))
-    }
-
+    })
   </script>
 </body>
 

@@ -1138,6 +1138,12 @@ video {
   scroll-behavior: smooth;
 }
 
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .rounded {
   border-radius: 0.25rem;
 }
@@ -1311,6 +1317,10 @@ video {
 
 .bg-white\/5 {
   background-color: rgb(255 255 255 / 0.05);
+}
+
+.bg-gray-900\/40 {
+  background-color: rgb(17 24 39 / 0.4);
 }
 
 .bg-\[radial-gradient\(circle_at_center\2c _white_1px\2c _transparent_1px\)\] {
@@ -1940,6 +1950,10 @@ video {
 
 .hover\:opacity-90:hover {
   opacity: 0.9;
+}
+
+.hover\:opacity-100:hover {
+  opacity: 1;
 }
 
 .hover\:shadow-\[0_15px_50px_rgba\(168\2c 85\2c 247\2c 0\.22\)\]:hover {
