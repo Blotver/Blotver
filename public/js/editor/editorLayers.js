@@ -55,8 +55,6 @@ window.EditorLayers = {
       left.className = "layer-left"
 
       // FIX SVG CLICK ❗
-      icon.style.pointerEvents = "none"
-
       const eye = document.createElement("button")
       eye.className = "layer-eye"
       eye.innerHTML = isHidden ? "🙈" : "👁"
