@@ -628,60 +628,6 @@
       window.location.href = "/dashboard/project";
     }
 
-
-    function renderLayers() {
-
-      const layerList = document.getElementById("layersPanel")
-      if (!layerList) return
-
-      layerList.innerHTML = ""
-
-      const rootWidgets = widgets.filter(w => !w.parent)
-
-      rootWidgets.forEach(w => {
-        renderLayerItem(w, 0)
-      })
-
-    }
-
-    function renderLayerItem(widget, level = 0) {
-
-      const layerList = document.getElementById("layersPanel")
-
-      const item = document.createElement("div")
-
-      item.className = "layer-item"
-      item.dataset.id = widget._id
-
-      // 👉 indentación tipo árbol
-      item.style.paddingLeft = (level * 16 + 10) + "px"
-
-      item.innerHTML = `
-    <span>${widget.type}</span>
-  `
-
-      // 👉 click = seleccionar widget
-      item.addEventListener("click", (e) => {
-        e.stopPropagation()
-
-        const el = document.querySelector(
-          `[data-widget-id="${widget._id}"]`
-        )
-
-        selectWidget(widget, el)
-      })
-
-      layerList.appendChild(item)
-
-      // 👉 hijos
-      const children = widgets.filter(w => w.parent === widget._id)
-
-      children.forEach(child => {
-        renderLayerItem(child, level + 1)
-      })
-
-    }
-
     let widgets = [];
     let selectedWidget = null;
     let selectedElement = null;
@@ -819,34 +765,142 @@
         }
       });
 
-    async function loadWidgets() {
+    /* ================= LOAD ================= */
 
+    async function loadWidgets() {
       const projectRes = await fetch("/api/projects");
       const allProjects = await projectRes.json();
-
-      currentProject = allProjects.find(p => p._id === projectId);
-
+      currentProject = allProjects.find((p) => p._id === projectId);
+      if (currentProject) {
+        document.getElementById("projectNameInput").value =
+          currentProject.name || currentProject.title || "";
+      }
       const res = await fetch(`/api/widgets/${projectId}`);
       widgets = await res.json();
 
-      widgets = widgets.map(w => ({
-        ...w,
-        data: w.data || {}
-      }));
+      // 🚀 Si es proyecto shoutout y no tiene widgets → crear uno automático
+      if (currentProject?.type && widgets.length === 0) {
+        const widgetType = currentProject.type;
+        const widgetDef = window.WidgetRegistry[widgetType];
+
+        if (widgetDef?.defaultData) {
+          await fetch("/api/widgets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              projectId,
+              type: widgetType,
+              name: widgetType,
+              data: widgetDef.defaultData,
+            }),
+          });
+
+          const newRes = await fetch(`/api/widgets/${projectId}`);
+          widgets = await newRes.json();
+        }
+      }
 
       const canvas = document.getElementById("canvas");
       const layersPanel = document.getElementById("layersPanel");
 
+      canvas.innerHTML = "";
+      layersPanel.innerHTML = "";
+
+      // 🔥 RENDER NUEVO
       EditorRenderer.renderAll({
         widgets,
         canvas,
-        layersPanel,
-        onSelect: selectWidget
+        onSelect: (widget, el) => {
+          selectWidget(widget, el);
+        }
       });
 
-      renderLayers()
+      // 🔥 APLICAR INTERACT DESPUES
+      applyInteractions();
+      renderLayers();
 
       resetChanges();
+    }
+
+    function applyInteractions() {
+
+      document.querySelectorAll("[data-widget-id]").forEach(el => {
+
+        // 🔥 LIMPIAR ANTES
+        if (interact.isSet(el)) {
+          interact(el).unset();
+        }
+
+        interact(el)
+          .draggable({
+            listeners: {
+              move(event) {
+                const target = event.target;
+
+                const left = parseFloat(target.style.left) || 0;
+                const top = parseFloat(target.style.top) || 0;
+
+                target.style.left = left + event.dx + "px";
+                target.style.top = top + event.dy + "px";
+              },
+              end(event) {
+                const target = event.target;
+                const widgetId = target.dataset.widgetId;
+
+                const widget = widgets.find(w => w._id === widgetId);
+                if (!widget) return;
+
+                const canvas = document.getElementById("canvas");
+
+                const left = parseFloat(target.style.left) || 0;
+                const top = parseFloat(target.style.top) || 0;
+
+                widget.data.x = left / canvas.clientWidth;
+                widget.data.y = top / canvas.clientHeight;
+
+                markAsChanged();
+              }
+            }
+          })
+
+          .resizable({
+            edges: {
+              top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
+              bottom: ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
+              left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
+              right: ".resize-handle.right, .resize-handle.tr, .resize-handle.br"
+            },
+            listeners: {
+              move(event) {
+                const target = event.target;
+                const widgetId = target.dataset.widgetId;
+
+                const widget = widgets.find(w => w._id === widgetId);
+                if (!widget) return;
+
+                let left = parseFloat(target.style.left) || 0;
+                let top = parseFloat(target.style.top) || 0;
+
+                const width = event.rect.width;
+                const height = event.rect.height;
+
+                target.style.width = width + "px";
+                target.style.height = height + "px";
+
+                const canvas = document.getElementById("canvas");
+
+                widget.data.width = width / canvas.clientWidth;
+                widget.data.height = height / canvas.clientHeight;
+                widget.data.x = left / canvas.clientWidth;
+                widget.data.y = top / canvas.clientHeight;
+              },
+              end() {
+                markAsChanged();
+              }
+            }
+          });
+
+      });
     }
 
     document.getElementById("saveBtn").addEventListener("click", saveConfig);
@@ -1089,20 +1143,15 @@
       if (updates.height !== undefined)
         selectedElement.style.height = (updates.height * canvas.clientHeight) + "px";
 
-      // ===== 3️⃣ 🔥 RE-RENDER DEL WIDGET =====
-      const widgetDef = window.WidgetRegistry[selectedWidget.type];
+      EditorRenderer.rerenderWidget({
+        widget: selectedWidget,
+        element: selectedElement
+      });
 
-      if (widgetDef && widgetDef.renderCanvas) {
-
-        selectedElement.innerHTML = "";
-
-        const rendered = widgetDef.renderCanvas(selectedWidget);
-
-        selectedElement.appendChild(rendered);
-
+      // esperar al DOM update
+      requestAnimationFrame(() => {
         addResizeHandles(selectedElement);
-
-      }
+      });
 
       // ===== 4️⃣ Sincronizar panel =====
       const panel = document.getElementById("configContent");
@@ -1359,6 +1408,18 @@
       sidebar.classList.add("translate-y-full");
       document.getElementById("sidebarOverlay").classList.add("hidden");
       document.body.classList.remove("overflow-hidden");
+    }
+
+    function renderLayers() {
+      const layersPanel = document.getElementById("layersPanel");
+      layersPanel.innerHTML = "";
+
+      const sorted = [...widgets].sort((a, b) => (a.data?.zIndex ?? 0) - (b.data?.zIndex ?? 0)).reverse();
+
+      sorted.forEach(widget => {
+        const item = createLayerItem(widget);
+        layersPanel.appendChild(item);
+      });
     }
   </script>
 </body>

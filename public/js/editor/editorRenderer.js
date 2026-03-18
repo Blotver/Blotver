@@ -1,5 +1,3 @@
-// blotver\public\js\editor\editorRenderer.js
-
 window.EditorRenderer = {
 
   renderAll({ widgets, canvas, onSelect }) {
@@ -14,6 +12,7 @@ window.EditorRenderer = {
       this.renderWidget({
         widget: w,
         widgets,
+        parentEl: canvas, // 🔥 CAMBIO
         canvas,
         onSelect
       });
@@ -22,20 +21,20 @@ window.EditorRenderer = {
   },
 
 
-  renderWidget({ widget, widgets, canvas, onSelect }) {
+  renderWidget({ widget, widgets, parentEl, canvas, onSelect }) {
 
     const el = document.createElement("div");
     el.dataset.widgetId = widget._id;
 
     const widgetDef = window.WidgetRegistry[widget.type];
 
-    // ===== CONTENIDO DEL WIDGET =====
+    // ===== CONTENIDO =====
     if (widgetDef && widgetDef.renderCanvas) {
       const content = widgetDef.renderCanvas(widget);
       el.appendChild(content);
     }
 
-    // ===== ESTILOS BASE =====
+    // ===== ESTILOS =====
     el.className = "absolute cursor-move select-none draggable-resizable";
 
     const canvasWidth = canvas.clientWidth;
@@ -56,7 +55,10 @@ window.EditorRenderer = {
       el.style.display = "none";
     }
 
-    // ===== CLICK SELECT =====
+    // 🔥 IMPORTANTE PARA CHILDREN
+    el.style.position = "absolute";
+
+    // ===== SELECT =====
     el.addEventListener("click", (e) => {
       e.stopPropagation();
       onSelect(widget, el);
@@ -64,15 +66,17 @@ window.EditorRenderer = {
 
     widget.el = el;
 
-    canvas.appendChild(el);
+    // 🔥 AHORA VA AL PADRE
+    parentEl.appendChild(el);
 
-    // ===== 🔥 CHILDREN (CLAVE FULL MODULAR) =====
+    // ===== CHILDREN (FIX REAL) =====
     const children = widgets.filter(w => w.parent === widget._id);
 
     children.forEach(child => {
       this.renderWidget({
         widget: child,
         widgets,
+        parentEl: el, // 🔥🔥🔥 ACA ESTA LA MAGIA
         canvas,
         onSelect
       });
