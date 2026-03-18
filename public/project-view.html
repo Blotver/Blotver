@@ -845,10 +845,9 @@
 
       document.querySelectorAll("[data-widget-id]").forEach(el => {
 
-        // 🔥 LIMPIAR ANTES
-        if (interact.isSet(el)) {
-          interact(el).unset();
-        }
+        // ❌ NO desregistrar interact
+        if (el._interactInitialized) return;
+        el._interactInitialized = true;
 
         interact(el)
           .draggable({

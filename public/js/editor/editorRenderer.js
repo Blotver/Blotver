@@ -10,7 +10,9 @@ window.EditorRenderer = {
 
     widgets.sort((a, b) => (a.data.zIndex || 0) - (b.data.zIndex || 0))
 
-    const rootWidgets = widgets.filter(w => !w.parent);
+    const rootWidgets = widgets
+      .filter(w => !w.parent)
+      .sort((a, b) => (a.data.zIndex || 0) - (b.data.zIndex || 0))
 
     rootWidgets.forEach(w => {
       this.renderWidget({
@@ -137,8 +139,16 @@ function reorderWidgets(dragId, targetId) {
       const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
       if (el) selectWidget(widget, el)
     },
-    onToggleVisibility,
-    onRename,
+    onToggleVisibility: (widget) => {
+      const el = document.querySelector(`[data-widget-id="${widget._id}"]`)
+      if (el) {
+        el.style.display = widget.data.visible === false ? "none" : "block"
+      }
+      markAsChanged()
+    },
+    onRename: () => {
+      markAsChanged()
+    },
     onReorder: reorderWidgets
   })
 
