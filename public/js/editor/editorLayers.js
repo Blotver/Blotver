@@ -54,10 +54,6 @@ window.EditorLayers = {
       const left = document.createElement("div")
       left.className = "layer-left"
 
-      const icon = document.createElement("div")
-      icon.className = "layer-icon"
-      icon.innerHTML = getIcon(widget.type)
-
       // FIX SVG CLICK ❗
       icon.style.pointerEvents = "none"
 
@@ -85,7 +81,6 @@ window.EditorLayers = {
         if (onRename) onRename(widget)
       }
 
-      left.appendChild(icon)
       left.appendChild(eye)
       left.appendChild(name)
 
