@@ -628,6 +628,60 @@
       window.location.href = "/dashboard/project";
     }
 
+
+    function renderLayers() {
+
+      const layerList = document.getElementById("layerList")
+      if (!layerList) return
+
+      layerList.innerHTML = ""
+
+      const rootWidgets = widgets.filter(w => !w.parent)
+
+      rootWidgets.forEach(w => {
+        renderLayerItem(w, 0)
+      })
+
+    }
+
+    function renderLayerItem(widget, level = 0) {
+
+      const layerList = document.getElementById("layerList")
+
+      const item = document.createElement("div")
+
+      item.className = "layer-item"
+      item.dataset.id = widget._id
+
+      // 👉 indentación tipo árbol
+      item.style.paddingLeft = (level * 16 + 10) + "px"
+
+      item.innerHTML = `
+    <span>${widget.type}</span>
+  `
+
+      // 👉 click = seleccionar widget
+      item.addEventListener("click", (e) => {
+        e.stopPropagation()
+
+        const el = document.querySelector(
+          `[data-widget-id="${widget._id}"]`
+        )
+
+        selectWidget(widget, el)
+      })
+
+      layerList.appendChild(item)
+
+      // 👉 hijos
+      const children = widgets.filter(w => w.parent === widget._id)
+
+      children.forEach(child => {
+        renderLayerItem(child, level + 1)
+      })
+
+    }
+
     let widgets = [];
     let selectedWidget = null;
     let selectedElement = null;
@@ -789,6 +843,8 @@
         layersPanel,
         onSelect: selectWidget
       });
+
+      renderLayers()
 
       resetChanges();
     }
@@ -1303,22 +1359,6 @@
       sidebar.classList.add("translate-y-full");
       document.getElementById("sidebarOverlay").classList.add("hidden");
       document.body.classList.remove("overflow-hidden");
-    }
-
-    function renderLayer(widget) {
-      const layerItem = createLayerItem(widget);
-
-      layersPanel.appendChild(layerItem);
-
-      const children = widgets.filter((w) => w.parent === widget._id);
-
-      children.forEach((child) => {
-        const childItem = createLayerItem(child);
-
-        childItem.style.marginLeft = "20px";
-
-        layersPanel.appendChild(childItem);
-      });
     }
   </script>
 </body>
