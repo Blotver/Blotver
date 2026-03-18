@@ -35,7 +35,6 @@ window.ShoutoutWidget = {
     el.style.overflow = "hidden"
     el.style.position = "relative"
 
-    // 🎬 PREVIEW AREA
     const clipArea = document.createElement("div")
     clipArea.style.flex = "1"
     clipArea.style.position = "relative"
@@ -72,19 +71,8 @@ window.ShoutoutWidget = {
 
     el.appendChild(clipArea)
 
-    // 🧩 CHILDREN (🔥 NUEVO)
-    const children = (window.widgets || [])
-      .filter(w => w.parent === widget._id)
-
-    Renderer.renderChildren(
-      el,
-      widget.data,
-      children,
-      canvasW,
-      canvasH
-    )
-
     return el
+
   },
 
   renderConfig(widget, content, update) {
@@ -112,13 +100,13 @@ window.ShoutoutWidget = {
 `
 
     document.getElementById("cfgCommand")
-      .addEventListener("input", e => update({command:e.target.value}))
+      .addEventListener("input", e => update({ command: e.target.value }))
 
     document.getElementById("cfgTemplate")
-      .addEventListener("input", e => update({textTemplate:e.target.value}))
+      .addEventListener("input", e => update({ textTemplate: e.target.value }))
 
     document.getElementById("cfgDuration")
-      .addEventListener("input", e => update({duration:parseInt(e.target.value)}))
+      .addEventListener("input", e => update({ duration: parseInt(e.target.value) }))
   }
 }
 

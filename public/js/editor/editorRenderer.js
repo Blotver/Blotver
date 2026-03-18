@@ -1,3 +1,5 @@
+// blotver\public\js\editor\editorRenderer.js
+
 window.EditorRenderer = {
 
   renderAll({ widgets, canvas, onSelect }) {

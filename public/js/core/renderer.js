@@ -1,3 +1,5 @@
+// blotver\public\js\core\renderer.js
+
 window.Renderer = {
 
   renderChildren(wrapper, parentData, children, screenW, screenH){

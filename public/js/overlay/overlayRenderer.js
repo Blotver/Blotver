@@ -1,3 +1,5 @@
+// blotver\public\js\overlay\overlayRenderer.js
+
 window.OverlayRenderer = {
 
   render(wrapper, data){
