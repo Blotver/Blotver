@@ -631,7 +631,7 @@
 
     function renderLayers() {
 
-      const layerList = document.getElementById("layerList")
+      const layerList = document.getElementById("layersPanel")
       if (!layerList) return
 
       layerList.innerHTML = ""
@@ -646,7 +646,7 @@
 
     function renderLayerItem(widget, level = 0) {
 
-      const layerList = document.getElementById("layerList")
+      const layerList = document.getElementById("layersPanel")
 
       const item = document.createElement("div")
 
