@@ -158,5 +158,10 @@ function reorderWidgets(dragId, targetId) {
     onSelect: (widget, el) => selectWidget(widget, el)
   })
 
+  EditorInteractions.apply({
+    widgets,
+    socket
+  });
+
   markAsChanged()
 }
