@@ -152,6 +152,11 @@ function reorderWidgets(dragId, targetId) {
     onReorder: reorderWidgets
   })
 
-  updatePreview()
+  EditorRenderer.renderAll({
+    widgets,
+    canvas: document.getElementById("canvas"),
+    onSelect: (widget, el) => selectWidget(widget, el)
+  })
+
   markAsChanged()
 }
