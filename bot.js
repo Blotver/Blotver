@@ -51,11 +51,29 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
+
   socket.on("joinProject", (projectId) => {
     socket.join(projectId);
+    socket.projectId = projectId; // 🔥 CLAVE
     console.log("Overlay conectado al proyecto:", projectId);
   });
+
+  socket.on("widget:updateLive", ({ id, data }) => {
+
+    const projectId = socket.projectId;
+
+    if (!projectId) return; // 🔥 seguridad
+
+    socket.to(projectId).emit("widget:updatedLive", {
+      id,
+      data
+    });
+
+  });
+
 });
+
+
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -283,7 +301,7 @@ app.post("/api/widgets", isAuthenticated, async (req, res) => {
   if (req.body.data) {
     defaultData = req.body.data;
   } else {
-defaultData = { x: 0.1, y: 0.1 };
+    defaultData = { x: 0.1, y: 0.1 };
 
     if (widgetType === "text") {
       defaultData = {
@@ -298,8 +316,8 @@ defaultData = { x: 0.1, y: 0.1 };
       defaultData = {
         ...defaultData,
         url: "",
-width: 0.2,
-height: 0.2
+        width: 0.2,
+        height: 0.2
       };
     }
 

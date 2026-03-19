@@ -602,6 +602,30 @@
       console.log("Editor conectado a socket:", socket.id);
     });
 
+    socket.on("widget:updatedLive", ({ id, data }) => {
+      const widget = widgets.find(w => w._id === id);
+      if (!widget) return;
+
+      Object.assign(widget.data, data);
+
+      const el = document.querySelector(`[data-widget-id="${id}"]`);
+      if (!el) return;
+
+      const canvas = document.getElementById("canvas");
+
+      if (data.x !== undefined)
+        el.style.left = (data.x * canvas.clientWidth) + "px";
+
+      if (data.y !== undefined)
+        el.style.top = (data.y * canvas.clientHeight) + "px";
+
+      if (data.width !== undefined)
+        el.style.width = (data.width * canvas.clientWidth) + "px";
+
+      if (data.height !== undefined)
+        el.style.height = (data.height * canvas.clientHeight) + "px";
+    });
+
     document
       .getElementById("copyOverlayBtn")
       .addEventListener("click", async () => {
@@ -854,12 +878,26 @@
             listeners: {
               move(event) {
                 const target = event.target;
+                const widgetId = target.dataset.widgetId;
 
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
 
-                target.style.left = left + event.dx + "px";
-                target.style.top = top + event.dy + "px";
+                const newLeft = left + event.dx;
+                const newTop = top + event.dy;
+
+                target.style.left = newLeft + "px";
+                target.style.top = newTop + "px";
+
+                const canvas = document.getElementById("canvas");
+
+                socket.emit("widget:updateLive", {
+                  id: widgetId,
+                  data: {
+                    x: newLeft / canvas.clientWidth,
+                    y: newTop / canvas.clientHeight
+                  }
+                });
               },
               end(event) {
                 const target = event.target;
@@ -893,11 +931,7 @@
                 const target = event.target;
                 const widgetId = target.dataset.widgetId;
 
-                const widget = widgets.find(w => w._id === widgetId);
-                if (!widget) return;
-
-                let left = parseFloat(target.style.left) || 0;
-                let top = parseFloat(target.style.top) || 0;
+                const canvas = document.getElementById("canvas");
 
                 const width = event.rect.width;
                 const height = event.rect.height;
@@ -905,12 +939,13 @@
                 target.style.width = width + "px";
                 target.style.height = height + "px";
 
-                const canvas = document.getElementById("canvas");
-
-                widget.data.width = width / canvas.clientWidth;
-                widget.data.height = height / canvas.clientHeight;
-                widget.data.x = left / canvas.clientWidth;
-                widget.data.y = top / canvas.clientHeight;
+                socket.emit("widget:updateLive", {
+                  id: widgetId,
+                  data: {
+                    width: width / canvas.clientWidth,
+                    height: height / canvas.clientHeight
+                  }
+                });
               },
               end() {
                 markAsChanged();
