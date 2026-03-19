@@ -19,14 +19,29 @@
       overflow: visible;
     }
 
-    .fade-in { animation: fadeIn 0.6s forwards; }
-    .fade-out { animation: fadeOut 0.6s forwards; }
+    .fade-in {
+      animation: fadeIn 0.6s forwards;
+    }
 
-    .zoom-in { animation: zoomIn 0.6s forwards; }
-    .zoom-out { animation: zoomOut 0.6s forwards; }
+    .fade-out {
+      animation: fadeOut 0.6s forwards;
+    }
 
-    .slide-in { animation: slideIn 0.6s forwards; }
-    .slide-out { animation: slideOut 0.6s forwards; }
+    .zoom-in {
+      animation: zoomIn 0.6s forwards;
+    }
+
+    .zoom-out {
+      animation: zoomOut 0.6s forwards;
+    }
+
+    .slide-in {
+      animation: slideIn 0.6s forwards;
+    }
+
+    .slide-out {
+      animation: slideOut 0.6s forwards;
+    }
   </style>
 </head>
 
@@ -34,7 +49,10 @@
   <div id="root"></div>
 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/overlay/overlayRenderer.js"></script>
   <script src="/js/styleEngine.js"></script>
+  <script src="/js/core/renderer.js"></script>
+  <script src="/js/core/utils.js"></script>
 
   <script>
     const projectId = window.location.pathname.split("/").pop();
@@ -96,44 +114,6 @@
       playClip(data);
     }
 
-    // 🧱 RENDER HIJOS (FULL MODULAR)
-    function renderChildren(parent, data) {
-      if (!data.children) return;
-
-      data.children.forEach(child => {
-        const el = document.createElement("div");
-
-        el.style.position = "absolute";
-        el.style.left = (child.x * 100) + "%";
-        el.style.top = (child.y * 100) + "%";
-        el.style.width = (child.width * 100) + "%";
-        el.style.height = (child.height * 100) + "%";
-
-        // 👇 tipo de widget hijo
-        if (child.type === "text") {
-
-          el.innerHTML = parseVariables(child.text, data);
-
-          StyleEngine.applyText(el, child);
-          StyleEngine.applyTextContainer(el, child);
-
-        }
-
-        if (child.type === "image") {
-
-          const img = document.createElement("img");
-          img.style.width = "100%";
-          img.style.height = "100%";
-
-          StyleEngine.applyImage(img, child);
-
-          el.appendChild(img);
-        }
-
-        parent.appendChild(el);
-      });
-    }
-
     // 🎬 PLAY
     function playClip(data) {
       if (!data.clipId) return;
@@ -193,8 +173,18 @@
         wrapper.appendChild(text);
       }
 
-      // 🧱 HIJOS (LO IMPORTANTE)
-      renderChildren(wrapper, data);
+      const children = [
+        ...(data.images || []).map(d => ({ type: "image", data: d })),
+        ...(data.texts || []).map(d => ({ type: "text", data: d }))
+      ];
+
+      Renderer.renderChildren(
+        wrapper,
+        data,
+        children,
+        window.innerWidth,
+        window.innerHeight
+      );
 
       root.appendChild(wrapper);
 
@@ -214,4 +204,5 @@
     }
   </script>
 </body>
+
 </html>

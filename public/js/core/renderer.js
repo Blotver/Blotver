@@ -2,25 +2,25 @@
 
 window.Renderer = {
 
-  renderChildren(wrapper, parentData, children, screenW, screenH){
+  renderChildren(wrapper, parentData, children, screenW, screenH) {
 
     children.forEach(child => {
 
       const d = child.data
 
-      const x = (Utils.norm(d.x) - parentData.x) * screenW
-      const y = (Utils.norm(d.y) - parentData.y) * screenH
-      const w = Utils.norm(d.width) * screenW
-      const h = Utils.norm(d.height) * screenH
+      const x = d.x * parentData.width * screenW
+      const y = d.y * parentData.height * screenH
+      const w = d.width * parentData.width * screenW
+      const h = d.height * parentData.height * screenH
 
       let el = null
 
-      if(child.type === "image"){
+      if (child.type === "image") {
         el = document.createElement("img")
         StyleEngine.applyImage(el, d)
       }
 
-      if(child.type === "text"){
+      if (child.type === "text") {
         const container = document.createElement("div")
         const inner = document.createElement("div")
 
@@ -30,9 +30,9 @@ window.Renderer = {
         container.style.display = "flex"
         container.style.alignItems = "center"
 
-        if(d.textAlign === "left")
+        if (d.textAlign === "left")
           container.style.justifyContent = "flex-start"
-        else if(d.textAlign === "right")
+        else if (d.textAlign === "right")
           container.style.justifyContent = "flex-end"
         else
           container.style.justifyContent = "center"
@@ -44,7 +44,7 @@ window.Renderer = {
         el = container
       }
 
-      if(!el) return
+      if (!el) return
 
       el.style.position = "absolute"
       el.style.left = x + "px"
