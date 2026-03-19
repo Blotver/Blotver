@@ -20,13 +20,9 @@ window.ShoutoutWidget = {
   renderCanvas(widget) {
 
     const el = document.createElement("div")
-    const canvas = document.getElementById("canvas")
 
-    const canvasW = canvas.clientWidth
-    const canvasH = canvas.clientHeight
-
-    el.style.width = widget.data.width * canvasW + "px"
-    el.style.height = widget.data.height * canvasH + "px"
+    el.style.width = "100%"
+    el.style.height = "100%"
 
     el.style.display = "flex"
     el.style.flexDirection = "column"
