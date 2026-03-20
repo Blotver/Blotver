@@ -71,7 +71,9 @@ window.EditorInteractions = {
 
       const widgetId = el.dataset.widgetId;
 
-      try { interact(el).unset(); } catch (e) {}
+      if (interact.isSet && interact.isSet(el)) {
+        interact(el).unset();
+      }
 
       const getParent = () => el.parentElement.getBoundingClientRect();
 
@@ -180,133 +182,132 @@ window.EditorInteractions = {
         }
       })
 
-      // ======================
-      // RESIZE PRO
-      // ======================
-      .resizable({
+        // ======================
+        // RESIZE PRO
+        // ======================
+        .resizable({
 
-        edges: {
-          top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
-          bottom: ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
-          left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
-          right: ".resize-handle.right, .resize-handle.tr, .resize-handle.br"
-        },
-
-        listeners: {
-
-          move(event) {
-
-            const target = event.target;
-
-            let x = parseFloat(target.style.left) || 0;
-            let y = parseFloat(target.style.top) || 0;
-
-            let width = event.rect.width;
-            let height = event.rect.height;
-
-            const parent = getParent();
-
-            // FIX real
-            x += event.deltaRect.left;
-            y += event.deltaRect.top;
-
-            // SHIFT = ratio
-            if (event.shiftKey) {
-              const ratio = target.offsetWidth / target.offsetHeight || 1;
-              if (width / height > ratio) {
-                width = height * ratio;
-              } else {
-                height = width / ratio;
-              }
-            }
-
-            // ALT = center resize
-            if (event.altKey) {
-              x -= event.deltaRect.left;
-              y -= event.deltaRect.top;
-            }
-
-            width = Math.max(MIN_SIZE, width);
-            height = Math.max(MIN_SIZE, height);
-
-            width = clamp(width, MIN_SIZE, parent.width - x);
-            height = clamp(height, MIN_SIZE, parent.height - y);
-
-            target.style.left = x + "px";
-            target.style.top = y + "px";
-            target.style.width = width + "px";
-            target.style.height = height + "px";
-
-            emit({
-              id: widgetId,
-              data: {
-                x: x / parent.width,
-                y: y / parent.height,
-                width: width / parent.width,
-                height: height / parent.height
-              }
-            });
+          edges: {
+            top: ".resize-handle.top, .resize-handle.tl, .resize-handle.tr",
+            bottom: ".resize-handle.bottom, .resize-handle.bl, .resize-handle.br",
+            left: ".resize-handle.left, .resize-handle.tl, .resize-handle.bl",
+            right: ".resize-handle.right, .resize-handle.tr, .resize-handle.br"
           },
 
-          end() {
-            hideGuides();
+          listeners: {
 
-            const target = el;
-            const widget = widgets.find(w => w._id === widgetId);
-            if (!widget) return;
+            move(event) {
 
-            const parent = getParent();
+              const target = event.target;
 
-            const x = parseFloat(target.style.left) || 0;
-            const y = parseFloat(target.style.top) || 0;
-            const width = parseFloat(target.style.width) || 0;
-            const height = parseFloat(target.style.height) || 0;
+              let x = parseFloat(target.style.left) || 0;
+              let y = parseFloat(target.style.top) || 0;
 
-            widget.data.x = x / parent.width;
-            widget.data.y = y / parent.height;
-            widget.data.width = width / parent.width;
-            widget.data.height = height / parent.height;
+              let width = event.rect.width;
+              let height = event.rect.height;
 
-            if (window.markAsChanged) markAsChanged();
-          }
-        }
-      });
+              const parent = getParent();
 
-      // ======================
-      // KEYBOARD MOVE (PRO)
-      // ======================
-      document.addEventListener("keydown", (e) => {
+              // FIX real
+              x += event.deltaRect.left;
+              y += event.deltaRect.top;
 
-        if (!el.classList.contains("selected-widget")) return;
+              // SHIFT = ratio
+              if (event.shiftKey) {
+                const ratio = target.offsetWidth / target.offsetHeight || 1;
+                if (width / height > ratio) {
+                  width = height * ratio;
+                } else {
+                  height = width / ratio;
+                }
+              }
 
-        const parent = getParent();
+              // ALT = center resize
+              if (event.altKey) {
+                x -= event.deltaRect.left;
+                y -= event.deltaRect.top;
+              }
 
-        let step = 5;
-        if (e.shiftKey) step = 20;
-        if (e.altKey) step = 1;
+              width = Math.max(MIN_SIZE, width);
+              height = Math.max(MIN_SIZE, height);
 
-        let x = parseFloat(el.style.left) || 0;
-        let y = parseFloat(el.style.top) || 0;
+              width = clamp(width, MIN_SIZE, parent.width - x);
+              height = clamp(height, MIN_SIZE, parent.height - y);
 
-        if (e.key === "ArrowUp") y -= step;
-        if (e.key === "ArrowDown") y += step;
-        if (e.key === "ArrowLeft") x -= step;
-        if (e.key === "ArrowRight") x += step;
+              target.style.left = x + "px";
+              target.style.top = y + "px";
+              target.style.width = width + "px";
+              target.style.height = height + "px";
 
-        x = clamp(x, 0, parent.width - el.offsetWidth);
-        y = clamp(y, 0, parent.height - el.offsetHeight);
+              emit({
+                id: widgetId,
+                data: {
+                  x: x / parent.width,
+                  y: y / parent.height,
+                  width: width / parent.width,
+                  height: height / parent.height
+                }
+              });
+            },
 
-        el.style.left = x + "px";
-        el.style.top = y + "px";
+            end() {
+              hideGuides();
 
-        emit({
-          id: widgetId,
-          data: {
-            x: x / parent.width,
-            y: y / parent.height
+              const target = el;
+              const widget = widgets.find(w => w._id === widgetId);
+              if (!widget) return;
+
+              const parent = getParent();
+
+              const x = parseFloat(target.style.left) || 0;
+              const y = parseFloat(target.style.top) || 0;
+              const width = parseFloat(target.style.width) || 0;
+              const height = parseFloat(target.style.height) || 0;
+
+              widget.data.x = x / parent.width;
+              widget.data.y = y / parent.height;
+              widget.data.width = width / parent.width;
+              widget.data.height = height / parent.height;
+
+              if (window.markAsChanged) markAsChanged();
+            }
           }
         });
+    });
+    
+    // ======================
+    // KEYBOARD MOVE (PRO)
+    // ======================
+    document.addEventListener("keydown", (e) => {
 
+      if (!el.classList.contains("selected-widget")) return;
+
+      const parent = getParent();
+
+      let step = 5;
+      if (e.shiftKey) step = 20;
+      if (e.altKey) step = 1;
+
+      let x = parseFloat(el.style.left) || 0;
+      let y = parseFloat(el.style.top) || 0;
+
+      if (e.key === "ArrowUp") y -= step;
+      if (e.key === "ArrowDown") y += step;
+      if (e.key === "ArrowLeft") x -= step;
+      if (e.key === "ArrowRight") x += step;
+
+      x = clamp(x, 0, parent.width - el.offsetWidth);
+      y = clamp(y, 0, parent.height - el.offsetHeight);
+
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+
+      emit({
+        id: widgetId,
+        data: {
+          x: x / parent.width,
+          y: y / parent.height
+        }
       });
 
     });

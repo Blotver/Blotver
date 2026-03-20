@@ -13,10 +13,13 @@ window.Renderer = {
       const d = child.data;
 
       // ===== DEFAULTS SEGUROS =====
-      const x = (d.x ?? 0) * screenW;
-      const y = (d.y ?? 0) * screenH;
-      const w = (d.width ?? 0.2) * screenW;
-      const h = (d.height ?? 0.1) * screenH;
+      const parentW = wrapper.clientWidth || screenW;
+      const parentH = wrapper.clientHeight || screenH;
+
+      const x = (d.x ?? 0) * parentW;
+      const y = (d.y ?? 0) * parentH;
+      const w = (d.width ?? 0.2) * parentW;
+      const h = (d.height ?? 0.1) * parentH;
 
       let el = null;
 

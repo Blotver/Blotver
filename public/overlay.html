@@ -178,28 +178,20 @@
         ...(data.texts || []).map(d => ({ type: "text", data: d }))
       ];
 
-      Renderer.renderChildren(
-        wrapper,
-        data,
-        children,
-        wrapper.offsetWidth,
-        wrapper.offsetHeight
-      );
-
-      root.appendChild(wrapper);
-
-      // 🔥 asegurar dimensiones reales
       requestAnimationFrame(() => {
 
         Renderer.renderChildren(
           wrapper,
           data,
           children,
-          wrapper.offsetWidth,
-          wrapper.offsetHeight
+          wrapper.clientWidth,
+          wrapper.clientHeight
         );
 
       });
+
+      root.appendChild(wrapper);
+
 
       // 🎞 ANIMACIÓN
       wrapper.className = `${data.animationIn || "fade"}-in`;
