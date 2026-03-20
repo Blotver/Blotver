@@ -100,11 +100,13 @@ module.exports = async function handleShoutout(ctx, widget) {
   const childImages = await Widget.find({
     projectId: matchedWidget.projectId,
     type: "image",
+    parent: matchedWidget._id
   });
 
   const childTexts = await Widget.find({
     projectId: matchedWidget.projectId,
     type: "text",
+    parent: matchedWidget._id
   });
 
   console.log("🖼️ Child images encontradas:", childImages);

@@ -2,10 +2,21 @@
 
 window.OverlayRenderer = {
 
-  render(wrapper, data){
+  render(wrapper, data) {
 
     const screenW = window.innerWidth
     const screenH = window.innerHeight
+
+    // ===== ROOT (SHOUTOUT) =====
+    const root = document.createElement("div")
+
+    root.style.position = "absolute"
+    root.style.left = (data.x * screenW) + "px"
+    root.style.top = (data.y * screenH) + "px"
+    root.style.width = (data.width * screenW) + "px"
+    root.style.height = (data.height * screenH) + "px"
+
+    wrapper.appendChild(root)
 
     // 🎬 CLIP
     const iframe = document.createElement("iframe")
@@ -17,16 +28,16 @@ window.OverlayRenderer = {
     iframe.style.inset = "0"
     iframe.style.zIndex = "1"
 
-    wrapper.appendChild(iframe)
+    root.appendChild(iframe)
 
     // 🧩 CHILDREN
     const children = [
-      ...(data.images || []).map(d => ({type:"image", data:d})),
-      ...(data.texts || []).map(d => ({type:"text", data:d}))
+      ...(data.images || []).map(d => ({ type: "image", data: d })),
+      ...(data.texts || []).map(d => ({ type: "text", data: d }))
     ]
 
     Renderer.renderChildren(
-      wrapper,
+      root, // 🔥🔥🔥 AHORA ES RELATIVO AL SHOUTOUT
       data,
       children,
       screenW,
