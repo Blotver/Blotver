@@ -182,11 +182,24 @@
         wrapper,
         data,
         children,
-        window.innerWidth,
-        window.innerHeight
+        wrapper.offsetWidth,
+        wrapper.offsetHeight
       );
 
       root.appendChild(wrapper);
+
+      // 🔥 asegurar dimensiones reales
+      requestAnimationFrame(() => {
+
+        Renderer.renderChildren(
+          wrapper,
+          data,
+          children,
+          wrapper.offsetWidth,
+          wrapper.offsetHeight
+        );
+
+      });
 
       // 🎞 ANIMACIÓN
       wrapper.className = `${data.animationIn || "fade"}-in`;
