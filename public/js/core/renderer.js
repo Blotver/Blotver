@@ -1,63 +1,104 @@
-// blotver\public\js\core\renderer.js
+// blotver/public/js/core/renderer.js
 
 window.Renderer = {
 
   renderChildren(wrapper, parentData, children, screenW, screenH) {
 
+    if (!wrapper || !children) return;
+
     children.forEach(child => {
 
-      const d = child.data
+      if (!child || !child.data) return;
 
-      const x = d.x * parentData.width * screenW
-      const y = d.y * parentData.height * screenH
-      const w = d.width * parentData.width * screenW
-      const h = d.height * parentData.height * screenH
+      const d = child.data;
 
-      let el = null
+      // ===== DEFAULTS SEGUROS =====
+      const x = (d.x ?? 0) * screenW;
+      const y = (d.y ?? 0) * screenH;
+      const w = (d.width ?? 0.2) * screenW;
+      const h = (d.height ?? 0.1) * screenH;
 
-      if (child.type === "image") {
-        el = document.createElement("img")
-        StyleEngine.applyImage(el, d)
+      let el = null;
+
+      // ======================
+      // WIDGET SYSTEM (ESCALABLE)
+      // ======================
+      const widgetDef = window.WidgetRegistry?.[child.type];
+
+      if (widgetDef?.renderOverlay) {
+        el = widgetDef.renderOverlay(child, parentData);
       }
 
-      if (child.type === "text") {
-        const container = document.createElement("div")
-        const inner = document.createElement("div")
+      // ===== FALLBACKS (compatibilidad) =====
+      else {
 
-        const parsed = Utils.parseVariables(d.text || "", parentData)
-        inner.innerHTML = parsed
+        // IMAGE
+        if (child.type === "image") {
+          el = document.createElement("img");
+          StyleEngine.applyImage(el, d);
+        }
 
-        container.style.display = "flex"
-        container.style.alignItems = "center"
+        // TEXT
+        else if (child.type === "text") {
 
-        if (d.textAlign === "left")
-          container.style.justifyContent = "flex-start"
-        else if (d.textAlign === "right")
-          container.style.justifyContent = "flex-end"
-        else
-          container.style.justifyContent = "center"
+          const container = document.createElement("div");
+          const inner = document.createElement("div");
 
-        StyleEngine.applyText(inner, d)
-        StyleEngine.applyTextContainer(container, d)
+          const parsed = Utils.parseVariables(d.text || "", parentData);
 
-        container.appendChild(inner)
-        el = container
+          // ⚠️ si querés máxima seguridad, usar textContent
+          inner.innerHTML = parsed;
+
+          container.style.display = "flex";
+          container.style.alignItems = "center";
+
+          if (d.textAlign === "left")
+            container.style.justifyContent = "flex-start";
+          else if (d.textAlign === "right")
+            container.style.justifyContent = "flex-end";
+          else
+            container.style.justifyContent = "center";
+
+          StyleEngine.applyText(inner, d);
+          StyleEngine.applyTextContainer(container, d);
+
+          container.appendChild(inner);
+          el = container;
+        }
+
       }
 
-      if (!el) return
+      if (!el) return;
 
-      el.style.position = "absolute"
-      el.style.left = x + "px"
-      el.style.top = y + "px"
-      el.style.width = w + "px"
-      el.style.height = h + "px"
-      el.style.zIndex = "5"
-      el.style.pointerEvents = "none"
+      // ======================
+      // VISIBILITY
+      // ======================
+      if (d.visible === false) {
+        el.style.display = "none";
+      }
 
-      wrapper.appendChild(el)
+      // ======================
+      // POSITIONING
+      // ======================
+      el.style.position = "absolute";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.width = w + "px";
+      el.style.height = h + "px";
 
-    })
+      // ✅ zIndex dinámico
+      el.style.zIndex = d.zIndex ?? 0;
+
+      // overlay = no interacción
+      el.style.pointerEvents = "none";
+
+      // opcional: mejora rendering
+      el.style.willChange = "transform";
+
+      wrapper.appendChild(el);
+
+    });
 
   }
 
-}
+};
