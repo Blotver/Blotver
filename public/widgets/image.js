@@ -75,7 +75,39 @@ window.ImageWidget = {
         return wrapper
 
     },
+    /* ============================= */
+    /* 🔥 NUEVO RENDER (ENGINE V2) */
+    /* ============================= */
 
+    render({ widget, context }) {
+
+        const d = widget.data;
+
+        const el = document.createElement("div");
+        el.style.position = "absolute";
+
+        const parentW = context.mode === "overlay"
+            ? context.screenW
+            : context.canvas.clientWidth;
+
+        const parentH = context.mode === "overlay"
+            ? context.screenH
+            : context.canvas.clientHeight;
+
+        el.style.left = (d.x * parentW) + "px";
+        el.style.top = (d.y * parentH) + "px";
+        el.style.width = (d.width * parentW) + "px";
+        el.style.height = (d.height * parentH) + "px";
+
+        // 🔥 usar tu style engine
+        const img = StyleEngine.createImage(d);
+
+        widget._img = img; // importante para applyStyles
+
+        el.appendChild(img);
+
+        return el;
+    },
     /* ============================= */
     /* CONFIG PANEL */
     /* ============================= */
@@ -353,8 +385,11 @@ class="config-slider"
 
             })
 
+
     }
 
 }
+
+
 
 registerWidget(window.ImageWidget)

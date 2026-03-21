@@ -1,3 +1,5 @@
+// blotver\bot\utils\widgetTree.js
+
 export function buildWidgetTree(widgets) {
 
   const map = new Map();

@@ -30,11 +30,42 @@ window.OverlayRenderer = {
 
     root.appendChild(iframe)
 
-    // 🧩 CHILDREN
-    const children = [
-      ...(data.images || []).map(d => ({ type: "image", data: d })),
-      ...(data.texts || []).map(d => ({ type: "text", data: d }))
-    ]
+    // 🔥 USAR ENGINE REAL
+
+    const widgets = [
+      {
+        _id: "root",
+        type: "shoutout",
+        parent: null,
+        data
+      },
+
+      ...(data.images || []).map((d, i) => ({
+        _id: "img_" + i,
+        type: "image",
+        parent: "root",
+        data: d
+      })),
+
+      ...(data.texts || []).map((d, i) => ({
+        _id: "txt_" + i,
+        type: "text",
+        parent: "root",
+        data: d
+      }))
+    ];
+
+    const tree = WidgetEngine.buildTree(widgets);
+
+    WidgetEngine.renderTree({
+      nodes: tree,
+      parentEl: wrapper,
+      context: {
+        mode: "overlay",
+        screenW,
+        screenH
+      }
+    });
 
     Renderer.renderChildren(
       root, // 🔥🔥🔥 AHORA ES RELATIVO AL SHOUTOUT
