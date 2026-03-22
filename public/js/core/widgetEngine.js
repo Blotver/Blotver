@@ -1,3 +1,4 @@
+// blotver\public\js\core\widgetEngine.js
 window.WidgetEngine = {
 
   buildTree(widgets) {
@@ -76,8 +77,22 @@ window.WidgetEngine = {
       // ❌ NO RENDER
       if (!el) return;
 
-      parentEl.appendChild(el);
+      // 🔥 IDENTIFICAR ELEMENTO
+      el.dataset.widgetId = node._id;
 
+      // 🔥 GUARDAR REFERENCIA (MUY IMPORTANTE)
+      node._el = el;
+
+      // 🔥 CLICK PARA SELECCIONAR (EDITOR)
+      if (context.mode === "editor" && context.onSelect) {
+        el.addEventListener("mousedown", (e) => {
+          e.stopPropagation();
+          context.onSelect(node, el);
+        });
+      }
+
+      parentEl.appendChild(el);
+      
       if (node.children && node.children.length > 0) {
         this.renderTree({
           nodes: node.children,
