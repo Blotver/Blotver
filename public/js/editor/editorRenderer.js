@@ -25,28 +25,33 @@ window.EditorRenderer = {
 
 function reorderWidgets(dragId, targetId) {
 
-  const dragged = widgets.find(w => w._id === dragId)
-  const target = widgets.find(w => w._id === targetId)
+  const draggedIndex = widgets.findIndex(w => w._id === dragId)
+  const targetIndex = widgets.findIndex(w => w._id === targetId)
 
-  if (!dragged || !target) return
+  if (draggedIndex === -1 || targetIndex === -1) return
 
-  // 🔥 SOLO reorder dentro del mismo padre
+  const dragged = widgets[draggedIndex]
+  const target = widgets[targetIndex]
+
+  // 🔥 SOLO mismo padre
   if (dragged.parent !== target.parent) return
 
+  // 🔥 sacar del array real
+  const [moved] = widgets.splice(draggedIndex, 1)
+
+  // 🔥 insertar en nueva posición
+  widgets.splice(targetIndex, 0, moved)
+
+  // 🔥 recalcular zIndex SOLO de siblings reales
   const siblings = widgets.filter(w => w.parent === dragged.parent)
 
-  const fromIndex = siblings.findIndex(w => w._id === dragId)
-  const toIndex = siblings.findIndex(w => w._id === targetId)
-
-  if (fromIndex === -1 || toIndex === -1) return
-
-  const moved = siblings.splice(fromIndex, 1)[0]
-  siblings.splice(toIndex, 0, moved)
-
-  // 🔥 aplicar orden SOLO a ese grupo
   siblings.forEach((w, i) => {
     w.data.zIndex = i
   })
+
+  // =========================
+  // 🔄 RE-RENDER TODO
+  // =========================
 
   EditorLayers.render({
     widgets,
@@ -76,7 +81,7 @@ function reorderWidgets(dragId, targetId) {
   EditorInteractions.apply({
     widgets,
     socket
-  });
+  })
 
   markAsChanged()
 }

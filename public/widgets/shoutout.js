@@ -1,3 +1,5 @@
+// blotver\public\widgets\shoutout.js
+
 window.ShoutoutWidget = {
   type: "shoutout",
 

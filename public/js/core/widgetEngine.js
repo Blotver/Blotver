@@ -66,7 +66,7 @@ window.WidgetEngine = {
         el.style.top = (d.y * parentH) + "px";
         el.style.width = (d.width * parentW) + "px";
         el.style.height = (d.height * parentH) + "px";
-        el.style.zIndex = d.zIndex ?? 0;
+        el.style.zIndex = String(d.zIndex ?? 0);
 
         const inner = widgetDef.renderCanvas(node);
 
