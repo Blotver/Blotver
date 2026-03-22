@@ -274,15 +274,23 @@ window.EditorInteractions = {
           }
         });
     });
-    
+
     // ======================
     // KEYBOARD MOVE (PRO)
     // ======================
+    // ======================
+    // KEYBOARD MOVE (FIXED)
+    // ======================
     document.addEventListener("keydown", (e) => {
 
-      if (!el.classList.contains("selected-widget")) return;
+      const el = document.querySelector(".selected-widget");
+      if (!el) return;
 
-      const parent = getParent();
+      const widgetId = el.dataset.widgetId;
+      const widget = widgets.find(w => w._id === widgetId);
+      if (!widget) return;
+
+      const parentRect = el.parentElement.getBoundingClientRect();
 
       let step = 5;
       if (e.shiftKey) step = 20;
@@ -296,8 +304,8 @@ window.EditorInteractions = {
       if (e.key === "ArrowLeft") x -= step;
       if (e.key === "ArrowRight") x += step;
 
-      x = clamp(x, 0, parent.width - el.offsetWidth);
-      y = clamp(y, 0, parent.height - el.offsetHeight);
+      x = clamp(x, 0, parentRect.width - el.offsetWidth);
+      y = clamp(y, 0, parentRect.height - el.offsetHeight);
 
       el.style.left = x + "px";
       el.style.top = y + "px";
@@ -305,8 +313,8 @@ window.EditorInteractions = {
       emit({
         id: widgetId,
         data: {
-          x: x / parent.width,
-          y: y / parent.height
+          x: x / parentRect.width,
+          y: y / parentRect.height
         }
       });
 
