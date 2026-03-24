@@ -1,8 +1,8 @@
 // blotver\public\js\editor\editorRenderer.js
 
 window.EditorRenderer = {
-  renderAll({ widgets, canvas, onSelect }) {
 
+  renderAll({ widgets, canvas, onSelect }) {
     if (!canvas) return;
 
     canvas.innerHTML = "";
@@ -18,8 +18,41 @@ window.EditorRenderer = {
         onSelect
       }
     });
-
   },
+
+  rerenderWidget({ widget, element }) {
+    if (!widget || !element) return;
+
+    const parent = element.parentElement;
+    if (!parent) return;
+
+    // 🔥 guardar estilos actuales
+    const prevStyle = {
+      left: element.style.left,
+      top: element.style.top,
+      width: element.style.width,
+      height: element.style.height
+    };
+
+    // borrar viejo
+    parent.removeChild(element);
+
+    // render nuevo
+    const newEl = WidgetEngine.renderSingle({
+      widget,
+      context: {
+        mode: "editor",
+        canvas: document.getElementById("canvas")
+      }
+    });
+
+    // 🔥 restaurar estilos
+    Object.assign(newEl.style, prevStyle);
+
+    parent.appendChild(newEl);
+
+    return newEl;
+  }
 
 };
 

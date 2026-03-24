@@ -1110,16 +1110,17 @@
       if (updates.height !== undefined)
         selectedElement.style.height = (updates.height * canvas.clientHeight) + "px";
 
-      EditorRenderer.rerenderWidget({
+      const newEl = EditorRenderer.rerenderWidget({
         widget: selectedWidget,
         element: selectedElement
       });
 
-      // esperar al DOM update
-      requestAnimationFrame(() => {
-        addResizeHandles(selectedElement);
-      });
+      // 🔥 actualizar referencia REAL
+      selectedElement = newEl;
 
+      // 🔥 volver a aplicar resize handles
+      addResizeHandles(selectedElement);
+      
       // ===== 4️⃣ Sincronizar panel =====
       const panel = document.getElementById("configContent");
       if (!panel) return;

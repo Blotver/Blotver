@@ -92,7 +92,7 @@ window.WidgetEngine = {
       }
 
       parentEl.appendChild(el);
-      
+
       if (node.children && node.children.length > 0) {
         this.renderTree({
           nodes: node.children,
@@ -103,6 +103,20 @@ window.WidgetEngine = {
 
     });
 
+  },
+
+  renderSingle({ widget, context }) {
+    const def = window.WidgetRegistry[widget.type];
+    if (!def || !def.render) return null;
+
+    const el = def.render({ widget, context });
+
+    el.dataset.widgetId = widget._id;
+
+    // 🔥 GUARDAR REFERENCIA
+    widget._el = el;
+
+    return el;
   }
 
 };
