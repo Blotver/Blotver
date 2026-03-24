@@ -143,7 +143,7 @@ window.StyleEngine = {
 
     this.applyImage(img, d)
 
-    img.style.pointerEvents = "none"
+    img.style.pointerEvents = "auto"
 
     return img
   }

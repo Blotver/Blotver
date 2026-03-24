@@ -19,9 +19,6 @@ window.ImageWidget = {
         shadow: 0,
         opacity: 1,
 
-        lockRatio: false,
-        aspectRatio: null
-
     },
 
     /* ============================= */
@@ -56,17 +53,6 @@ window.ImageWidget = {
 
         if (d.url)
             img.src = d.url
-
-        img.onload = () => {
-
-            if (img.naturalWidth) {
-
-                widget.data.aspectRatio =
-                    img.naturalWidth / img.naturalHeight
-
-            }
-
-        }
 
         wrapper.appendChild(img)
 
@@ -163,11 +149,6 @@ data-field="height"
 value="${Math.round(d.height * 100)}"
 class="config-input"
 />
-
-<button id="lockRatio"
-class="ratio-btn ${d.lockRatio ? "active" : ""}">
-${d.lockRatio ? "Locked" : "Free"}
-</button>
 
 </div>
 
@@ -300,41 +281,6 @@ class="config-slider"
                     else
                         value = (parseFloat(e.target.value) || 0) / 100
 
-
-                    /* LOCK RATIO */
-
-                    if (
-                        d.lockRatio &&
-                        d.aspectRatio &&
-                        field === "width"
-                    ) {
-
-                        update({
-                            width: value,
-                            height: value / d.aspectRatio
-                        })
-
-                    }
-
-                    else if (
-                        d.lockRatio &&
-                        d.aspectRatio &&
-                        field === "height"
-                    ) {
-
-                        update({
-                            height: value,
-                            width: value * d.aspectRatio
-                        })
-
-                    }
-
-                    else {
-
-                        update({ [field]: value })
-
-                    }
-
                     window.ImageWidget.applyStyles(widget)
 
                 })
@@ -370,26 +316,8 @@ class="config-slider"
 
             })
 
-
-        /* ============================= */
-        /* RATIO LOCK */
-        /* ============================= */
-
-        container
-            .querySelector("#lockRatio")
-            ?.addEventListener("click", () => {
-
-                update({
-                    lockRatio: !d.lockRatio
-                })
-
-            })
-
-
     }
 
 }
-
-
 
 registerWidget(window.ImageWidget)

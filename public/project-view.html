@@ -1126,15 +1126,14 @@
         element: selectedElement
       });
 
-      // 🔥 actualizar referencia REAL
+      // 🔥 actualizar referencia
       selectedElement = newEl;
 
-      if (newEl !== selectedElement) {
-        EditorInteractions.apply({
-          widgets,
-          socket
-        });
-      }
+      // 🔥 REAPLICAR INTERACT SIEMPRE
+      EditorInteractions.apply({
+        widgets,
+        socket
+      });
 
       // 🔥 volver a aplicar resize handles
       addResizeHandles(selectedElement);
