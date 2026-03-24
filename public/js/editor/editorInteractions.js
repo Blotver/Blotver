@@ -5,28 +5,52 @@ window.EditorInteractions = {
   apply({ widgets, socket }) {
 
     const canvas = document.getElementById("canvas");
-    if (!canvas) return;
+    if (!canvas || !window.interact) return;
 
+    // =========================
+    // GLOBAL STATE (ANTI-BUG)
+    // =========================
+    if (!window.__interactionState) {
+      window.__interactionState = {
+        dragging: false,
+        resizing: false,
+        raf: null,
+        lastEmit: 0,
+        keyboardBound: false
+      };
+    }
+
+    const state = window.__interactionState;
+
+    // =========================
+    // CONFIG
+    // =========================
     const GRID = 10;
     const SNAP_THRESHOLD = 6;
     const MIN_SIZE = 30;
-
-    let lastEmit = 0;
     const EMIT_DELAY = 16;
-
-    function emit(data) {
-      const now = Date.now();
-      if (now - lastEmit < EMIT_DELAY) return;
-      lastEmit = now;
-      socket.emit("widget:updateLive", data);
-    }
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
     const snap = (v) => Math.round(v / GRID) * GRID;
 
-    // ======================
-    // GUIDES (visual snap lines)
-    // ======================
+    function safeParent(el) {
+      if (!el || !el.parentElement) return null;
+      return el.parentElement.getBoundingClientRect();
+    }
+
+    function emit(data) {
+      const now = Date.now();
+      if (now - state.lastEmit < EMIT_DELAY) return;
+      state.lastEmit = now;
+
+      if (!socket || socket.disconnected) return;
+
+      socket.emit("widget:updateLive", data);
+    }
+
+    // =========================
+    // GUIDES
+    // =========================
     let guideX = null;
     let guideY = null;
 
@@ -41,6 +65,7 @@ window.EditorInteractions = {
     }
 
     function showGuides(x, y, parent) {
+      if (!parent) return;
 
       if (x !== null) {
         if (!guideX) guideX = createGuide();
@@ -64,18 +89,25 @@ window.EditorInteractions = {
       if (guideY) guideY.remove(), guideY = null;
     }
 
-    // ======================
-    // INTERACTIONS
-    // ======================
+    // =========================
+    // CLEAN OLD INTERACTIONS
+    // =========================
+    document.querySelectorAll("[data-widget-id]").forEach(el => {
+      try {
+        if (interact.isSet && interact.isSet(el)) {
+          interact(el).unset();
+        }
+      } catch (e) { }
+    });
+
+    // =========================
+    // APPLY INTERACTIONS
+    // =========================
     document.querySelectorAll("[data-widget-id]").forEach(el => {
 
+      if (!el || !el.dataset.widgetId) return;
+
       const widgetId = el.dataset.widgetId;
-
-      if (interact.isSet && interact.isSet(el)) {
-        interact(el).unset();
-      }
-
-      const getParent = () => el.parentElement.getBoundingClientRect();
 
       // ======================
       // DRAG
@@ -84,92 +116,104 @@ window.EditorInteractions = {
 
         listeners: {
 
+          start() {
+            state.dragging = true;
+          },
+
           move(event) {
 
-            const target = event.target;
+            if (!event || !event.target) return;
 
-            let x = parseFloat(target.style.left) || 0;
-            let y = parseFloat(target.style.top) || 0;
+            cancelAnimationFrame(state.raf);
 
-            x += event.dx;
-            y += event.dy;
+            state.raf = requestAnimationFrame(() => {
 
-            const parent = getParent();
+              const target = event.target;
+              const parent = safeParent(target);
+              if (!parent) return;
 
-            const w = target.offsetWidth;
-            const h = target.offsetHeight;
+              let x = parseFloat(target.style.left) || 0;
+              let y = parseFloat(target.style.top) || 0;
 
-            // límites
-            x = clamp(x, 0, parent.width - w);
-            y = clamp(y, 0, parent.height - h);
+              x += event.dx;
+              y += event.dy;
 
-            // snap grid (SHIFT)
-            if (event.shiftKey) {
-              x = snap(x);
-              y = snap(y);
-            }
+              const w = target.offsetWidth;
+              const h = target.offsetHeight;
 
-            // snap edges
-            let snapX = null;
-            let snapY = null;
+              x = clamp(x, 0, parent.width - w);
+              y = clamp(y, 0, parent.height - h);
 
-            if (Math.abs(x) < SNAP_THRESHOLD) {
-              x = 0;
-              snapX = 0;
-            }
-
-            if (Math.abs(y) < SNAP_THRESHOLD) {
-              y = 0;
-              snapY = 0;
-            }
-
-            if (Math.abs((x + w) - parent.width) < SNAP_THRESHOLD) {
-              x = parent.width - w;
-              snapX = parent.width;
-            }
-
-            if (Math.abs((y + h) - parent.height) < SNAP_THRESHOLD) {
-              y = parent.height - h;
-              snapY = parent.height;
-            }
-
-            // center snap
-            const centerX = x + w / 2;
-            const centerY = y + h / 2;
-
-            if (Math.abs(centerX - parent.width / 2) < SNAP_THRESHOLD) {
-              x = parent.width / 2 - w / 2;
-              snapX = parent.width / 2;
-            }
-
-            if (Math.abs(centerY - parent.height / 2) < SNAP_THRESHOLD) {
-              y = parent.height / 2 - h / 2;
-              snapY = parent.height / 2;
-            }
-
-            showGuides(snapX, snapY, parent);
-
-            target.style.left = x + "px";
-            target.style.top = y + "px";
-
-            emit({
-              id: widgetId,
-              data: {
-                x: x / parent.width,
-                y: y / parent.height
+              if (event.shiftKey) {
+                x = snap(x);
+                y = snap(y);
               }
+
+              let snapX = null;
+              let snapY = null;
+
+              if (Math.abs(x) < SNAP_THRESHOLD) {
+                x = 0;
+                snapX = 0;
+              }
+
+              if (Math.abs(y) < SNAP_THRESHOLD) {
+                y = 0;
+                snapY = 0;
+              }
+
+              if (Math.abs((x + w) - parent.width) < SNAP_THRESHOLD) {
+                x = parent.width - w;
+                snapX = parent.width;
+              }
+
+              if (Math.abs((y + h) - parent.height) < SNAP_THRESHOLD) {
+                y = parent.height - h;
+                snapY = parent.height;
+              }
+
+              const centerX = x + w / 2;
+              const centerY = y + h / 2;
+
+              if (Math.abs(centerX - parent.width / 2) < SNAP_THRESHOLD) {
+                x = parent.width / 2 - w / 2;
+                snapX = parent.width / 2;
+              }
+
+              if (Math.abs(centerY - parent.height / 2) < SNAP_THRESHOLD) {
+                y = parent.height / 2 - h / 2;
+                snapY = parent.height / 2;
+              }
+
+              showGuides(snapX, snapY, parent);
+
+              target.style.left = x + "px";
+              target.style.top = y + "px";
+
+              emit({
+                id: widgetId,
+                data: {
+                  x: x / parent.width,
+                  y: y / parent.height
+                }
+              });
+
             });
           },
 
           end(event) {
 
+            state.dragging = false;
             hideGuides();
 
+            if (!event || !event.target) return;
+
             const target = event.target;
+            const parent = safeParent(target);
+            if (!parent) return;
+
             const widget = widgets.find(w => w._id === widgetId);
             if (!widget) return;
-
-            const parent = getParent();
 
             const x = parseFloat(target.style.left) || 0;
             const y = parseFloat(target.style.top) || 0;
@@ -183,7 +227,7 @@ window.EditorInteractions = {
       })
 
         // ======================
-        // RESIZE PRO
+        // RESIZE
         // ======================
         .resizable({
 
@@ -196,9 +240,17 @@ window.EditorInteractions = {
 
           listeners: {
 
+            start() {
+              state.resizing = true;
+            },
+
             move(event) {
 
+              if (!event || !event.target) return;
+
               const target = event.target;
+              const parent = safeParent(target);
+              if (!parent) return;
 
               let x = parseFloat(target.style.left) || 0;
               let y = parseFloat(target.style.top) || 0;
@@ -206,30 +258,19 @@ window.EditorInteractions = {
               let width = event.rect.width;
               let height = event.rect.height;
 
-              const parent = getParent();
-
-              // FIX real
               x += event.deltaRect.left;
               y += event.deltaRect.top;
 
-              // SHIFT = ratio
               if (event.shiftKey) {
                 const ratio = target.offsetWidth / target.offsetHeight || 1;
-                if (width / height > ratio) {
-                  width = height * ratio;
-                } else {
-                  height = width / ratio;
-                }
+                if (width / height > ratio) width = height * ratio;
+                else height = width / ratio;
               }
 
-              // ALT = center resize
               if (event.altKey) {
                 x -= event.deltaRect.left;
                 y -= event.deltaRect.top;
               }
-
-              width = Math.max(MIN_SIZE, width);
-              height = Math.max(MIN_SIZE, height);
 
               width = clamp(width, MIN_SIZE, parent.width - x);
               height = clamp(height, MIN_SIZE, parent.height - y);
@@ -251,18 +292,20 @@ window.EditorInteractions = {
             },
 
             end() {
+
+              state.resizing = false;
               hideGuides();
 
-              const target = el;
+              const parent = safeParent(el);
+              if (!parent) return;
+
               const widget = widgets.find(w => w._id === widgetId);
               if (!widget) return;
 
-              const parent = getParent();
-
-              const x = parseFloat(target.style.left) || 0;
-              const y = parseFloat(target.style.top) || 0;
-              const width = parseFloat(target.style.width) || 0;
-              const height = parseFloat(target.style.height) || 0;
+              const x = parseFloat(el.style.left) || 0;
+              const y = parseFloat(el.style.top) || 0;
+              const width = parseFloat(el.style.width) || 0;
+              const height = parseFloat(el.style.height) || 0;
 
               widget.data.x = x / parent.width;
               widget.data.y = y / parent.height;
@@ -273,52 +316,58 @@ window.EditorInteractions = {
             }
           }
         });
+
     });
 
-    // ======================
-    // KEYBOARD MOVE (PRO)
-    // ======================
-    // ======================
-    // KEYBOARD MOVE (FIXED)
-    // ======================
-    document.addEventListener("keydown", (e) => {
+    // =========================
+    // KEYBOARD (NO DUPLICATE)
+    // =========================
+    if (!state.keyboardBound) {
 
-      const el = document.querySelector(".selected-widget");
-      if (!el) return;
+      document.addEventListener("keydown", (e) => {
 
-      const widgetId = el.dataset.widgetId;
-      const widget = widgets.find(w => w._id === widgetId);
-      if (!widget) return;
+        if (state.dragging || state.resizing) return;
 
-      const parentRect = el.parentElement.getBoundingClientRect();
+        const el = document.querySelector(".selected-widget");
+        if (!el) return;
 
-      let step = 5;
-      if (e.shiftKey) step = 20;
-      if (e.altKey) step = 1;
+        const parent = safeParent(el);
+        if (!parent) return;
 
-      let x = parseFloat(el.style.left) || 0;
-      let y = parseFloat(el.style.top) || 0;
+        const widgetId = el.dataset.widgetId;
+        const widget = widgets.find(w => w._id === widgetId);
+        if (!widget) return;
 
-      if (e.key === "ArrowUp") y -= step;
-      if (e.key === "ArrowDown") y += step;
-      if (e.key === "ArrowLeft") x -= step;
-      if (e.key === "ArrowRight") x += step;
+        let step = 5;
+        if (e.shiftKey) step = 20;
+        if (e.altKey) step = 1;
 
-      x = clamp(x, 0, parentRect.width - el.offsetWidth);
-      y = clamp(y, 0, parentRect.height - el.offsetHeight);
+        let x = parseFloat(el.style.left) || 0;
+        let y = parseFloat(el.style.top) || 0;
 
-      el.style.left = x + "px";
-      el.style.top = y + "px";
+        if (e.key === "ArrowUp") y -= step;
+        if (e.key === "ArrowDown") y += step;
+        if (e.key === "ArrowLeft") x -= step;
+        if (e.key === "ArrowRight") x += step;
 
-      emit({
-        id: widgetId,
-        data: {
-          x: x / parentRect.width,
-          y: y / parentRect.height
-        }
+        x = clamp(x, 0, parent.width - el.offsetWidth);
+        y = clamp(y, 0, parent.height - el.offsetHeight);
+
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+
+        emit({
+          id: widgetId,
+          data: {
+            x: x / parent.width,
+            y: y / parent.height
+          }
+        });
+
       });
 
-    });
+      state.keyboardBound = true;
+    }
 
   }
 

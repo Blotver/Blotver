@@ -799,6 +799,10 @@
     /* ================= LOAD ================= */
 
     async function loadWidgets() {
+      if (window.__interactionState?.dragging || window.__interactionState?.resizing) {
+        return;
+      }
+
       const projectRes = await fetch("/api/projects");
       const allProjects = await projectRes.json();
       currentProject = allProjects.find((p) => p._id === projectId);
@@ -876,6 +880,11 @@
     document.getElementById("saveBtn").addEventListener("click", saveConfig);
 
     async function saveConfig() {
+
+      if (window.__interactionState?.dragging || window.__interactionState?.resizing) {
+        return;
+      }
+
       if (!currentProject) return;
 
       const projectTitle = document.getElementById("projectNameInput").value;
@@ -907,13 +916,15 @@
           });
         }
 
-        showSaveToast("Saved", "success");
         resetChanges();
-        loadWidgets();
+        showSaveToast("Saved", "success");
+
       } catch (error) {
         console.error(error);
         showSaveToast("Error saving", "error");
       }
+
+
     }
 
     function markAsChanged() {
@@ -1118,9 +1129,16 @@
       // 🔥 actualizar referencia REAL
       selectedElement = newEl;
 
+      if (newEl !== selectedElement) {
+        EditorInteractions.apply({
+          widgets,
+          socket
+        });
+      }
+
       // 🔥 volver a aplicar resize handles
       addResizeHandles(selectedElement);
-      
+
       // ===== 4️⃣ Sincronizar panel =====
       const panel = document.getElementById("configContent");
       if (!panel) return;
