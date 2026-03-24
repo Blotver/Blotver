@@ -2,322 +2,249 @@
 
 window.ImageWidget = {
 
-    type: "image",
+  type: "image",
 
-    defaultData: {
+  defaultData: {
+    x: 0.2,
+    y: 0.2,
+    width: 0.30,
+    height: 0.30,
 
-        x: 0.2,
-        y: 0.2,
-        width: 0.15,
-        height: 0.15,
+    url: "",
+    visible: true,
 
-        url: "",
-        visible: true,
+    objectFit: "cover",
+    borderRadius: 0,
+    shadow: 0,
+    opacity: 1,
+  },
 
-        objectFit: "cover",
-        borderRadius: 0,
-        shadow: 0,
-        opacity: 1,
+  /* ============================= */
+  /* APPLY STYLES */
+  /* ============================= */
 
-    },
+  applyStyles(widget) {
+    if (!widget._img) return;
+    StyleEngine.applyImage(widget._img, widget.data);
+  },
 
-    /* ============================= */
-    /* APPLY STYLES (GLOBAL) */
-    /* ============================= */
+  /* ============================= */
+  /* RENDER (ENGINE V2) */
+  /* ============================= */
 
-    applyStyles(widget) {
+  render({ widget, context }) {
 
-        StyleEngine.applyImage(widget._img, widget.data)
+    const d = widget.data;
 
-    },
+    const el = document.createElement("div");
+    el.style.position = "absolute";
 
-    /* ============================= */
-    /* CANVAS RENDER */
-    /* ============================= */
+    const parentW = context.mode === "overlay"
+      ? context.screenW
+      : context.canvas.clientWidth;
 
-    renderCanvas(widget) {
+    const parentH = context.mode === "overlay"
+      ? context.screenH
+      : context.canvas.clientHeight;
 
-        const d = widget.data
+    el.style.left = (d.x * parentW) + "px";
+    el.style.top = (d.y * parentH) + "px";
+    el.style.width = (d.width * parentW) + "px";
+    el.style.height = (d.height * parentH) + "px";
 
-        const wrapper = document.createElement("div")
-        wrapper.style.width = "100%"
-        wrapper.style.height = "100%"
+    // imagen via engine
+    const img = StyleEngine.createImage(d);
 
-        const img = document.createElement("img")
+    widget._img = img;
 
-        widget._img = img
+    el.appendChild(img);
 
-        img.style.width = "100%"
-        img.style.height = "100%"
-        img.draggable = false
+    return el;
+  },
 
-        if (d.url)
-            img.src = d.url
+  /* ============================= */
+  /* CONFIG PANEL */
+  /* ============================= */
 
-        wrapper.appendChild(img)
+  renderConfig(widget, container, update) {
 
-        this.applyStyles(widget)
+    const d = widget.data;
 
-        return wrapper
-
-    },
-    /* ============================= */
-    /* 🔥 NUEVO RENDER (ENGINE V2) */
-    /* ============================= */
-
-    render({ widget, context }) {
-
-        const d = widget.data;
-
-        const el = document.createElement("div");
-        el.style.position = "absolute";
-
-        const parentW = context.mode === "overlay"
-            ? context.screenW
-            : context.canvas.clientWidth;
-
-        const parentH = context.mode === "overlay"
-            ? context.screenH
-            : context.canvas.clientHeight;
-
-        el.style.left = (d.x * parentW) + "px";
-        el.style.top = (d.y * parentH) + "px";
-        el.style.width = (d.width * parentW) + "px";
-        el.style.height = (d.height * parentH) + "px";
-
-        // 🔥 usar tu style engine
-        const img = StyleEngine.createImage(d);
-
-        widget._img = img; // importante para applyStyles
-
-        el.appendChild(img);
-
-        return el;
-    },
-    /* ============================= */
-    /* CONFIG PANEL */
-    /* ============================= */
-
-    renderConfig(widget, container, update) {
-
-        const d = widget.data
-
-        container.innerHTML = `
-
+    container.innerHTML = `
 <div class="config-root">
 
-<!-- IMAGE -->
-<div class="config-card">
+  <!-- IMAGE -->
+  <div class="config-card">
+    <div class="config-title">Image</div>
 
-<div class="config-title">
-Image
-</div>
+    <div id="changeImage" class="cursor-pointer">
+      ${d.url
+        ? `<img src="${d.url}" class="config-image-preview"/>`
+        : `<div class="config-image-placeholder">No image</div>`
+      }
+    </div>
+  </div>
 
-<div id="changeImage" class="cursor-pointer">
+  <!-- SIZE -->
+  <div class="config-card">
+    <div class="config-title">Size (%)</div>
 
-${d.url
-                ? `<img src="${d.url}" class="config-image-preview"/>`
-                : `<div class="config-image-placeholder">No image</div>`
-            }
+    <div class="config-row">
+      <div class="config-size-grid">
 
-</div>
+        <input
+          type="number"
+          data-field="width"
+          value="${Math.round(d.width * 100)}"
+          class="config-input"
+        />
 
-</div>
+        <input
+          type="number"
+          data-field="height"
+          value="${Math.round(d.height * 100)}"
+          class="config-input"
+        />
 
+      </div>
+    </div>
+  </div>
 
-<!-- SIZE -->
-<div class="config-card">
+  <!-- FIT -->
+  <div class="config-card">
+    <div class="config-title">Fit Mode</div>
 
-<div class="config-title">
-Size
-</div>
+    <div class="mode-switch">
 
-<div class="config-row">
+      <button data-fit="cover"
+        class="mode-btn ${d.objectFit === "cover" ? "active" : ""}">
+        Cover
+      </button>
 
-<div class="config-size-grid">
+      <button data-fit="contain"
+        class="mode-btn ${d.objectFit === "contain" ? "active" : ""}">
+        Contain
+      </button>
 
-<input
-type="number"
-data-field="width"
-value="${Math.round(d.width * 100)}"
-class="config-input"
-/>
+    </div>
+  </div>
 
-<input
-type="number"
-data-field="height"
-value="${Math.round(d.height * 100)}"
-class="config-input"
-/>
+  <!-- BORDER -->
+  <div class="config-card">
+    <div class="config-title">Border Radius</div>
 
-</div>
+    <div class="config-row">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        data-field="borderRadius"
+        value="${d.borderRadius}"
+        class="config-slider"
+      />
+    </div>
+  </div>
 
-</div>
+  <!-- SHADOW -->
+  <div class="config-card">
+    <div class="config-title">Shadow</div>
 
-</div>
+    <div class="config-row">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        data-field="shadow"
+        value="${d.shadow}"
+        class="config-slider"
+      />
+    </div>
+  </div>
 
+  <!-- OPACITY -->
+  <div class="config-card">
+    <div class="config-title">Opacity</div>
 
-<!-- FIT -->
-<div class="config-card">
-
-<div class="config-title">
-Fit Mode
-</div>
-
-<div class="mode-switch">
-
-<button data-fit="cover"
-class="mode-btn ${d.objectFit === "cover" ? "active" : ""}">
-Cover
-</button>
-
-<button data-fit="contain"
-class="mode-btn ${d.objectFit === "contain" ? "active" : ""}">
-Contain
-</button>
-
-</div>
-
-</div>
-
-
-<!-- BORDER -->
-<div class="config-card">
-
-<div class="config-title">
-Border Radius
-</div>
-
-<div class="config-row">
-
-<input
-type="range"
-min="0"
-max="100"
-data-field="borderRadius"
-value="${d.borderRadius}"
-class="config-slider"
-/>
-
-</div>
-
-</div>
-
-
-<!-- SHADOW -->
-<div class="config-card">
-
-<div class="config-title">
-Shadow
-</div>
-
-<div class="config-row">
-
-<input
-type="range"
-min="0"
-max="100"
-data-field="shadow"
-value="${d.shadow}"
-class="config-slider"
-/>
+    <div class="config-row">
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        data-field="opacity"
+        value="${d.opacity}"
+        class="config-slider"
+      />
+    </div>
+  </div>
 
 </div>
+`;
 
-</div>
+    /* ============================= */
+    /* IMAGE PICKER */
+    /* ============================= */
 
+    container
+      .querySelector("#changeImage")
+      ?.addEventListener("click", () => {
+        openImageModal((url) => {
+          update({ url });
+        });
+      });
 
-<!-- OPACITY -->
-<div class="config-card">
+    /* ============================= */
+    /* INPUTS (FIX REAL) */
+    /* ============================= */
 
-<div class="config-title">
-Opacity
-</div>
+    container
+      .querySelectorAll("[data-field]")
+      .forEach(input => {
 
-<div class="config-row">
+        input.addEventListener("input", (e) => {
 
-<input
-type="range"
-min="0"
-max="1"
-step="0.01"
-data-field="opacity"
-value="${d.opacity}"
-class="config-slider"
-/>
+          const field = e.target.dataset.field;
+          let value;
 
-</div>
+          if (input.type === "range") {
+            value = parseFloat(e.target.value);
+          } else {
+            value = (parseFloat(e.target.value) || 0) / 100;
+          }
 
-</div>
+          // 🔥 ESTA ES LA CLAVE (antes te faltaba)
+          update({ [field]: value });
 
-</div>
-`
+        });
 
-        /* ============================= */
-        /* IMAGE MODAL */
-        /* ============================= */
+      });
 
-        container
-            .querySelector("#changeImage")
-            ?.addEventListener("click", openImageModal)
+    /* ============================= */
+    /* FIT BUTTONS */
+    /* ============================= */
 
+    container
+      .querySelectorAll("[data-fit]")
+      .forEach(btn => {
 
-        /* ============================= */
-        /* INPUT HANDLERS */
-        /* ============================= */
+        btn.addEventListener("click", () => {
 
-        container
-            .querySelectorAll("[data-field]")
-            .forEach(input => {
+          const fit = btn.dataset.fit;
 
-                input.addEventListener("input", e => {
-
-                    const field = e.target.dataset.field
-
-                    let value
-
-                    if (input.type === "range")
-                        value = parseFloat(e.target.value)
-                    else
-                        value = (parseFloat(e.target.value) || 0) / 100
-
-                    window.ImageWidget.applyStyles(widget)
-
-                })
-
-            })
-
-
-        /* ============================= */
-        /* FIT BUTTONS */
-        /* ============================= */
-
-        container
+          container
             .querySelectorAll("[data-fit]")
-            .forEach(btn => {
+            .forEach(b => b.classList.remove("active"));
 
-                btn.addEventListener("click", () => {
+          btn.classList.add("active");
 
-                    const fit = btn.dataset.fit
+          update({ objectFit: fit });
 
-                    container
-                        .querySelectorAll("[data-fit]")
-                        .forEach(b => b.classList.remove("active"))
+        });
 
-                    btn.classList.add("active")
+      });
 
-                    update({
-                        objectFit: fit
-                    })
+  }
 
-                    window.ImageWidget.applyStyles(widget)
+};
 
-                })
-
-            })
-
-    }
-
-}
-
-registerWidget(window.ImageWidget)
+registerWidget(window.ImageWidget);
