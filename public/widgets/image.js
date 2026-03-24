@@ -29,7 +29,7 @@ window.ImageWidget = {
   },
 
   /* ============================= */
-  /* RENDER (ENGINE V2) */
+  /* RENDER */
   /* ============================= */
 
   render({ widget, context }) {
@@ -38,6 +38,13 @@ window.ImageWidget = {
 
     const el = document.createElement("div");
     el.style.position = "absolute";
+    el.style.userSelect = "none";
+    el.style.cursor = context.mode === "editor" ? "move" : "default";
+
+    // 🔥 GUÍA VISUAL (EDITOR)
+    if (context.mode === "editor") {
+      el.style.outline = "1px dashed rgba(255,255,255,0.25)";
+    }
 
     const parentW = context.mode === "overlay"
       ? context.screenW
@@ -47,13 +54,34 @@ window.ImageWidget = {
       ? context.screenH
       : context.canvas.clientHeight;
 
-    el.style.left = (d.x * parentW) + "px";
-    el.style.top = (d.y * parentH) + "px";
-    el.style.width = (d.width * parentW) + "px";
-    el.style.height = (d.height * parentH) + "px";
+    const left = d.x * parentW;
+    const top = d.y * parentH;
+    const width = d.width * parentW;
+    const height = d.height * parentH;
 
-    // imagen via engine
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.width = width + "px";
+    el.style.height = height + "px";
+
+    // =============================
+    // IMAGE
+    // =============================
+
     const img = StyleEngine.createImage(d);
+
+    // 🔥 fallback visual si no hay imagen
+    if (!d.url) {
+      img.style.background = "linear-gradient(135deg,#1f2937,#111827)";
+      img.style.display = "flex";
+      img.style.alignItems = "center";
+      img.style.justifyContent = "center";
+      img.innerHTML = `<span style="
+        color:#9ca3af;
+        font-size:12px;
+        font-family:sans-serif;
+      ">No image</span>`;
+    }
 
     widget._img = img;
 
@@ -77,10 +105,10 @@ window.ImageWidget = {
   <div class="config-card">
     <div class="config-title">Image</div>
 
-    <div id="changeImage" class="cursor-pointer">
+    <div id="changeImage" class="cursor-pointer config-image-box">
       ${d.url
         ? `<img src="${d.url}" class="config-image-preview"/>`
-        : `<div class="config-image-placeholder">No image</div>`
+        : `<div class="config-image-placeholder">Select image</div>`
       }
     </div>
   </div>
@@ -89,24 +117,9 @@ window.ImageWidget = {
   <div class="config-card">
     <div class="config-title">Size (%)</div>
 
-    <div class="config-row">
-      <div class="config-size-grid">
-
-        <input
-          type="number"
-          data-field="width"
-          value="${Math.round(d.width * 100)}"
-          class="config-input"
-        />
-
-        <input
-          type="number"
-          data-field="height"
-          value="${Math.round(d.height * 100)}"
-          class="config-input"
-        />
-
-      </div>
+    <div class="config-size-grid">
+      <input type="number" data-field="width" value="${Math.round(d.width * 100)}" class="config-input"/>
+      <input type="number" data-field="height" value="${Math.round(d.height * 100)}" class="config-input"/>
     </div>
   </div>
 
@@ -115,67 +128,27 @@ window.ImageWidget = {
     <div class="config-title">Fit Mode</div>
 
     <div class="mode-switch">
-
-      <button data-fit="cover"
-        class="mode-btn ${d.objectFit === "cover" ? "active" : ""}">
-        Cover
-      </button>
-
-      <button data-fit="contain"
-        class="mode-btn ${d.objectFit === "contain" ? "active" : ""}">
-        Contain
-      </button>
-
+      <button data-fit="cover" class="mode-btn ${d.objectFit === "cover" ? "active" : ""}">Cover</button>
+      <button data-fit="contain" class="mode-btn ${d.objectFit === "contain" ? "active" : ""}">Contain</button>
     </div>
   </div>
 
   <!-- BORDER -->
   <div class="config-card">
     <div class="config-title">Border Radius</div>
-
-    <div class="config-row">
-      <input
-        type="range"
-        min="0"
-        max="100"
-        data-field="borderRadius"
-        value="${d.borderRadius}"
-        class="config-slider"
-      />
-    </div>
+    <input type="range" min="0" max="100" data-field="borderRadius" value="${d.borderRadius}" class="config-slider"/>
   </div>
 
   <!-- SHADOW -->
   <div class="config-card">
     <div class="config-title">Shadow</div>
-
-    <div class="config-row">
-      <input
-        type="range"
-        min="0"
-        max="100"
-        data-field="shadow"
-        value="${d.shadow}"
-        class="config-slider"
-      />
-    </div>
+    <input type="range" min="0" max="100" data-field="shadow" value="${d.shadow}" class="config-slider"/>
   </div>
 
   <!-- OPACITY -->
   <div class="config-card">
     <div class="config-title">Opacity</div>
-
-    <div class="config-row">
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        data-field="opacity"
-        value="${d.opacity}"
-        class="config-slider"
-      />
-    </div>
+    <input type="range" min="0" max="1" step="0.01" data-field="opacity" value="${d.opacity}" class="config-slider"/>
   </div>
 
 </div>
@@ -185,63 +158,64 @@ window.ImageWidget = {
     /* IMAGE PICKER */
     /* ============================= */
 
-    container
-      .querySelector("#changeImage")
-      ?.addEventListener("click", () => {
-        openImageModal((url) => {
-          update({ url });
-        });
+    container.querySelector("#changeImage")?.addEventListener("click", () => {
+      openImageModal((url) => {
+        update({ url });
       });
+    });
 
     /* ============================= */
-    /* INPUTS (FIX REAL) */
+    /* INPUTS */
     /* ============================= */
 
-    container
-      .querySelectorAll("[data-field]")
-      .forEach(input => {
+    container.querySelectorAll("[data-field]").forEach(input => {
 
-        input.addEventListener("input", (e) => {
+      input.addEventListener("input", (e) => {
 
-          const field = e.target.dataset.field;
-          let value;
+        const field = e.target.dataset.field;
+        let value;
 
-          if (input.type === "range") {
-            value = parseFloat(e.target.value);
-          } else {
-            value = (parseFloat(e.target.value) || 0) / 100;
-          }
+        if (input.type === "range") {
+          value = parseFloat(e.target.value);
+        } else {
+          value = (parseFloat(e.target.value) || 0) / 100;
+        }
 
-          // 🔥 ESTA ES LA CLAVE (antes te faltaba)
-          update({ [field]: value });
+        // 🔥 clamp básico (evita bugs locos)
+        if (field === "width" || field === "height") {
+          value = Math.max(0.01, Math.min(1, value));
+        }
 
-        });
+        if (field === "opacity") {
+          value = Math.max(0, Math.min(1, value));
+        }
+
+        update({ [field]: value });
 
       });
+
+    });
 
     /* ============================= */
     /* FIT BUTTONS */
     /* ============================= */
 
-    container
-      .querySelectorAll("[data-fit]")
-      .forEach(btn => {
+    container.querySelectorAll("[data-fit]").forEach(btn => {
 
-        btn.addEventListener("click", () => {
+      btn.addEventListener("click", () => {
 
-          const fit = btn.dataset.fit;
+        const fit = btn.dataset.fit;
 
-          container
-            .querySelectorAll("[data-fit]")
-            .forEach(b => b.classList.remove("active"));
+        container.querySelectorAll("[data-fit]")
+          .forEach(b => b.classList.remove("active"));
 
-          btn.classList.add("active");
+        btn.classList.add("active");
 
-          update({ objectFit: fit });
-
-        });
+        update({ objectFit: fit });
 
       });
+
+    });
 
   }
 
