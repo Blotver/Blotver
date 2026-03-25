@@ -44,20 +44,6 @@ window.ImageWidget = {
         el.style.userSelect = "none";
         el.style.cursor = context.mode === "editor" ? "move" : "default";
 
-        // 🔥 GUÍA VISUAL (EDITOR)
-        if (context.mode === "editor") {
-
-            // borde base oscuro (siempre visible)
-            el.style.border = "1px solid rgba(0,0,0,0.6)";
-
-            // glow suave violeta (tu UI)
-            el.style.boxShadow = `
-    0 0 0 1px rgba(139, 92, 246, 0.25),
-    0 4px 15px rgba(0,0,0,0.6)
-  `;
-
-            el.style.borderRadius = "6px";
-        }
         const parentW = context.mode === "overlay"
             ? context.screenW
             : context.canvas.clientWidth;

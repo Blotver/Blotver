@@ -870,11 +870,6 @@
         onReorder: reorderWidgets
       })
 
-      EditorInteractions.apply({
-        widgets,
-        socket
-      });
-
       resetChanges();
     }
 
@@ -1130,11 +1125,10 @@
       // 🔥 actualizar referencia
       selectedElement = newEl;
 
-      // 🔥 REAPLICAR INTERACT SIEMPRE
-      EditorInteractions.apply({
-        widgets,
-        socket
-      });
+      // 🔥 VOLVER A SELECCIONAR correctamente (CRÍTICO)
+      setTimeout(() => {
+        selectWidget(selectedWidget, selectedElement)
+      }, 0);
 
       // 🔥 volver a aplicar resize handles
       addResizeHandles(selectedElement);

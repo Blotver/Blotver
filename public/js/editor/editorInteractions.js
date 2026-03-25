@@ -94,12 +94,9 @@ window.EditorInteractions = {
     // =========================
     document.querySelectorAll("[data-widget-id]").forEach(el => {
       try {
-        if (interact.isSet && interact.isSet(el)) {
-          interact(el).unset();
-        }
+        interact(el).unset();
       } catch (e) { }
     });
-
     // =========================
     // APPLY INTERACTIONS
     // =========================
