@@ -79,6 +79,8 @@ window.ImageWidget = {
 
         const img = StyleEngine.createImage(d);
 
+        img.style.pointerEvents = "none";
+
         // 🔥 fallback visual si no hay imagen
         if (!d.url) {
             img.style.background = "linear-gradient(135deg,#1f2937,#111827)";
