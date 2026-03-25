@@ -50,6 +50,11 @@ window.EditorRenderer = {
     Object.assign(newEl.style, prevStyle);
 
     parent.appendChild(newEl);
+    
+    EditorInteractions.apply({
+      widgets,
+      socket
+    });
 
     return newEl;
   }

@@ -37,6 +37,9 @@ window.ImageWidget = {
         const d = widget.data;
 
         const el = document.createElement("div");
+
+        el.dataset.widgetId = widget._id;
+
         el.style.position = "absolute";
         el.style.userSelect = "none";
         el.style.cursor = context.mode === "editor" ? "move" : "default";
