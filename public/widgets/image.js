@@ -2,103 +2,112 @@
 
 window.ImageWidget = {
 
-  type: "image",
+    type: "image",
 
-  defaultData: {
-    x: 0.2,
-    y: 0.2,
-    width: 0.30,
-    height: 0.30,
+    defaultData: {
+        x: 0.2,
+        y: 0.2,
+        width: 0.30,
+        height: 0.30,
 
-    url: "",
-    visible: true,
+        url: "",
+        visible: true,
 
-    objectFit: "cover",
-    borderRadius: 0,
-    shadow: 0,
-    opacity: 1,
-  },
+        objectFit: "cover",
+        borderRadius: 0,
+        shadow: 0,
+        opacity: 1,
+    },
 
-  /* ============================= */
-  /* APPLY STYLES */
-  /* ============================= */
+    /* ============================= */
+    /* APPLY STYLES */
+    /* ============================= */
 
-  applyStyles(widget) {
-    if (!widget._img) return;
-    StyleEngine.applyImage(widget._img, widget.data);
-  },
+    applyStyles(widget) {
+        if (!widget._img) return;
+        StyleEngine.applyImage(widget._img, widget.data);
+    },
 
-  /* ============================= */
-  /* RENDER */
-  /* ============================= */
+    /* ============================= */
+    /* RENDER */
+    /* ============================= */
 
-  render({ widget, context }) {
+    render({ widget, context }) {
 
-    const d = widget.data;
+        const d = widget.data;
 
-    const el = document.createElement("div");
-    el.style.position = "absolute";
-    el.style.userSelect = "none";
-    el.style.cursor = context.mode === "editor" ? "move" : "default";
+        const el = document.createElement("div");
+        el.style.position = "absolute";
+        el.style.userSelect = "none";
+        el.style.cursor = context.mode === "editor" ? "move" : "default";
 
-    // 🔥 GUÍA VISUAL (EDITOR)
-    if (context.mode === "editor") {
-      el.style.outline = "1px dashed rgba(255,255,255,0.25)";
-    }
+        // 🔥 GUÍA VISUAL (EDITOR)
+        if (context.mode === "editor") {
 
-    const parentW = context.mode === "overlay"
-      ? context.screenW
-      : context.canvas.clientWidth;
+            // borde base oscuro (siempre visible)
+            el.style.border = "1px solid rgba(0,0,0,0.6)";
 
-    const parentH = context.mode === "overlay"
-      ? context.screenH
-      : context.canvas.clientHeight;
+            // glow suave violeta (tu UI)
+            el.style.boxShadow = `
+    0 0 0 1px rgba(139, 92, 246, 0.25),
+    0 4px 15px rgba(0,0,0,0.6)
+  `;
 
-    const left = d.x * parentW;
-    const top = d.y * parentH;
-    const width = d.width * parentW;
-    const height = d.height * parentH;
+            el.style.borderRadius = "6px";
+        }
+        const parentW = context.mode === "overlay"
+            ? context.screenW
+            : context.canvas.clientWidth;
 
-    el.style.left = left + "px";
-    el.style.top = top + "px";
-    el.style.width = width + "px";
-    el.style.height = height + "px";
+        const parentH = context.mode === "overlay"
+            ? context.screenH
+            : context.canvas.clientHeight;
 
-    // =============================
-    // IMAGE
-    // =============================
+        const left = d.x * parentW;
+        const top = d.y * parentH;
+        const width = d.width * parentW;
+        const height = d.height * parentH;
 
-    const img = StyleEngine.createImage(d);
+        el.style.left = left + "px";
+        el.style.top = top + "px";
+        el.style.width = width + "px";
+        el.style.height = height + "px";
 
-    // 🔥 fallback visual si no hay imagen
-    if (!d.url) {
-      img.style.background = "linear-gradient(135deg,#1f2937,#111827)";
-      img.style.display = "flex";
-      img.style.alignItems = "center";
-      img.style.justifyContent = "center";
-      img.innerHTML = `<span style="
+        // =============================
+        // IMAGE
+        // =============================
+
+        const img = StyleEngine.createImage(d);
+
+        // 🔥 fallback visual si no hay imagen
+        if (!d.url) {
+            img.style.background = "linear-gradient(135deg,#1f2937,#111827)";
+            img.style.display = "flex";
+            img.style.alignItems = "center";
+            img.style.justifyContent = "center";
+            img.innerHTML = `<span style="
         color:#9ca3af;
         font-size:12px;
         font-family:sans-serif;
       ">No image</span>`;
-    }
+        }
 
-    widget._img = img;
+        widget._img = img;
 
-    el.appendChild(img);
+        el.appendChild(img);
 
-    return el;
-  },
+        return el;
+    },
 
-  /* ============================= */
-  /* CONFIG PANEL */
-  /* ============================= */
+    /* ============================= */
+    /* CONFIG PANEL */
+    /* ============================= */
 
-  renderConfig(widget, container, update) {
+    renderConfig(widget, container, update) {
 
-    const d = widget.data;
+        const d = widget.data;
 
-    container.innerHTML = `
+        container.innerHTML = `
 <div class="config-root">
 
   <!-- IMAGE -->
@@ -107,9 +116,9 @@ window.ImageWidget = {
 
     <div id="changeImage" class="cursor-pointer config-image-box">
       ${d.url
-        ? `<img src="${d.url}" class="config-image-preview"/>`
-        : `<div class="config-image-placeholder">Select image</div>`
-      }
+                ? `<img src="${d.url}" class="config-image-preview"/>`
+                : `<div class="config-image-placeholder">Select image</div>`
+            }
     </div>
   </div>
 
@@ -154,70 +163,70 @@ window.ImageWidget = {
 </div>
 `;
 
-    /* ============================= */
-    /* IMAGE PICKER */
-    /* ============================= */
+        /* ============================= */
+        /* IMAGE PICKER */
+        /* ============================= */
 
-    container.querySelector("#changeImage")?.addEventListener("click", () => {
-      openImageModal((url) => {
-        update({ url });
-      });
-    });
+        container.querySelector("#changeImage")?.addEventListener("click", () => {
+            openImageModal((url) => {
+                update({ url });
+            });
+        });
 
-    /* ============================= */
-    /* INPUTS */
-    /* ============================= */
+        /* ============================= */
+        /* INPUTS */
+        /* ============================= */
 
-    container.querySelectorAll("[data-field]").forEach(input => {
+        container.querySelectorAll("[data-field]").forEach(input => {
 
-      input.addEventListener("input", (e) => {
+            input.addEventListener("input", (e) => {
 
-        const field = e.target.dataset.field;
-        let value;
+                const field = e.target.dataset.field;
+                let value;
 
-        if (input.type === "range") {
-          value = parseFloat(e.target.value);
-        } else {
-          value = (parseFloat(e.target.value) || 0) / 100;
-        }
+                if (input.type === "range") {
+                    value = parseFloat(e.target.value);
+                } else {
+                    value = (parseFloat(e.target.value) || 0) / 100;
+                }
 
-        // 🔥 clamp básico (evita bugs locos)
-        if (field === "width" || field === "height") {
-          value = Math.max(0.01, Math.min(1, value));
-        }
+                // 🔥 clamp básico (evita bugs locos)
+                if (field === "width" || field === "height") {
+                    value = Math.max(0.01, Math.min(1, value));
+                }
 
-        if (field === "opacity") {
-          value = Math.max(0, Math.min(1, value));
-        }
+                if (field === "opacity") {
+                    value = Math.max(0, Math.min(1, value));
+                }
 
-        update({ [field]: value });
+                update({ [field]: value });
 
-      });
+            });
 
-    });
+        });
 
-    /* ============================= */
-    /* FIT BUTTONS */
-    /* ============================= */
+        /* ============================= */
+        /* FIT BUTTONS */
+        /* ============================= */
 
-    container.querySelectorAll("[data-fit]").forEach(btn => {
+        container.querySelectorAll("[data-fit]").forEach(btn => {
 
-      btn.addEventListener("click", () => {
+            btn.addEventListener("click", () => {
 
-        const fit = btn.dataset.fit;
+                const fit = btn.dataset.fit;
 
-        container.querySelectorAll("[data-fit]")
-          .forEach(b => b.classList.remove("active"));
+                container.querySelectorAll("[data-fit]")
+                    .forEach(b => b.classList.remove("active"));
 
-        btn.classList.add("active");
+                btn.classList.add("active");
 
-        update({ objectFit: fit });
+                update({ objectFit: fit });
 
-      });
+            });
 
-    });
+        });
 
-  }
+    }
 
 };
 
