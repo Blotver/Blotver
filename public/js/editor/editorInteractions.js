@@ -249,8 +249,11 @@ window.EditorInteractions = {
               const parent = safeParent(target);
               if (!parent) return;
 
-              let x = parseFloat(target.style.left) || 0;
-              let y = parseFloat(target.style.top) || 0;
+              let x = parseFloat(target.style.left);
+              let y = parseFloat(target.style.top);
+
+              if (isNaN(x)) x = target.offsetLeft;
+              if (isNaN(y)) y = target.offsetTop;
 
               let width = event.rect.width;
               let height = event.rect.height;

@@ -1,3 +1,5 @@
+// blotver\public\widgets\text.js
+
 window.TextWidget = {
 
   type: "text",
