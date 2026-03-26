@@ -49,6 +49,24 @@ window.WidgetEngine = {
           context
         });
 
+        // 💥 APLICAR POSICIÓN (CLAVE)
+        if (el && node.data && context.canvas) {
+
+          const parent = el.parentElement || context.canvas;
+
+          const parentW = parent.clientWidth || context.canvas.clientWidth;
+          const parentH = parent.clientHeight || context.canvas.clientHeight;
+
+          const d = node.data;
+
+          el.style.position = "absolute";
+          el.style.left = (d.x * parentW) + "px";
+          el.style.top = (d.y * parentH) + "px";
+          el.style.width = (d.width * parentW) + "px";
+          el.style.height = (d.height * parentH) + "px";
+          el.style.zIndex = String(d.zIndex ?? 0);
+          el.style.pointerEvents = "auto";
+        }
       }
 
       // ✅ FALLBACK (TU SISTEMA VIEJO)
