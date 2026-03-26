@@ -85,7 +85,7 @@ window.Renderer = {
         el.style.width = w + "px";
         el.style.height = h + "px";
         el.style.zIndex = d.zIndex ?? 0;
-        el.style.pointerEvents = "none";
+        el.style.pointerEvents = "auto";
 
         parentEl.appendChild(el);
 

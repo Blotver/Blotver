@@ -1,5 +1,5 @@
 // blotver/public/js/editor/editorInteractions.js
-
+console.log("interact:", window.interact);
 window.EditorInteractions = {
 
   apply({ widgets, socket }) {
@@ -34,8 +34,9 @@ window.EditorInteractions = {
     const snap = (v) => Math.round(v / GRID) * GRID;
 
     function safeParent(el) {
-      if (!el || !el.parentElement) return null;
-      return el.parentElement.getBoundingClientRect();
+      const canvas = document.getElementById("canvas");
+      if (!canvas) return null;
+      return canvas.getBoundingClientRect();
     }
 
     function emit(data) {
