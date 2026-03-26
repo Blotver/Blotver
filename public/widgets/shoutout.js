@@ -6,8 +6,8 @@ window.ShoutoutWidget = {
   defaultData: {
     x: 0.1,
     y: 0.1,
-    width: 446,
-    height: 309.9,
+    width: 0.45,
+    height: 0.90,
 
     command: "!so",
     textTemplate: "Sigan a {user} jugando {game}",
